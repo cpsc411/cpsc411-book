@@ -1,0 +1,7 @@
+.refcolumn-inline {
+    margin: auto !important;
+    margin-bottom: 1rem !important;
+    float: none !important;
+    clear: right !important;
+    width: auto !important;
+}
