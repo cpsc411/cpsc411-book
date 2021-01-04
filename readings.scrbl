@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@title[#:style '(toc) #:tag "top" #:tag-prefix "book:"]{Readings: Compiler Design through Language Design}
+@title[#:style '(toc) #:tag "top" #:tag-prefix "book:"]{Book}
 
 @(local-table-of-contents #:style 'immediate-only)
 
