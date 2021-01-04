@@ -8,7 +8,9 @@ Instead, it's meant to be forked and modified to fit your course.
 This collection can be easily built into a website with added notes and pages,
 or built as a PDF (TODO).
 
-You can view the temporary website at https://www.williamjbowman.com/tmp/compilers/
+The "official" version of this used in the course is built here: https://www.students.cs.ubc.ca/~cs-411/
+
+My temporary working version is built here: https://www.williamjbowman.com/tmp/compilers/
 
 ## Usage
 First, install this book by running `raco pkg install` in this (the `cpsc411-book`)
