@@ -14,3 +14,5 @@
 @include-section{chapter/return.scrbl}
 @include-section{appendix/racket-prelim.scrbl}
 @include-section{appendix/recipe.scrbl}
+
+@margin-note{~3 Chapters still being rewritten}
