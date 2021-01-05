@@ -23,5 +23,6 @@
     "racket-graphviz"
     ("scribble-bettergrammar-lib" #:version "1.4")))
 (define scribblings '(("index.scrbl" (multi-page no-search))))
+(define test-omit-paths (list "serve.rkt"))
 (define pkg-desc "The CPSC411 Book, which includes lecture notes and assignments.")
 (define pkg-authors '(wilbowma))
