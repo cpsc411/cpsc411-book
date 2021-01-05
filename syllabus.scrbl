@@ -542,11 +542,15 @@ solution is derived from them.
 
 When you are provided starter code, as is the case in most of our assignments,
 it is automatically assumed that you did not write the starter code yourself.
-It is therefore not necessary to provide explicit documentation to explain this
-obvious fact.
+It is therefore not necessary to provide explicit documentation to explain this.
 On the other hand, it is automatically assumed that @bold{you are claiming any code
 that differs from the original starter code as entirely your own work.
 If this is not the case, you are fully responsible to provide a clear and
 complete explanation of this fact.}
 Any failure to do so will be considered academic misconduct. Forgetfulness is
 not an excuse.
+
+It is also consider academic misconduct to share your own code outside your
+group.
+Do not share your solutions, either privately or by making them publically
+accessible on code sharing websites such as GitHub.
