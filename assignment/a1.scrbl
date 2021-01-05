@@ -24,8 +24,15 @@ ignoring some of the boilerplate and operating-system-specific details.
 
 This milestone is due @(due 'a1).
 
-For this assignment, we provide a skeleton to demonstrate the expected
-interface: @url{share/a1-skeleton.rkt}
+You should start from the @tt{milestone-1} branch of the @tt{cpsc411-skeleton}
+repository.
+
+You can use the interrogator to get limited access to the reference solution:
+@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a1}.
+
+You can use the language diff tool to view differences between languages that
+aren't typeset in the book:
+@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/lang-differ.cgi}.
 
 @subsubsub*section{Assignment Checklist}
 Before you start, you should read:

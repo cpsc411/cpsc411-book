@@ -24,6 +24,9 @@ source language.
 
 This milestone is due @(due 'a4).
 
+You can use the interrogator to get limited access to the reference solution:
+@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a4}.
+
 @todo{Design component? Might be a heavy assignment already.}
 
 @subsection{Learning Objectives}
