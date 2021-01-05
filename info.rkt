@@ -9,7 +9,9 @@
                "web-server-lib"
                "with-cache"
                "base"
-               "functional-lib"))
+               "functional-lib"
+               "draw-lib"
+               "pict-lib"))
 (define build-deps
   '("graph-doc"
     "rackunit-doc"
