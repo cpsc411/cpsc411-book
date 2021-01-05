@@ -31,7 +31,6 @@ Please report bugs, typos, etc at in the relevant repository:
 
 @include-section{syllabus.scrbl}
 @include-section{calendar.scrbl}
-@;include-section{course-info.scrbl}
 @include-section{project-logistics.scrbl}
 @include-section{readings.scrbl}
 @include-section{assignments.scrbl}
