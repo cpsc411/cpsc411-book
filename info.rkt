@@ -15,7 +15,7 @@
     "rackunit-doc"
     "rackunit-lib"
     "scribble-doc"
-    ("base" #:version "7.5")
+    ("base" #:version "7.4")
     "racket-doc"
     #;"cpsc411-doc"
     "cpsc411-lib"
