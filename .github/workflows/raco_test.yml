@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: Install system dependencies
       run: |
-        sudo apt-get install nasm
+        sudo apt-get install nasm graphviz
     - name: Install Racket
       uses: Bogdanp/setup-racket@v0.12
       with:
