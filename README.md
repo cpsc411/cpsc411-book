@@ -1,5 +1,9 @@
 cpsc411-book
 =======
+<p align="left">
+  <a href="https://github.com/cpsc411/cpsc411-book/actions?query=workflow%3A%22CI%22"><img alt="GitHub Actions status" src="https://github.com/cpsc411/cpsc411-book/workflows/CI/badge.svg"></a>
+</p>
+
 This collection defines the "book" for UBC's Computer Science 411 (CPSC 411),
 "Introduction to Compiler Construction".
 
