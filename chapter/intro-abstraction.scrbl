@@ -62,7 +62,7 @@ edge [fontname="Courier", fontsize=12, labeljust=left]
 
 L4 -> L5 [label=" uncover-locals"];
 L5 -> L6 [label=" assign-fvars"];
-L6 -> L7 [label=" replace-locations"];
+L6 -> L62 [label=" replace-locations"];
 
 /* The Passes */
 
