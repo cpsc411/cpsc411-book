@@ -101,8 +101,8 @@ with each?}
 @subsection{Self-studying the background material}
 
 The CPSC 311 material is usually online:
-@url{https://www.students.cs.ubc.ca/~cs-311/current/notes.html}
-@url{https://www.students.cs.ubc.ca/~cs-311/current/assignments.html}
+@url{https://www.students.cs.ubc.ca/~cs-311/2019W1/notes.html}
+@url{https://www.students.cs.ubc.ca/~cs-311/2019W1/assignments.html}
 
 Last I checked the notes, the following lectures were particularly relevant
 background for CPSC 411: Lectures 1--13,16--22,27--30.
