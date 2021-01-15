@@ -118,7 +118,7 @@ subgraph DoNotcluster1 {
 @section{Preface: What's wrong with our language?}
 In the last chapter, we designed the language @ch3-tech{Values-lang v3}.
 This language is an improvement over @ch1-tech{x64}, but has a significant
-limitation: we can only expression simple, straight-line arithmetic
+limitation: we can only express simple, straight-line arithmetic
 computations. We'll never be able to write any interesting programs!
 
 In this chapter, we will expose a machine feature, control flow instructions
@@ -166,7 +166,7 @@ leading to type confusion when reading and writing data.
 If a programmer sees the number @racket[-5] printed or in a program, is it a
 boolean or a number?
 
-There are many ways to solves the problems, but the most robust way is to add
+There are many ways to solve the problems, but the most robust way is to add
 proper booleans as a separate primitive data type.
 That is a task separate from adding control-flow, so we deal with it later, and
 instead implement a limited form of structured control-flow.
@@ -203,7 +203,7 @@ labels, and conditional and unconditional jump operations.
 @bettergrammar*-diff[paren-x64-v2 paren-x64-v4]
 
 Labels are too complex to define by grammar; instead, they're defined by the
-the @racket[label?] predicate in @racketmodname[cpsc411/compiler-lib].
+@racket[label?] predicate in @racketmodname[cpsc411/compiler-lib].
 
 In @tech{Paren-x64 v4}, we model labels with the @object-code{(with-label label s)}
 instruction, which defines a label @object-code{label} at the instruction
@@ -348,7 +348,7 @@ more structured form of control flow, @object-code{if}.
 Our next two languages in the pipeline, bottom-up, are @tech{Paren-x64-fvars
 v4} and @tech{Para-asm-lang v4}.
 Both of these abstract machine-specific details about @tech{physical locations}.
-This doesn't seem very related to control-flow, so we simply want to propegate
+This doesn't seem very related to control-flow, so we simply want to propagate
 our new primitives up through these layers of abstraction.
 We expose the new instructions while abstracting away from the machine
 constraints about which instructions work on which physical locations.
@@ -610,7 +610,7 @@ manipulating the branches of @object-code{if} statements to resolve branches.
 
 Note that this pass is not an optimization.
 Optimization passes are intra-language.
-However, it's existance allows us to implement an optimization pass by
+However, its existence allows us to implement an optimization pass by
 transforming predicates in the predicate language.
 We delay writing this optimization for one more language, as an additional
 abstraction will help us unlock further optimizations.
@@ -639,12 +639,12 @@ In @object-code{if} expressions, like other expressions, we support arbitrarily
 nesting sub-expressions in the branches.
 In @object-code{if} statements, we restrict the branches.
 
-To could compile @object-code{if} expressions to @object-code{if} statements, we
+To compile @object-code{if} expressions to @object-code{if} statements, we
 must generate new basic blocks with fresh labels from nested branches, and
 transform the branches into jumps.
-Phrased top-down, the question is should we do that before or after register
+Phrased top-down, the question is if we should do that before or after register
 allocation?
-Phrase bottom-up, should we expose jumps through the register allocation
+Phrased bottom-up, should we expose jumps through the register allocation
 languages or not?
 
 As discussed earlier when describing the semantics of labels and jumps, jumps
@@ -706,22 +706,22 @@ Note that @tech{Nested-asm-lang v4} enables much of the same nesting we find in
 @ch3-tech{monadic form}.
 We skipped right over @ch3-tech{a-normal form}.
 Unnesting @nested-asm-lang-v4[if] requires jumps, unless we want to duplicate
-code, so for efficiency and to simplicity, it is beneficial to maintain
+code, so for efficiency and simplicity, it is beneficial to maintain
 @ch3-tech{monadic form} until this very low level in the compiler.
 @todo{elaborate}
 
 To implement @tech{Nested-asm-lang v4}, we define the procedure
 @racket[expose-basic-blocks].
-The strategy for writing this slightly complex.
+The strategy for writing this is slightly complex.
 Each helper for processing a nonterminal may need to introduce new basic blocks.
-You can pass multiple return values using @racket[values], and bind them using
+In Racket, you can pass multiple return values using @racket[values], and bind them using
 @racket[let-values], @racket[let-values*], or @racket[define-values].
 You should use @racket[fresh-label] to generate new unique labels.
 @todo{elaborate}
 
 The transformer for predicates should transform predicates and generate an
 @nested-asm-lang-v4[if] statement whose branches are jumps.
-The helper takes two addition inputs, a "true" and a "false" label, used to
+The helper takes two additional inputs, a "true" and a "false" label, used to
 generate the output @nested-asm-lang-v4[if] instruction.
 For a base predicate, such as @nested-asm-lang-v4[(true)] or
 @nested-asm-lang-v4[(relop aloc triv)], you can generate an @nested-asm-lang-v4[if]
@@ -732,7 +732,7 @@ generate two new basic blocks, and rearrange the current true and false labels.
 The transformer for effects should take care to unnest @nested-asm-lang-v4[begin]
 statments.
 This is not really related to exposing basic blocks, but it is trivial to deal
-with using the right abstraction, and so does not warrent a separate compiler
+with using the right abstraction, and so does not warrant a separate compiler
 pass.
 @todo{The same is true of predicates. Why then do we have resolve-predicates?...
 for future optimization potential?}
@@ -741,7 +741,7 @@ for future optimization potential?}
 @defproc[(expose-basic-blocks (p nested-asm-lang-v4.p?))
           block-pred-lang-v4]{
 Compile the @tech{Nested-asm-lang v4} to @tech{Block-pred-lang v4}, eliminating
-all nested expressions by generate fresh basic blocks and jumps.
+all nested expressions by generating fresh basic blocks and jumps.
 }
 ]
 
@@ -764,14 +764,13 @@ More generally, we might define an @deftech{abstract interpreter} for
 predicates.
 This interpreter would run during compile-time, and thus over possibly
 incomplete programs.
-This means it has to define some abstract notion of the value of a statement in
-order, which in the worst case represent "any run-time value", and such as
-result means we don't have enough static information to make any changes.
-However, we might be able evaluate a predicate to @object-code{(true)}
+This means it has to define some abstract notion of the value of a statement.
+In the worst case, such an abstract value will represent "any run-time value", meaning that we don't have enough static information to predict the result.
+However, we might be able to evaluate a predicate to @object-code{(true)}
 or @object-code{(false)} in the abstract interpreter, and if so, this justifies
 an optimization.
 
-@question{Can you think of any that require using nested @object-code{if}
+@question{Can you think of any predicates that require using nested @object-code{if}
 statements?}
 @todo{Can i?}
 
@@ -784,8 +783,7 @@ predicates.
 ]
 
 @section{Register Allocation}
-Next, we design @deftech{Asm-pred-lang v4}, an imperative language that supports some
-nested structured control-flow
+Next, we design @deftech{Asm-pred-lang v4}, an imperative language that supports some nested structured control-flow.
 Like @tech{Loc-lang v2}, this language is a family of @ch2-tech{administrative
 languages}, each differing only in its info fields.
 
