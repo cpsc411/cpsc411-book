@@ -838,6 +838,8 @@ statements.
 
 @bettergrammar*-diff[#:include (info) asm-pred-lang-v4/locals asm-pred-lang-v4/undead]
 
+@todo{mention that basic blocks are not allowed to have cycles and therefore, we don't need to compute a fixpoint?}
+
 The key to describing the analysis is designing a representation of @tech{undead
 sets} that can representing the new structure of our statements.
 Now, statements can branch.
