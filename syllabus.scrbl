@@ -101,8 +101,8 @@ with each?}
 @subsection{Self-studying the background material}
 
 The CPSC 311 material is usually online:
-@url{https://www.students.cs.ubc.ca/~cs-311/current/notes.html}
-@url{https://www.students.cs.ubc.ca/~cs-311/current/assignments.html}
+@url{https://www.students.cs.ubc.ca/~cs-311/2019W1/notes.html}
+@url{https://www.students.cs.ubc.ca/~cs-311/2019W1/assignments.html}
 
 Last I checked the notes, the following lectures were particularly relevant
 background for CPSC 411: Lectures 1--13,16--22,27--30.
@@ -160,7 +160,7 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
   (list @bold{Instructor} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "TBD"))
+  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "Tuesday 4pm--5pm"))
 ]
 
 @tabular[
@@ -169,9 +169,9 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
 (list @bold{TA} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-(list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "" "TBD")
-(list "Adam Geller" @mailto["atgeller@cs.ubc.ca"] "" "TBD")
-(list "Justin Hu" @mailto["justin.hu@alumni.ubc.ca"] "" "TBD")
+(list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "" "Monday 3pm--5pm; Wednesday 12:30pm--2:30pm")
+(list "Adam Geller" @mailto["atgeller@cs.ubc.ca"] "" "Monday 12pm--1pm; Tue/Thu 10am--11am")
+(list "Justin Hu" @mailto["justin.hu@alumni.ubc.ca"] "" "Thursday 4pm--5pm;Friday 2pm--3pm")
 )
 ]
 

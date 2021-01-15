@@ -14,6 +14,8 @@ This assignment will instruct you to install and test the required tools.
 
 This assignment is due @(due 'a0).
 
+You should have a git repository created for you at @url{https://github.students.cs.ubc.ca/orgs/cpsc411-2020w-t2/}
+
 @subsubsub*section{Assignment Checklist}
 @itemlist[
 @item{Either:
@@ -79,13 +81,14 @@ If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca},
 which has the correct version of @code{nasm} and @code{racket}.
 You can sign up for an account at @url{https://www.cs.ubc.ca/getacct/}.
 
-If you want a local development environment, you can use this
-@share{Dockerfile} to setup a development container that mirrors
+If you want a local development environment, you can use the @tt{Dockerfile}
+found in your git repository. to setup a development container that mirrors
 @url{remote.students.cs.ubc.ca}.
 This will install a container with all the appropriate build tools and version.
 We recommend editing the compiler assignment files in the host machine,
 mounting them in the Docker container, and running tests in the container.
-You can create a new image using @tt{docker image build -t cpsc411 @|url-root|/share/Dockerfile}.
+You can create a new image using @tt{docker image build -t cpsc411 .} from your
+git repostory with the @tt{Dockerfile}.
 Assuming your compilers assignments are in stored in the path
 @tt{~/workspace/}, you can launch a new container with access to your
 assignments via @tt{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
@@ -154,10 +157,10 @@ We can compile and execute a file from Racket using @racket[system] or
 This is how the last pass of the compiler will translate your code into an
 executable, and how you will test your compiler from Racket.
 
-@exercise{Rename the the skeleton file @share{a0-skeleton.rkt} to
-@code{fact.rkt}.
-Complete all TODOs in the file.
+@exercise{
 Run the file to ensure the test passes, using @tt{raco test fact.rkt}.
+Make sure to push to @tt{assignment-0} branch of the git repository we created
+for you.
 }
 
 @section{x64 References}
