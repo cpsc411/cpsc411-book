@@ -221,7 +221,7 @@ Paren-asm-sub.
        (TODO)]
       [`(set! ,loc1 (,binop ,loc2 loc3))
        #:when (and (location? loc1)
-                   (Paren-asm-sub-binop? '(+ * -))
+                   (Paren-asm-sub-binop? binop)
                    (location? loc2)
                    (location? loc3))
        (TODO)]))
