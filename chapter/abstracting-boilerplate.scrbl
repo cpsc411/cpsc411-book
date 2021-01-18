@@ -33,11 +33,11 @@ that be separate from abstracting boilerplate?}
 Our goal in designing and implementing a language is to systematically design
 and build new layers of abstractions.
 These abstractions are meant to solve some problem, such as software development
-being error prone or software design being complex, software produced in the
+being error-prone, software design being complex, or software produced in the
 language being unsafe, unportable, or verbose.
 Ideally, we solve these problems without introducing some cost, such as a high
-learning curve or introducing some performance cost.
-To solve these problems, we must first concretely identify one, and design a
+learning curve, or introducing some performance cost.
+To solve these problems, we must first concretely identify one, and then design a
 layer of abstraction to address it.
 
 The first limitation in @ch1-tech{x64} we identify is boilerplate.
@@ -45,15 +45,15 @@ Writing programs in @ch1-tech{x64} requires the programmer to insert repetitive
 boilerplate, such as the declaration of the initial label, and some code to exit
 the program and report the result to the user.
 This boilerplate prevents the user from focusing on the program and requires
-them to copy and paste the same snippets of code into their programs, an error
-prone process if that snippet ever needs to change.
+them to copy and paste the same snippets of code into their programs, an error-prone
+process if that snippet ever needs to change.
 
 To address this, we design a new @ch1-tech{source language} that is free of this
 boilerplate, and design a compiler to transform the @ch1-tech{source language}
 into the @ch1-tech{target language} by introducing the boilerplate.
 
 @section{Designing an abstraction}
-Our goal is to introduce the abstraction of @deftech{instruction sequences},
+Our goal is to introduce the abstraction of @deftech{instruction sequences}:
 lists of instructions that represent the code of an @ch1-tech{x64} program.
 @tech{Instruction sequences} separate the code from the boilerplate.
 As a result, we get a notion of program composition, allowing us to focus on the
@@ -61,17 +61,17 @@ program, and decompose a program into separate pieces that we can easily stitch
 together.
 Supposing @metavar{p_1} and @metavar{p_2} are both @tech{instruction sequences},
 then there exists @racket[(p-append _p_1 _p_2)] (for some definition of
-@racket[p-append]) which first executes the instructions @metavar{p_1} and then
+@racket[p-append]) which first executes the instructions in @metavar{p_1} and then
 executes the instructions in @metavar{p_2}.
 
-Since these are not valid @ch1-tech{x64} programs on their own, we need define
-the meaning @tech{instruction sequences} to make clear whether we are compiling
+Since these are not valid @ch1-tech{x64} programs on their own, we need to define
+the meaning of @tech{instruction sequences} to make clear whether we are compiling
 them correctly.
 We define their meaning by describing an interpreter for @tech{instruction
 sequences}: executing the @tech{instruction sequence} begins at the first
 instruction in the sequence, and ends with the last instruction.
 We describe how to execute each instruction once we fix a specific set of
-instruction.
+instructions.
 The final result of the @tech{instruction sequence} is the value of some
 designated register after the last instruction is executed.
 
@@ -86,7 +86,7 @@ location to another, or moves a value into a locaction.
 
 @ch1-tech{x64} imposes further restrictions on @tt{mov}
 (remember---@ch1-tech{x64} @emph{is}, we must not ask why).
-We can only move a value into a register, or a value one register to another
+We can only move a value into a register, or a value in one register to another
 register.
 }
 
@@ -283,7 +283,7 @@ If they might, we hobble them until we can eliminate the @tech{undefined behavio
 @section{Enforcing Assumptions}
 One of the jobs of the front-end of a compiler is to enforce assumptions the
 rest of the compiler makes.
-These takes enforcement mechanisms take various forms, such as parsers,
+Enforcement mechanisms take various forms, such as parsers,
 type checkers, linters, and static analyses.
 
 We're going to design a function @racket[check-paren-x64] to validate
@@ -303,7 +303,7 @@ rather than complex string automata.
 
 You could view @racket[check-paren-x64] as a type checker.
 In this view, it checks for a single type: @emph{The-Paren-x64-Type}, which
-every valid instruction has and which has quite simple typing rules.
+every valid instruction has, and which has quite simple typing rules.
 @racket[check-paren-x64] checks that the input program is following the typing
 disciplines of the language (which aren't very restrictive).
 
@@ -327,10 +327,10 @@ register is initialized at the beginning of a program.}
 program.}
 ]
 
-We split this into two separate functions, to enable separation of concerns.
+We split this into two separate functions to enable separation of concerns.
 We always want our syntax to be valid, but because @tech{Paren-x64 v1} will
 serve as a target language, we may not always want to enforce that registers are
-provbably initialized.
+provabably initialized.
 For example, the language may evolve to the point where checking this will be
 undecidable, and source languages will be responsible to enforcing the guarantee
 isntead.
@@ -368,7 +368,7 @@ v1} syntax, or raises an error with a descriptive error message.
 ]}
 
 Then, we check register initialization.
-Note that this procedure can assume it's input is well-formed @tech{Paren-x64
+Note that this procedure can assume its input is well-formed @tech{Paren-x64
 v1} syntax, and only concern itself with register initialization.
 
 @nested[#:style 'inset]{
@@ -433,7 +433,7 @@ compilation.
 
 We can define the meaning of a language by writing an interpreter.
 To design an interpreter for @tech{Paren-x64 v1} is straightforward.
-We implement a register machine, a recursive function over @tech{instruction
+We implement a register machine: a recursive function over @tech{instruction
 sequences} that interprets each instructions by modifying a dictionary mapping
 registers mapped to values.
 When there are no instructions left, the interpreter returns the value of
@@ -602,7 +602,7 @@ in later versions of our compiler.
 Because we've chosen to return the result as an exit code, our definition for
 compiler correctness is non-trivial.
 The meaning of a @tech{Paren-x64 v1} program is a 64-bit integer, but we've
-design the compiler to only ever return a value between 0 and 255.
+designed the compiler to only ever return a value between 0 and 255.
 This doesn't mean our compiler is incorrect, but instead, our definition of
 correctness uses a custom notion of equivalence.
 For this compiler, the result of a @tech{Paren-x64 v1} is considered
