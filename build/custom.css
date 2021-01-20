@@ -1,0 +1,23 @@
+.refcolumn-inline {
+    margin: auto !important;
+    margin-bottom: 1rem !important;
+    float: none !important;
+    clear: right !important;
+    width: auto !important;
+}
+
+.navsettop {
+    position: fixed;
+}
+
+.tocset {
+    position: fixed;
+    overflow-y: scroll;
+    height: 88%;
+}
+
+.navright {
+    z-index: 1;
+    position: fixed;
+    background: #a7b0be;;
+}
