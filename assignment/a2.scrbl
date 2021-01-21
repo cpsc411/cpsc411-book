@@ -136,7 +136,7 @@ These are now provided by @racketmodname[cpsc411/compiler-lib], since your
 run-time system is getting more complicated.
 }
 
-@exercise{Extend @racket[generate-x64] to emit @tech{displacement-mode operands}.
+@exercise{Extend @racket[generate-x64] to emit @ch2-tech{displacement mode operands}.
 @todo{Add hint for nasm syntax?}
 }
 
@@ -164,7 +164,7 @@ For working with sets, you may want to use @secref["sets" #:doc '(lib
 "scribblings/reference/reference.scrbl")].
 }
 
-@exercise{Design and implement @racket[selection-instructions] to compile
+@exercise{Design and implement @racket[select-instructions] to compile
 imperative operations to abstract assembly instructions.
 
 You may find the functions @racket[aloc?] helpful and @racket[fresh] helpful.
