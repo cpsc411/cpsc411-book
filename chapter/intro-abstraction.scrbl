@@ -470,7 +470,7 @@ We also enable nesting in effect position.
 This essentially allows to copy and paste some @tech{instruction sequence} into
 the middle of a program.
 
-@nested[#:style 'inset][
+@nested[#:style 'inset
 @defproc[(flatten-begins [p nested-asm-lang-v2]) para-asm-lang-v2]{
 Flatten all nested @nested-asm-lang-v2[begin] expressions.
 }
