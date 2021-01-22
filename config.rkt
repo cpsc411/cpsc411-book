@@ -34,7 +34,12 @@
 
 (define important-dates
   ;; List of date x note
-  `((,(moment 2021 1 11) . "First Day of Lecture")
+  `((,(moment 2021 1 25) . "Weekly Readings: Chp 3 and 4 (4.3 and 4.4)")
+    (,(moment 2021 2 1) . "Weekly Readings: Chp 5 (4.5)")
+    (,(moment 2021 2 8) . "Weekly Readings: Chp 6 (4.6)")
+    #;(,(moment 2021 2 22) . "Weekly Readings: Chp 7 (4.7)")
+
+    (,(moment 2021 1 11) . "First Day of Lecture")
     (,(moment 2021 1 22) . "Last day to withdraw, without W")
     (,(moment 2021 3 12) . "Last day to withdraw, with W")
     (,(moment 2021 2 15) . "Start of Midterm Break")
