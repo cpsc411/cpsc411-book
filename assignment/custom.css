@@ -5,3 +5,19 @@
     clear: right !important;
     width: auto !important;
 }
+
+.navsettop {
+    position: fixed;
+}
+
+.tocset {
+    position: fixed;
+    overflow-y: scroll;
+    height: 88%;
+}
+
+.navright {
+    z-index: 1;
+    position: fixed;
+    background: #a7b0be;
+}
