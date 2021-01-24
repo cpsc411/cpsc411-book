@@ -47,9 +47,11 @@ You can use the interrogator to get limited access to the reference solution:
 @typeset-passlist[
 implement-fvars
 patch-instructions
+flatten-begins
 replace-locations
-assign-homes
+assign-fvars
 uncover-locals
+assign-homes
 select-instructions
 canonicalize-bind
 sequentialize-let
@@ -148,12 +150,20 @@ You may find the function @racket[fvar->index] helpful.
 
 @exercise{Design and implement @racket[patch-instructions] to abstract away from
 @ch1-tech{x64} restrictions.
+}
+
+@exercise{Design and implement @racket[flatten-begins] to flatten nested
+instructions.
 
 You may find the function @racket[make-begin] helpful.
 }
 
 @exercise{Design and implement @racket[replace-locations] to replace
 @ch2-tech{abstract locations} with their assigned @tech{physical location}.
+}
+
+@exercise{Design and implement @racket[assign-fvars] assign @ch2-tech{abstract
+locations} to @tech{physical location}.
 }
 
 @exercise{Design and implement @racket[uncover-locals] to analyze which
@@ -163,6 +173,8 @@ You may find the function @racket[aloc?] helpful.
 For working with sets, you may want to use @secref["sets" #:doc '(lib
 "scribblings/reference/reference.scrbl")].
 }
+
+@exercise{Implement @racket[assign-homes].}
 
 @exercise{Design and implement @racket[select-instructions] to compile
 imperative operations to abstract assembly instructions.
