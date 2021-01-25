@@ -243,7 +243,7 @@ If you're interested in how this is done, you can read the definition of
 @racket[x86-64-runtime].
 
 @nested[#:style 'inset
-@defproc[(generate-x64 (p Paren-x64-v4.p))
+@defproc[(generate-x64 (p paren-x64-v2?))
          (and/c string? x64-instructions?)]{
 Compile the @tech{Paren-x64 v2} program into a valid sequence of @ch1-tech{x64}
 instructions, represented as a string.
