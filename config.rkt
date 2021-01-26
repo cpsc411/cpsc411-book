@@ -15,7 +15,7 @@
   (let ([x (make-hasheq)])
     (hash-set! x 'a0 (moment 2021 1 15 23 59 59))
     (hash-set! x 'a1 (+weeks (hash-ref x 'a0) 1))
-    (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 1))
+    (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 2))
     (hash-set! x 'a3 (+weeks (hash-ref x 'a2) 1))
     (hash-set! x 'a4 (+weeks (hash-ref x 'a3) 1))
     (hash-set! x 'a5 (+weeks (hash-ref x 'a4) 1))
@@ -35,8 +35,8 @@
 (define important-dates
   ;; List of date x note
   `((,(moment 2021 1 25) . "Weekly Readings: Chp 3 and 4 (4.3 and 4.4)")
-    (,(moment 2021 2 1) . "Weekly Readings: Chp 5 (4.5)")
-    (,(moment 2021 2 8) . "Weekly Readings: Chp 6 (4.6)")
+    (,(moment 2021 2 8) . "Weekly Readings: Chp 5 (4.5)")
+    (,(moment 2021 2 15) . "Weekly Readings: Chp 6 (4.6)")
     #;(,(moment 2021 2 22) . "Weekly Readings: Chp 7 (4.7)")
 
     (,(moment 2021 1 11) . "First Day of Lecture")
