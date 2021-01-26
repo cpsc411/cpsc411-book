@@ -651,14 +651,14 @@ location} from the @asm-lang-v2/assignments[assignment] @tech{info field}.
 
 @examples[#:eval sb
 (replace-locations
-  '(module ((assignment ((x.1 rax))) (locals (x.1)))
+  '(module ((locals (x.1)) (assignment ((x.1 rax))))
     (begin
       (set! x.1 0)
       (halt x.1))))
 
 (replace-locations
-  '(module ((assignment ((x.1 rax) (y.1 rbx) (w.1 r9)))
-            (locals (x.1 y.1 w.1)))
+  '(module ((locals (x.1 y.1 w.1))
+            (assignment ((x.1 rax) (y.1 rbx) (w.1 r9))))
     (begin
       (set! x.1 0)
       (set! y.1 x.1)
