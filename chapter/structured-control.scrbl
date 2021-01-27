@@ -785,7 +785,7 @@ predicates.
 
 @section{Register Allocation}
 Next, we design @deftech{Asm-pred-lang v4}, an imperative language that supports some nested structured control-flow.
-Like @tech{Loc-lang v2}, this language is a family of @ch2-tech{administrative
+Like @tech{Asm-lang v2}, this language is a family of @ch2-tech{administrative
 languages}, each differing only in its info fields.
 
 @bettergrammar*-diff[nested-asm-lang-v4 asm-pred-lang-v4]
