@@ -3,7 +3,7 @@
 @(require
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
-  (for-label cpsc411/v1-reference/a4-franken-solution)
+  (for-label cpsc411/reference/a4-solution)
   (for-label cpsc411/langs/v4)
   cpsc411/langs/v2
   cpsc411/langs/v3
@@ -13,12 +13,12 @@
 @(provide
   (except-out (all-defined-out) sb))
 
-@declare-exporting[cpsc411/v1-reference/a4-franken-solution]
+@declare-exporting[cpsc411/reference/a4-solution]
 
 @(define sb
    (make-cached-eval
     "ch4-eval"
-    '(require cpsc411/v1-reference/a4-franken-solution cpsc411/compiler-lib)
+    '(require cpsc411/reference/a4-solution cpsc411/compiler-lib)
     '(current-stack-size 512)))
 
 @; ----- Language Defs ------
