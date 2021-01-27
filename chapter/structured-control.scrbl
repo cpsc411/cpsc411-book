@@ -79,6 +79,7 @@ L1 -> L15 [label=" sequentialize-let"];
 L15 -> L16 [label=" canonicalize-bind"];
 L16 -> L2 [label=" select-instructions"];
 
+L7 -> L7 [label=" optimize-predicates"];
 L7 -> L8 [label=" expose-basic-blocks"];
 L8 -> L9 [label=" resolve-predicates"]
 L9 -> L10 [label=" flatten-program"];
