@@ -1087,12 +1087,11 @@ Compiles @tech{Values-lang v4} to @tech{Values-unique-lang v4} by resolving
 @todo{Anything I want to say here? check-values-lang? interpreter?}
 
 @nested[#:style 'inset
-@defproc[(interp-values-lang (p Values-lang-v4.p))
-         (integer-in/c 0 255)]{
-Interpret the @tech{Values-lang v4} program @racket[p] as a value, returning the
-exit code for @racket[p].
+@defproc[(interp-values-lang (p values-lang-v4?))
+         int64?]{
+Interpret the @tech{Values-lang v4} program @racket[p] as a value.
 For all @racket[p], the value of @racket[(interp-values-lang p)] should equal
-@racket[(interp-paren-x64 (compile p))] and @racket[(execute p)].
+to @racket[(execute p)].
 }
 ]
 
