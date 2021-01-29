@@ -148,12 +148,12 @@ Remember to use the auxiliary registers from
 }
 
 @challenge{
-In @ch4-tech{Paren-asm v4}, it's unnecessary to have a jump when the target of the
+In @ch4-tech{Block-asm-lang v4}, it's unnecessary to have a jump when the target of the
 jump is the next instruction.
 Design and implement an optimization pass, called @racket[inline-jump], that
 eliminates these unnecessary jumps.
-The source language is @ch4-tech{Paren-asm v4} and target is
-@ch4-tech{Paren-asm v4}
+The source language is @ch4-tech{Block-asm-lang v4} and target is
+@ch4-tech{Block-asm-lang v4}
 }
 
 @challenge{
@@ -209,10 +209,10 @@ module with a single conflict graph.
 
 @exercise{
 Redesign and extend the implementation of @racket[undead-analysis] to collect
-@a3-tech{undead-out sets} for each block.
+@tech[#:tag-prefixes '("book:" "chp-reg-alloc:")]{undead-out sets} for each block.
 
 Only the @object-code{info} field of each block of the output program is
-modified, with the addition of the the @a3-tech{undead-out set}.
+modified, with the addition of the the @tech[#:tag-prefixes '("book:" "chp-reg-alloc:")]{undead-out set}.
 }
 
 @exercise{
