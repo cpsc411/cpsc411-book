@@ -688,7 +688,7 @@ Compiles @tech{Asm-lang v2} to @tech{Nested-asm-lang v2}, replacing each
 }
 ]
 
-@section{Source Language Polishing}
+@;section{Source Language Polishing}
 @todo{Add validator to remove undefined behaviour}
 
 @section{Appendix: Overview}
