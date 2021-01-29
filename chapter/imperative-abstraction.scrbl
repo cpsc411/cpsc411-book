@@ -140,6 +140,15 @@ value.
 For example, the following example uses the same @tech{names} multiple times,
 but this doesn't overwrite any other use of the @tech{name}.
 
+@nested[#:style 'inset
+@defproc[(interp-values-lang (p values-lang-v3?))
+int64?]{
+Interprets the @tech{Values-lang v3} program @racket[p] as a value.
+For all @racket[p], the value of @racket[(interp-values-lang p)] should equal
+to @racket[(execute p)].
+}
+]
+
 @examples[#:eval sb
 (interp-values-lang
  '(module
@@ -171,6 +180,67 @@ One context that expects a value is the right-hand side of a
 @values-lang-v3[let] binding.
 Only a @values-lang-v3[value] or a @values-lang-v3[let] whose body is a
 @values-lang-v3[tail] is valid in tail context.
+
+In @tech{Values-lang v3}, the @values-lang-v3[let] expression implements a
+particular kind of lexcial binding.
+The same @tech{lexical identifier} can be shadowed by nested
+@values-lang-v3[let] expressions, and nested @values-lang-v3[let] expressions
+can refer to the bindings of prior @values-lang-v3[let] expressions.
+However, in the @emph{same} @values-lang-v3[let] expression, the binding are
+considered @emph{paralell}---they do not shadow, and cannot refer to each other.
+This means we can freely reorder the bindings in a single @values-lang-v3[let]
+statement.
+This can be useful for optimization.
+However, it means we cannot allow duplicate bindings or allow reference to
+bindings in the same @values-lang-v3[let] statement.
+Otherwise, the ability to reorder could introduce @tech{undefined behaviour}.
+
+To guard against this undefined behaviour, we introduce a validator.
+
+We must also check for reference to unbound variables, since these may be
+compiled into reference to uninitialized memory, and resulting in undefined
+behaviour.
+
+@nested[#:style 'inset
+@defproc[(check-values-lang (p any/c))
+values-lang-v3?]{
+Takes an arbitrary value and either returns it, if it is a valid
+@tech{Values-lang v3} program, or raises an error with a descriptive
+error message.
+
+
+@examples[#:eval sb
+(check-values-lang
+  '(module
+     (let ([x 5]
+           [y 6])
+       x)))
+(check-values-lang
+ '(module
+    (let ([x 5]
+          [y 6])
+      (let ([y x])
+        y))))
+(eval:error
+  (check-values-lang
+   '(module
+      (let ([x 5]
+            [y x])
+        y))))
+(eval:error
+  (check-values-lang
+   '(module
+      (let ([x 5]
+            [x 6])
+        x))))
+(check-values-lang
+ '(module (let () 5)))
+(eval:error
+  (check-values-lang
+    '(module (let () x))))
+]
+}
+]
 
 @;@todo{Patch instructions vs select instructions seems to come up naturally as I
 @;design this assignment.
