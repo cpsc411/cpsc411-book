@@ -683,7 +683,7 @@ single pass.
 @nested[#:style 'inset
 @defproc[(assign-homes (p asm-lang-v2?))
          nested-asm-lang-v2?]{
-Compiles @tech{Asm-lang v2} to @tech{Nested-asm v2}, replacing each
+Compiles @tech{Asm-lang v2} to @tech{Nested-asm-lang v2}, replacing each
 @tech{abstract location} with a @tech{physical location}.
 }
 ]
