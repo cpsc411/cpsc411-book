@@ -6,6 +6,9 @@
 
 @(require
   (for-label cpsc411/reference/a3-solution)
+  (for-label (rename-in
+              cpsc411/reference/a2-solution
+              [assign-homes v2:assign-homes]))
   (for-label cpsc411/deprecated/a3-compiler-lib))
 
 @(define (rtech . x) (apply tech #:tag-prefixes '("book:" "chp-reg-alloc:") x))
@@ -16,7 +19,7 @@
 
 The goal of this assignment is to introduce (1) "optimizing" compilation (2)
 register allocation, a critically important "optimization".
-In this assignment, you will replace the @racket[assign-homes] pass with
+In this assignment, you will replace the @racket[v2:assign-homes] pass with
 @racket[assign-homes-opt], a version that tries hard to put variables into
 registers instead of in the frame.
 
