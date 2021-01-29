@@ -6,7 +6,7 @@
 
 @(require
   (for-label cpsc411/reference/a3-solution)
-  (for-label (rename-in
+  (for-label (only-in
               cpsc411/reference/a2-solution
               [assign-homes v2:assign-homes]))
   (for-label cpsc411/deprecated/a3-compiler-lib))
