@@ -151,8 +151,18 @@ It is written as @tt{QWORD [reg - int32]} or
 @tt{QWORD [reg + int32]} in @ch1-tech{x64}, where @tt{reg} is a register
 holding some memory address and the @tt{int32} is an offset number of bytes
 from that address to access, as a 32-bit integer.
-The keyword @tt{QWORD}, which is an unintuitive spelling of "four bytes",
+The keyword @tt{QWORD}, which is an unintuitive spelling of "8 bytes",
 indicates that this operand is accessing 64 bits at a time.
+
+@margin-note{
+"Word" normally means the unit of addressing memory---64bits in our case.
+Unfortunately, in the past, the word size was different.
+In order to avoid backwards incompatibilty changes, tools that use @tt{WORD} as
+a keyword, like @tt{nasm}, didn't want to change it's meaning.
+Instead, the keyword @tt{WORD} means 16-bits, not the word size, and prefixes
+give us multiple of that notion of @tt{WORD}.
+So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on x64.
+}
 
 For example, if @tt{rbp} holds a memory address, we can move the value
 @tt{42} to that memory address using the instruction
