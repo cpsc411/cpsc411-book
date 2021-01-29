@@ -534,9 +534,7 @@ Compiles @tech{Values-lang v3} to @tech{Values-unique-lang v3} by resolving all
  '(module
     (let ([x 2])
       (let ([x 2])
-        (+ x x)))))]}]}
-
-@todo{Add shadowing example; requires update to solution}
+        (+ x x)))))]}]
 
 @section{Appendix: Overview}
 
