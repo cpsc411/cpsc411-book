@@ -9,7 +9,7 @@
   (for-label (only-in
               cpsc411/reference/a2-solution
               [assign-homes v2:assign-homes]))
-  (for-label cpsc411/deprecated/a3-compiler-lib))
+  (for-label cpsc411/compiler-lib))
 
 @(define (rtech . x) (apply tech #:tag-prefixes '("book:" "chp-reg-alloc:") x))
 
@@ -97,23 +97,23 @@ detect bugs in the register allocator.
 }
 
 @exercise{Implement @racket[assign-homes-opt], which has the same interface and
-performs the same function as @racket[assign-homes], but uses register
+performs the same function as @racket[v2:assign-homes], but uses register
 allocation instead of assigning all @ch2-tech{abstract locations} to
 @ch2-tech{frame variables}.
 
 @racket[assign-homes-opt] should be a drop-in replacement for
-@racket[assign-homes].
+@racket[v2:assign-homes].
 
 Run your test suite and ensure you get the same outputs whether you use
-@racket[assign-homes] or @racket[assign-homes-opt].
+@racket[v2:assign-homes] or @racket[assign-homes-opt].
 }
 
 @exercise{Create two versions of your compiler by defining two functions,
 @racket[compiler-a2] and @racket[compiler-a3].
 The source language should be @ch3-tech{Values-lang v3} and the target should be
 @ch1-tech{x64}, represented as a string.
-@racket[compiler-a2] should use @racket[assign-homes], while
-@racket[compiler-a3] should use @racket[assign-home-opt] instead.
+@racket[compiler-a2] should use @racket[v2:assign-homes], while
+@racket[compiler-a3] should use @racket[assign-homes-opt] instead.
 You should use @racket[parameterize] and @racket[current-pass-list].
 
 Write a paragraph comparing the two compilers.
@@ -162,8 +162,8 @@ Are there any surprises?}
 @challenge{
 Design and implement the function @racket[bury-dead], which removes assignments
 to unused abstract locations.
-The source language is @rtech{Asm-lang v3/undead} and the target language is
-@rtech{Asm-lang v3/undead}.
+The source language is @rtech{Asm-lang v2/undead} and the target language is
+@rtech{Asm-lang v2/undead}.
 (Optimizations often have the same source and target language.)
 
 An assignment to a variable is @rtech{dead} if it is not in the
