@@ -625,8 +625,8 @@ The language is more general than our implementation strategy; we allow an
 including registers, to permit future optimizations or hand-written code.
 
 @nested[#:style 'inset
-@defproc[(assign-fvars (p Asm-lang-v2/locals.p))
-          Asm-lang-v2/assignments.p]{
+@defproc[(assign-fvars (p asm-lang-v2/locals?))
+          asm-lang-v2/assignments?]{
 Compiles @tech{Asm-lang v2/locals} to @tech{Asm-lang v2/assignments},
 by assigning each @tech{abstract location} from the @asm-lang-v2/locals[locals]
 @tech{info field} to a fresh @tech{frame variable}.
@@ -654,7 +654,7 @@ the @tech{physical location} assigned by @racket[assign-fvars].
 @nested[#:style 'inset
 @defproc[(replace-locations (p asm-lang-v2/assignments?))
           nested-asm-lang-v2?]{
-Compiles @tech{Asm-lang v2/assignments} to @tech{Nested-asm v2},
+Compiles @tech{Asm-lang v2/assignments} to @tech{Nested-asm-lang v2},
 replaced each @tech{abstract location} with its assigned @tech{physical
 location} from the @asm-lang-v2/assignments[assignment] @tech{info field}.
 }
