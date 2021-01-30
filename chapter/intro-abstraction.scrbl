@@ -417,7 +417,7 @@ the @tech{stack discipline} invariant for the
 @nested[#:style 'inset
 @defproc[(patch-instructions (p para-asm-lang-v2?))
           paren-x64-fvars-v2?]{
-Compile the @tech{Para-asm v2} to @tech{Paren-fvars-x64 v2} by patching
+Compiles the @tech{Para-asm v2} to @tech{Paren-x64-fvars v2} by patching
 instructions that have no @ch1-tech{x64} analogue into a sequence of
 instructions.
 The implementation should use auxiliary registers from
