@@ -390,8 +390,8 @@ beneficial, some design decisions may not be obvious until the software evolves.
 @todo{Add citations for the ANF and MF papers}
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v3.p))
-          imp-cmf-lang-v3.p]{
+@defproc[(canonicalize-bind (p imp-mf-lang-v3?))
+          imp-cmf-lang-v3?]{
 Compiles @tech{Imp-mf-lang v3} to @tech{Imp-cmf-lang v3}, pushing
 @imp-mf-lang-v3[set!] under @imp-mf-lang-v3[begin] so that the right-hand-side of each
 @imp-mf-lang-v3[set!] is simple value-producing operation.
