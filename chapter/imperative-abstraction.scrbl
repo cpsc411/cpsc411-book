@@ -398,14 +398,11 @@ Compiles @tech{Imp-mf-lang v3} to @tech{Imp-cmf-lang v3}, pushing
 This canonicalizes @tech{Imp-mf-lang v3} with respect to the equations
 @tabular[
 (list
- (list
-  @imp-mf-lang-v3[(set! aloc (begin  effect_2 ... value))]
-  "="
-  @imp-mf-lang-v3[(begin effect_2 ... (set! aloc value))])
-  (list
-  @imp-mf-lang-v3[(begin (begin effect_1 ....) effect_2 ... value)]
-  "="
-  @imp-mf-lang-v3[(begin effect_1 .... effect_2 ... value)]))
+(list
+@imp-mf-lang-v4[(set! aloc (begin effect_1 ... value))]
+"="
+@imp-mf-lang-v4[(begin effect_1 ... (set! aloc value))])
+)
 ]
 }
 ]
