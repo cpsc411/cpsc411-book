@@ -399,9 +399,9 @@ This canonicalizes @tech{Imp-mf-lang v3} with respect to the equations
 @tabular[
 (list
 (list
-@imp-mf-lang-v4[(set! aloc (begin effect_1 ... value))]
+@imp-mf-lang-v3[(set! aloc (begin effect_1 ... value))]
 "="
-@imp-mf-lang-v4[(begin effect_1 ... (set! aloc value))])
+@imp-mf-lang-v3[(begin effect_1 ... (set! aloc value))])
 )
 ]
 }
