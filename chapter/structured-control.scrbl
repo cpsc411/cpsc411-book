@@ -1024,7 +1024,7 @@ Compiles @tech{Imp-mf-lang v4} to @tech{Imp-cmf-lang v4}, pushing
 that the right-hand-side of each @imp-mf-lang-v3[set!] is simple value-producing
 operation.
 
-This canonicalizes @tech{Imp-mf-lang v4} with respet to the equations
+This canonicalizes @tech{Imp-mf-lang v4} with respect to the equations
 @tabular[
 (list
  (list
