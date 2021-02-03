@@ -1,6 +1,8 @@
 #lang racket/base
 
-(require gregor)
+(require
+ gregor
+ (only-in scribble/manual emph))
 
 (provide (all-defined-out))
 
@@ -48,6 +50,7 @@
     (,(-days (hash-ref deadline-dict 'a10) 4)  . "Weekly Readings: Chp 12 (4.12)")
     (,(-days (hash-ref deadline-dict 'a11) 4)  . "Weekly Readings: Chp 13 (4.13)")
     #;(,(moment 2021 2 22) . "Weekly Readings: Chp 7 (4.7)")
+    (,(moment 2021 2 25) . ,(emph "Midterm!"))
 
     (,(moment 2021 1 11) . "First Day of Lecture")
     (,(moment 2021 1 22) . "Last day to withdraw, without W")
