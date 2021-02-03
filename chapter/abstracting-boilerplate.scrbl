@@ -455,8 +455,9 @@ and duplicates code.
 
 @nested[#:style 'inset
 @defproc[(interp-paren-x64 [x paren-x64-v1?]) int64?]{
-Interprets the @tech{Paren-x64 v1} program, returning the final value as a
-64-bit signed integer.
+Interprets the @tech{Paren-x64 v1} program, returning the final value as an exit code
+in the range 0--255.
+@;, returning the final value as a 64-bit signed integer.
 
 @examples[#:eval eg
 (interp-paren-x64
@@ -493,8 +494,9 @@ the value @paren-x64-v1[integer_1]}
 get the value @paren-x64-v1[integer_2]}
 @item{the values @paren-x64-v1[integer_1] and @paren-x64-v1[integer_2] are
 @emph{equivalent}. In general, we have to define equivalence for each pair of
-source and target languages. We'll define equivalence between @tech{Paren-x64
-v1} and @ch1-tech{x64} values shortly.
+source and target languages. In this case, the interpreter and the compiler
+should return @emph{the same} value.
+@;We'll define equivalence between @tech{Paren-x64 v1} and @ch1-tech{x64} values shortly.
 }
 ]
 
@@ -599,19 +601,20 @@ In Racket, we can access the exit code of a subprocess using
 This limits how much our programs can communicate; we will lift that restriction
 in later versions of our compiler.
 
-Because we've chosen to return the result as an exit code, our definition for
-compiler correctness is non-trivial.
-The meaning of a @tech{Paren-x64 v1} program is a 64-bit integer, but we've
-designed the compiler to only ever return a value between 0 and 255.
-This doesn't mean our compiler is incorrect, but instead, our definition of
-correctness uses a custom notion of equivalence.
-For this compiler, the result of a @tech{Paren-x64 v1} is considered
-@emph{equivalent} to the exit code returned by a @ch1-tech{x64} program when the
-two are @emph{equal} up to modulo 256:
-@racketblock[
-(define (v1-results-equivalent? s t)
-  (= (modulo s 256) t))
-]
+@todo{Cross-language equivalence}
+@;Because we've chosen to return the result as an exit code, our definition for
+@;compiler correctness is non-trivial.
+@;The meaning of a @tech{Paren-x64 v1} program is a 64-bit integer, but we've
+@;designed the compiler to only ever return a value between 0 and 255.
+@;This doesn't mean our compiler is incorrect, but instead, our definition of
+@;correctness uses a custom notion of equivalence.
+@;For this compiler, the result of a @tech{Paren-x64 v1} is considered
+@;@emph{equivalent} to the exit code returned by a @ch1-tech{x64} program when the
+@;two are @emph{equal} up to modulo 256:
+@;@racketblock[
+@;(define (v1-results-equivalent? s t)
+@;  (= (modulo s 256) t))
+@;]
 
 Our run-time system is an @ch1-tech{x64} @tech{instruction sequence} which
 expects to be composed after another @tech{instruction sequence}.
