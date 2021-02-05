@@ -41,8 +41,9 @@ L4 [label="Imp-cmf-lang v5"];
 L5 [label="Asm-pred-lang v5"];
 L10 [label="Para-asm-lang v5"];
 L11 [label="Block-pred-lang v5"];
-L12 [label="Block-asm-lang v5"];
-L13 [label="Paren-x64-fvars v5"];
+L12 [label="Block-asm-lang v4"];
+L12a [label="Para-asm-lang v4"];
+L13 [label="Paren-x64-fvars v4"];
 L14 [label="x64"];
 L15 [label="integer"]
 
@@ -84,7 +85,8 @@ L4 -> L5 [label=" select-instructions"];
 
 L10 -> L11 [label=" expose-basic-blocks"];
 L11 -> L12 [label=" resolve-predicates"]
-L12 -> L13 [label=" patch-instructions"];
+L12 -> L12a [label=" flatten-program"]
+L12a -> L13 [label=" patch-instructions"];
 L13 -> L16 [label=" implement-fvars"];
 L16 -> L14 [label=" generate-x64"];
 L14 -> L15 [label=" execute"];
