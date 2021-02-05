@@ -134,7 +134,7 @@ reading the entire chapter.
 
 @exercise{Remove your definitions of @racket[wrap-x64-boilerplate] and
 @racket[wrap-x64-run-time].
-These are now provided by @racketmodname[cpsc411/compiler-lib], since your
+These are now provided by @racketmodname[cpsc411/2c-run-time], since your
 run-time system is getting more complicated.
 }
 
