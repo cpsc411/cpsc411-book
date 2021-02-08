@@ -280,9 +280,9 @@ To describe the output of the analysis, we define a new @tech{administrative
 language}.
 We collect the @tech{undead-set list} a new @asm-lang-v2/undead{info} field.
 Below, we define @deftech{Asm-lang v2/undead}.
-The only change compared to @tech{Asm-lang v2/locals} is in the
-@asm-lang-v2/undead{info} field, so we typeset the difference in the
-@asm-lang-v2/undead{info} field.
+The only change compared to @ch2-tech{Asm-lang v2/locals} is in the
+@asm-lang-v2/undead[info] field, so we typeset the difference in the
+@asm-lang-v2/undead[info] field.
 
 @bettergrammar*-diff[asm-lang-v2/locals asm-lang-v2/undead]
 
