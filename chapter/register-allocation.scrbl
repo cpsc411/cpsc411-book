@@ -32,7 +32,7 @@ node [ fontname="Courier", shape="box", fontsize=12 ]
 
 L4 [label="Asm-lang-v2"];
 
-L62 [label="Nested-asm v2"];
+L62 [label="Nested-asm-lang v2"];
 
 /* Register allocator */
 
@@ -42,7 +42,7 @@ subgraph DoNotcluster0 {
     color=lightgrey,
     fontname="Courier",
     fontsize=12,
-    label = "assign-homes";
+    label = "assign-homes-opt";
   ];
   edge [fontname="Courier", fontsize=10, labeljust=right]
 
@@ -60,7 +60,7 @@ L51 -> L52 [label=" conflict-analysis"];
 L52 -> L6 [label=" assign-registers"];
 L6 -> L62 [label=" replace-locations"];
 
-L4 -> L62 [label=" assign-homes"];
+L4 -> L62 [label=" assign-homes-opt"];
 }
 }
 ]
@@ -161,10 +161,10 @@ functionality, but one that performs "better" (for some definition of "better").
 We will replace @racket[assign-homes] with @racket[assign-homes-opt].
 
 @nested[#:style 'inset]{
-@defproc[(assign-homes-opt [p asm-lang-v2?]) paren-asm-v2?]{
-Compiles @tech{Asm-lang v2} to @tech{Paren-asm v2}, replacing each
-@tech{abstract location} with a @tech{physical location}.
-This version perform @tech{graph-colouring register allocation}.
+@defproc[(assign-homes-opt [p asm-lang-v2?]) nested-asm-lang-v2?]{
+Compiles @ch2-tech{Asm-lang v2} to @ch2-tech{Nested-asm-lang v2}, replacing each
+@ch2-tech{abstract location} with a @ch2-tech{physical location}.
+This version perform graph-colouring register allocation.
 }
 }
 
@@ -186,7 +186,7 @@ The result is that we ignore @tech{live}ness entirely.
 we're analyzing, not merely variable.
 This is why SSA is valuable; makes variables = variables-at-point-in-time.}
 @margin-note{
-@tech{asm-lang-v2/locals} is a simple enough language that we can tell whether a
+@ch2-tech{Asm-lang v2/locals} is a simple enough language that we can tell whether a
 variable is @tech{dead} or @tech[#:key "live"]{alive}.
 Later, when we add new instructions, we will modify the @tech{undead} analysis
 and find variables that aren't necessarily @tech{live} or @tech{dead}, and must
@@ -243,7 +243,7 @@ from the @tech{undead-in set}.
 
 To start the loop, this algorithm requires a default @tech{undead-out set} for
 the last instruction; the default @tech{undead-out set} for
-@tech{Asm-lang v2/locals} is empty.
+@ch2-tech{Asm-lang v2/locals} is empty.
 In general, the default set may not be empty, because we may assume that some
 values are live after the program.
 For example, in @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
@@ -257,7 +257,7 @@ A simple way is to create a data structure that maps each set to an instruction.
 Since our programs are trees of instructions, we represent the @tech{undead-out
 sets} for each instruction as a tree of @tech{undead-out sets}.
 We define the data @tech{undead-set tree} to mirror structure of
-@tech{Asm-lang v2} programs.
+@ch2-tech{Asm-lang v2} programs.
 An @deftech{undead-set tree} is either:
 @itemlist[
 @item{an @tech{undead-out set} @asm-lang-v2[(aloc ...)], corresponding to a
@@ -596,7 +596,7 @@ Note only the @asm-lang-v2/assignments{info} field changes.
 
 @nested[#:style 'inset]{
 @defproc[(assign-registers [p asm-lang-v2/conflicts]) asm-lang-v2/assignments?]{
-Performs @tech{graph-colouring register allocation}.
+Performs graph-colouring register allocation.
 The pass attempts to fit each of the @ch2-tech{abstract location} declared in
 the locals set into a register, and if one cannot be found, assigns it a
 @ch2-tech{frame variable} instead.
