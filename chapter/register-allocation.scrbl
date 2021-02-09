@@ -593,7 +593,7 @@ sorted order.
 To describe the output of the regsiter allocator, we reuse @ch2-tech{Asm-lang
 v2/assignments}.
 Below, we typeset the changes compared to @tech{Asm-lang v2/conflicts}.
-Note only the @asm-lang-v2/assignments{info} field changes.
+Note only the @asm-lang-v2/assignments[info] field changes.
 
 @bettergrammar*-diff[#:include (info) asm-lang-v2/conflicts asm-lang-v2/assignments]
 
