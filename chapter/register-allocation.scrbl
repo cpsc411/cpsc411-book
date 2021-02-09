@@ -456,9 +456,9 @@ As in @tech{Asm-lang v2/undead}, the @asm-lang-v2/conflicts[info] field also
 contains a declaration of the @ch2-tech{abstract locations} that may be used in the
 program, and (as usual) possibly other non-required but useful information.
 
-To implement conflict analysis, we simultaneously traverse an @tech{instruction
-sequence} with its @tech{undead-out set}, and analysis each instruction
-according to the approxiate conflict definition above.
+To implement conflict analysis, we simultaneously traverse an program with its
+@tech{undead-set tree}, and analysis each instruction according to the
+approxiate conflict definition above.
 We start with an graph that initially contains a node for every
 @ch2-tech{abstract location} in the @asm-lang-v2/conflicts[locals] set, and
 extend the graph with conflicts as we discover them.
