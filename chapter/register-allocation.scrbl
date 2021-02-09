@@ -254,19 +254,29 @@ later passes can associate each instruction with its @tech{undead-out set}.
 There are many ways to associate the @tech{undead-out sets} with instructions.
 A simple way is to create a data structure that maps each set to an instruction.
 
-Since our programs are simple lists of instructions, a list of sets is a good
-representation of the @tech{undead-out sets}.
-We define the data @deftech{undead-set list} as a list of @tech{undead-out
-sets}, where the position in the list maps the @tech{undead-out set} to an
-instruction in a corresponding @tech{instruction sequence}.
-The first element of the list represents @tech{undead-out set} for the first
-instruction, the second element represents the @tech{undead-out set} for the
-second instruction, and so on.
-An @tech{undead-set list} @object-code{(undead-out-set? ...)} together with a
-list of instructions @object-code{(s ...)} can be traversed together using the
-template for for two lists simultaneously:
+Since our programs are trees of instructions, we represent the @tech{undead-out
+sets} for each instruction as a tree of @tech{undead-out sets}.
+We define the data @tech{undead-set tree} to mirror structure of
+@tech{Asm-lang v2} programs.
+An @deftech{undead-set tree} is either:
+@itemlist[
+@item{an @tech{undead-out set} @asm-lang-v2[(aloc ...)], corresponding to a
+single instruction such as @asm-lang-v2[(halt triv)]}
+@item{or a list of @tech{undead-set tree}s, corresponding to the
+@tech{undead-set tree}s @asm-lang-v2[(undead-set-tree?_1 ... undead-set-tree?_2)]
+corresponding to a @asm-lang-v2[begin] statement
+@asm-lang-v2[(begin effect_1 ... effect_2)]
+The first element of the list represents @tech{undead-set tree} for the first
+@asm-lang-v2[effect], the second element represents the @tech{undead-set tree}
+for the second @asm-lang-v2[effect], and so on.
+}
+]
+An @tech{undead-set tree} @asm-lang-v2[(undead-set-tree? ...)] together with a
+list of instructions @asm-lang-v2[(effect ...)] can be traversed together using
+the template for for two trees simultaneously.
+This is similar to traversing two lists simultaneously:
 @racketblock[
-(define (fn-for-ss-and-undead-outs ss undead-outs)
+(define (fn-for-s-and-undead-outs ss undead-outs)
   (match (cons ss undead-outs)
     [(cons '() '())
      (... case-for-empty ...)]
@@ -275,10 +285,13 @@ template for for two lists simultaneously:
           (fn-for-ss-and-undead-outs rest-ss rest-undead-outs))]))
 ]
 
+You'll need to design the template for traversing @asm-lang-v2[tail] and
+@asm-lang-v2[effect] trees simultaneously with an @tech{undead-set tree}
+yourself.
 
 To describe the output of the analysis, we define a new @tech{administrative
 language}.
-We collect the @tech{undead-set list} a new @asm-lang-v2/undead{info} field.
+We collect the @tech{undead-set tree} a new @asm-lang-v2/undead[info] field.
 Below, we define @deftech{Asm-lang v2/undead}.
 The only change compared to @ch2-tech{Asm-lang v2/locals} is in the
 @asm-lang-v2/undead[info] field, so we typeset the difference in the
@@ -289,7 +302,7 @@ The only change compared to @ch2-tech{Asm-lang v2/locals} is in the
 @nested[#:style 'inset]{
 @defproc[(undead-analysis [p asm-lang-v2/locals?]) asm-lang-v2/undead?]{
 Performs undeadness analysis, decorating the program with @tech{undead-set
-lists}.
+tree}.
 Only the info field of the program is modified.
 
 @examples[#:eval sb
