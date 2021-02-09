@@ -3,7 +3,10 @@
 @(require
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
-  (for-label cpsc411/reference/a3-solution)
+  (for-label
+    (except-in cpsc411/reference/a3-solution uncover-locals replace-locations assign-homes))
+  (for-label
+    (only-in cpsc411/reference/a2-solution uncover-locals replace-locations assign-homes))
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v2
   (for-label cpsc411/langs/v2)
