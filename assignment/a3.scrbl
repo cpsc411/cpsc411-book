@@ -109,11 +109,11 @@ Run your test suite and ensure you get the same outputs whether you use
 }
 
 @exercise{Create two versions of your compiler by defining two functions,
-@racket[compiler-a2] and @racket[compiler-a3].
+@racket[compile-a2] and @racket[compile-a3].
 The source language should be @ch3-tech{Values-lang v3} and the target should be
 @ch1-tech{x64}, represented as a string.
-@racket[compiler-a2] should use @racket[v2:assign-homes], while
-@racket[compiler-a3] should use @racket[assign-homes-opt] instead.
+@racket[compile-a2] should use @racket[v2:assign-homes], while
+@racket[compile-a3] should use @racket[assign-homes-opt] instead.
 You should use @racket[parameterize] and @racket[current-pass-list].
 
 Write a paragraph comparing the two compilers.
