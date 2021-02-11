@@ -844,12 +844,9 @@ statements.
 
 The key to describing the analysis is designing a representation of @tech{undead
 sets} that can representing the new structure of our statements.
-Now, statements can branch.
-Our statements are trees rather than sequences.
-So, we must describe the @tech{undead sets} as a @emph{tree} instead of
-sequence.
+Now, statements can branch at @asm-pred-lang-v4[if].
+We update the definition of @racket[undead-set-tree?] to include this case:
 
-@todo{Rewrite undead-set-tree}
 @racketblock[
 (define (undead-set? x)
   (and (list? x)
@@ -860,7 +857,7 @@ sequence.
   (match ust
     [(? undead-set?) #t]
     [(list (? undead-set?) (? undead-set-tree?) (? undead-set-tree?)) #t]
-    [`(,(? undead-set?) ...) #t]
+    [`(,(? undead-set-tree?) ... (? undead-set-tree?)) #t]
     [else #f]))
 ]
 
@@ -873,7 +870,7 @@ interp. a set of undead alocs at a particular instruction
 Undead-set-tree is one of:
 - Undead-set
 - (list Undead-set Undead-set-tree Undead-set-tree)
-- (listof Undead-set)
+- (listof Undead-set-tree)
 WARNING: datatype is non-canonical since Undead-set-tree can be an
          Undead-set, so second and third case can overlap.
          An Undead-set-tree is meant to be traversed simultaneously with an
@@ -882,7 +879,7 @@ interp. a tree of Undead-sets.  The structure of the tree mirrors the
   structure of a Block-locals-lang tail. There are three kinds of sub-trees:
 (1) an instruction node is simply an undead sets;
 (2) an if node has an undead-set for the condition and two branch sub-trees.
-(3) a begin node is a list of undead sets, culminating in a sub-tree;
+(3) a begin node is a list of undead set trees, culminating in a sub-tree;
 }
 
 @todo{Changed this example to remove jump. Should also just compute the example instead of manually doing it.}
