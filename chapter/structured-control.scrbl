@@ -14,6 +14,7 @@
   (except-out (all-defined-out) sb))
 
 @declare-exporting[cpsc411/reference/a4-solution]
+@(define (ch-ra-tech . rest) (apply tech #:tag-prefixes '("book:" "chp-reg-allocl") rest))
 
 @(define sb
    (make-cached-eval
@@ -791,7 +792,7 @@ languages}, each differing only in its info fields.
 @bettergrammar*-diff[nested-asm-lang-v4 asm-pred-lang-v4]
 
 The big difference is that @tech{physical locations} have changed to
-@tech{abstract locations}.
+@ch2-tech{abstract locations}.
 Recall that this is the big abstraction register allocation buys us, so it ought
 to be the only big change.
 
@@ -802,7 +803,7 @@ As before, we treat the register allocator as single compiler from
 @defproc[(assign-homes-opt [p asm-pred-lang-v4.p?])
          nested-asm-lang-v4.p?]{
 Compiles @tech{Asm-pred-lang v4} to @tech{Nested-asm-lang v4} by replacing all
-@tech{abstract locations} with @tech{physical locations}.
+@ch2-tech{abstract locations} with @tech{physical locations}.
 }
 ]
 
@@ -824,10 +825,10 @@ module.
 @bettergrammar*-diff[#:include (info) asm-pred-lang-v4 asm-pred-lang-v4/locals]
 
 @nested[#:style 'inset
-@defproc[(uncover-locals (p asm-pred-lang-v4.p?))
-         asm-pred-lang-v4/locals.p?]{
+@defproc[(uncover-locals (p asm-pred-lang-v4?))
+         asm-pred-lang-v4/locals?]{
 Compiles @tech{Asm-pred-lang v4} to @tech{Asm-pred-lang v4/locals}, analysing which
-@tech{abstract locations} are used in the module and decorating the module with
+@ch2-tech{abstract locations} are used in the module and decorating the module with
 the set of variables in an @racket[info?] field.
 }
 ]
@@ -896,7 +897,7 @@ For example, consider the following @tech{Undead-set-tree}.
     ((y.2 c.4)
      (x.1 y.2)))))
 ]
-This corresponds to the following @object-code{tail}.
+This corresponds to the following @asm-pred-lang-v4[tail].
 @racketblock[
 `(begin
    (set! x.1 5)
@@ -911,16 +912,13 @@ This corresponds to the following @object-code{tail}.
              (halt c.4)))))
 
 ]
-The nesting structure mirror the nesting of tails.
-We can therefore follow a simultaneously traversing two lists, similar to
-what we did in @secref[#:tag-prefixes '("a3:")]{top}.
 
 @nested[#:style 'inset
-@defproc[(undead-analysis (p asm-pred-lang-v4/locals.p?))
-         asm-pred-lang-v4/undead.p?]{
-Performs @tech{undead analysis}, compiling @tech{Asm-pred-lang v4/locals} to
-@tech{Asm-pred-lang v4/undead} by decorating programs with their @tech{undead set
-trees}.
+@defproc[(undead-analysis (p asm-pred-lang-v4/locals?))
+         asm-pred-lang-v4/undead?]{
+Performs undeadness analysis, decorating the program with
+@tech{Undead-set-tree}.
+Only the info field of the program is modified.
 }
 ]
 
@@ -934,15 +932,13 @@ control-flow.
 
 The @racket[conflict-analysis] does not change significantly.
 We simply extend the algorithm to support the new statements.
-Note that new statements only reference but never define an @tech{abstract
+Note that new statements only reference but never define an @ch2-tech{abstract
 location}.
 
 @nested[#:style 'inset
-@defproc[(conflict-analysis (p asm-pred-lang-v4/undead.p?))
-         asm-pred-lang-v4/conflicts.p?]{
-Performs @tech{conflict analysis}, compiling @tech{Asm-pred-lang v4/undead} to
-@tech{Asm-pred-lang v4/conflicts} by decorating programs with their @tech{conflict
-graph}.
+@defproc[(conflict-analysis (p asm-pred-lang-v4/undead?))
+         asm-pred-lang-v4/conflicts?]{
+Decorates a program with its @ch-ra-tech{conflict graph}.
 }
 ]
 
@@ -966,18 +962,18 @@ their @tech{register assignments}.
 ]
 
 @subsection{Replace Locations}
-Finally, we actually replace @tech{abstract locations} with @tech{physical
+Finally, we actually replace @ch2-tech{abstract locations} with @tech{physical
 locations}.
 In the process, we're free to discard the info from the analyses.
 
 @bettergrammar*-diff[#:include (info) asm-pred-lang-v4/assignments asm-pred-lang-v4]
 
 @nested[#:style 'inset
-@defproc[(replace-locations [p asm-pred-lang-v4/assignments.p?])
-         nested-asm-lang-v4.p?]{
+@defproc[(replace-locations [p asm-pred-lang-v4/assignments?])
+         nested-asm-lang-v4?]{
 Compiles @tech{Asm-pred-lang v4/assignments} to @tech{Nested-asm-lang v4} by replacing all
-@tech{abstract location} with @tech{physical locations} using the assignment
-described in the @object-code{assignment} info field.
+@ch2-tech{abstract location} with @tech{physical locations} using the assignment
+described in the @asm-pred-lang-v4[assignment] info field.
 }
 ]
 
