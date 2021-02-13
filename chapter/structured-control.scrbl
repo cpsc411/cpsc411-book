@@ -251,7 +251,7 @@ To implement @tech{Paren-x64 v4}, we define the procedure @racket[generate-x64],
 which simply converts each instruction to its @ch1-tech{x64} string form.
 
 @nested[#:style 'inset
-@defproc[(generate-x64 (p Paren-x64-v4.p))
+@defproc[(generate-x64 (p paren-x64-v4?))
          (and/c string? x64-instructions?)]{
 Compile the @tech{Paren-x64 v4} program into a valid sequence of @ch1-tech{x64}
 instructions, represented as a string.
@@ -302,8 +302,8 @@ To implement @tech{Paren-x64-rt v4} and thus perform linking, we define
 the procedure @racket[link-paren-x64].
 
 @nested[#:style 'inset
-@defproc[(link-paren-x64 (p Paren-x64-v4.p))
-         Paren-x64-rt-v4.p]{
+@defproc[(link-paren-x64 (p paren-x64-v4?))
+         paren-x64-rt-v4?]{
 Compiles @tech{Paren-x64 v4} to @tech{Paren-x64-rt v4} by resolving all labels
 to their position in the instruction sequence.
 }
@@ -320,13 +320,13 @@ To interpret a jump, we simply change the program counter to the number
 indicated in the jump.
 
 @nested[#:style 'inset
-@defproc[(interp-paren-x64 (p Paren-x64-v4.p))
+@defproc[(interp-paren-x64 (p paren-x64-v4?))
          (integer-in/c 0 255)]{
 Interpret the @tech{Paren-x64 v4} program @racket[p] as a value, returning the
 exit code for @racket[p].
 }
 
-@defproc[(interp-loop (c (listof Paren-x64-rt-v4.s))
+@defproc[(interp-loop (c (listof paren-x64-rt-v4.s))
                       (m dict?)
                       (pc natural-number/c))
          (integer-in/c 0 255)]{
@@ -370,8 +370,8 @@ Nothing important changes in @tech{Paren-x64-fvars v4}.
 We simply add the new control-flow primitives.
 
 @nested[#:style 'inset
-@defproc[(implement-fvars (p Paren-x64-fvars-v4.p))
-         Paren-x64-v4.p]{
+@defproc[(implement-fvars (p paren-x64-fvars-v4?))
+         paren-x64-v4?]{
 Compile the @tech{Paren-x64-fvars v4} to @tech{Paren-x64 v4} by reifying
 @paren-x64-fvars-v4[fvar]s into displacement mode operands.
 The pass should use @racket[current-frame-base-pointer].
@@ -417,8 +417,8 @@ We can do this by generating a 2-instruction sequence and negating the
 where we have predicates.}
 
 @nested[#:style 'inset
-@defproc[(patch-instructions (p Para-asm-lang-v4.p))
-         Paren-x64-fvars-v4.p]{
+@defproc[(patch-instructions (p para-asm-lang-v4?))
+         paren-x64-fvars-v4?]{
 Compile the @tech{Para-asm-lang v4} to @tech{Paren-x64-fvars v4} by patching
 instructions that have no @ch1-tech{x64} analogue into to a sequence of
 instructions and an auxiliary register from
@@ -534,8 +534,8 @@ To implement @tech{Block-asm-lang v4}, we simply flatten blocks, moving the
 the block using @object-code{with-label}.
 
 @nested[#:style 'inset
-@defproc[(flatten-program (p Block-asm-lang-v4.p))
-          Para-asm-lang-v4.p]{
+@defproc[(flatten-program (p block-asm-lang-v4?))
+          para-asm-lang-v4?]{
 Compile @tech{Block-asm-lang v4} to @tech{Para-asm-lang v4} by flattening basic
 blocks into labeled instructions.
 }
@@ -610,8 +610,8 @@ We implement @tech{Block-pred-lang v4} with a simple compiler,
 @racket[resolve-predicates].
 
 @nested[#:style 'inset
-@defproc[(resolve-predicates (p block-pred-lang-v4.p?))
-         block-asm-lang-v4]{
+@defproc[(resolve-predicates (p block-pred-lang-v4?))
+         block-asm-lang-v4?]{
 Compile the @tech{Block-pred-lang v4} to @tech{Block-asm-lang v4} by
 manipulating the branches of @object-code{if} statements to resolve branches.
 }
@@ -747,8 +747,8 @@ pass.
 for future optimization potential?}
 
 @nested[#:style 'inset
-@defproc[(expose-basic-blocks (p nested-asm-lang-v4.p?))
-          block-pred-lang-v4]{
+@defproc[(expose-basic-blocks (p nested-asm-lang-v4?))
+          block-pred-lang-v4?]{
 Compile the @tech{Nested-asm-lang v4} to @tech{Block-pred-lang v4}, eliminating
 all nested expressions by generating fresh basic blocks and jumps.
 }
@@ -784,8 +784,8 @@ statements?}
 @todo{Can i?}
 
 @nested[#:style 'inset
-@defproc[(optimize-predicates (p nested-asm-lang-v4.p?))
-         nested-asm-lang-v4.p?]{
+@defproc[(optimize-predicates (p nested-asm-lang-v4?))
+         nested-asm-lang-v4?]{
 Optimize @tech{Nested-asm-lang v4} programs by analyzing and simplifying
 predicates.
 }
@@ -807,8 +807,8 @@ As before, we treat the register allocator as single compiler from
 @tech{Asm-pred-lang v4} to @tech{Nested-asm-lang v4}.
 
 @nested[#:style 'inset
-@defproc[(assign-homes-opt [p asm-pred-lang-v4.p?])
-         nested-asm-lang-v4.p?]{
+@defproc[(assign-homes-opt [p asm-pred-lang-v4?])
+         nested-asm-lang-v4?]{
 Compiles @tech{Asm-pred-lang v4} to @tech{Nested-asm-lang v4} by replacing all
 @ch2-tech{abstract locations} with @tech{physical locations}.
 }
@@ -957,8 +957,8 @@ The allocator should run the same algorithm as before.
 Since the allocator doesn't traverse programs, it shouldn't need any changes.
 
 @nested[#:style 'inset
-@defproc[(assign-registers (p asm-pred-lang-v4/conflicts.p?))
-         asm-pred-lang-v4/assignments.p?]{
+@defproc[(assign-registers (p asm-pred-lang-v4/conflicts?))
+         asm-pred-lang-v4/assignments?]{
 Performs @tech{graph-colouring register allocation}, compiling @tech{asm-pred-lang
 v4/conflicts} to @tech{Asm-pred-lang v4/assignments} by decorating programs with
 their @tech{register assignments}.
@@ -1003,8 +1003,8 @@ The following two programs are equal:
 @todo{Seems like we could easily deal with that one.}
 
 @nested[#:style 'inset
-@defproc[(select-instructions (p imp-cmf-lang-v4.p))
-         asm-pred-lang-v4.p]{
+@defproc[(select-instructions (p imp-cmf-lang-v4?))
+         asm-pred-lang-v4?]{
 Compiles @tech{Imp-cmf-lang v4} to @tech{Asm-pred-lang v4}, selecting
 appropriate sequences of abstract assembly instructions to implement the
 operations of the source language.
@@ -1017,8 +1017,8 @@ defined below.
 @bettergrammar*-diff[imp-cmf-lang-v4 imp-mf-lang-v4]
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v4.p))
-         imp-cmf-lang-v4.p]{
+@defproc[(canonicalize-bind (p imp-mf-lang-v4?))
+         imp-cmf-lang-v4?]{
 Compiles @tech{Imp-mf-lang v4} to @tech{Imp-cmf-lang v4}, pushing
 @imp-mf-lang-v3[set!] under @imp-mf-lang-v4[begin] and @imp-mf-lang-v4[if] so
 that the right-hand-side of each @imp-mf-lang-v3[set!] is simple value-producing
@@ -1060,8 +1060,8 @@ run-time representation of the value that a comparison operation produces, @ie
 we don't have booleans.
 
 @nested[#:style 'inset
-@defproc[(sequentialize-let (p values-unique-lang-v4.p?))
-         imp-mf-lang-v4.p?]{
+@defproc[(sequentialize-let (p values-unique-lang-v4?))
+         imp-mf-lang-v4?]{
 Compiles @tech{Values-unique-lang v4} to @tech{Imp-mf-lang v4} by picking a
 particular order to implement @values-unique-lang-v4[let] expressions using
 @imp-mf-lang-v4[set!].
@@ -1076,8 +1076,8 @@ We defined @deftech{Values-lang v4} below.
 @bettergrammar*-diff[values-unique-lang-v4 values-lang-v4]
 
 @nested[#:style 'inset
-@defproc[(uniquify (p values-lang-v4.p?))
-          values-unique-lang-v4.p?]{
+@defproc[(uniquify (p values-lang-v4?))
+          values-unique-lang-v4?]{
 Compiles @tech{Values-lang v4} to @tech{Values-unique-lang v4} by resolving
 @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }
