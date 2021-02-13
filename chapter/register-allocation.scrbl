@@ -558,7 +558,7 @@ We recur over the set of @asm-lang-v2/conflicts[locals] and producing an
 assignment.}
 @item{Otherwise, choose a @tech{low-degree} @variable from the input set of
 @|variables|, if one exists.
-Otherwise, pick an arbtrary @ch2-tech{abstract locations} from the set.
+Otherwise, pick an arbitrary @ch2-tech{abstract locations} from the set.
 
 A @deftech{low-degree} @ch2-tech{abstract locations} is one with fewer than
 @tt{k} conflicts, some for pre-defined @tt{k}.
