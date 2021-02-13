@@ -394,8 +394,15 @@ the program.
 It could also be that there are multiple @para-asm-lang-v4[halt] instructions
 syntactically, but only one will ever be executed due to conditional jumps.
 
-We continue to support nested @para-asm-lang-v4[tail]s for backwards compatibility,
-but it will turn out that we no longer generate these in @tech{Para-asm-lang v4}.
+This also means compiling @para-asm-lang-v4[halt] is slightly more complicated.
+We must ensure that @para-asm-lang-v4[halt] is the last instruction executed.
+The run-time system provides a special label, @racket['done], which is expected
+to be executed at the end of the program.
+Straightline code will fall through to this label, but it can be jumped to
+instead.
+
+@;We continue to support nested @para-asm-lang-v4[tail]s for backwards compatibility,
+@;but it will turn out that we no longer generate these in @tech{Para-asm-lang v4}.
 @todo{Is that true? Kent gets ride of this in expose-basic-blocks, but my ebb
 comes earlier in the pipeline.}
 
