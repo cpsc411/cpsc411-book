@@ -680,22 +680,14 @@ done the design work to simplify that.
 
 First, we design @deftech{Asm-pred-lang v5}, the target of our
 @racket[select-instructions] pass.
-We typeset the differences compared to @ch4-tech{Asm-pred-lang v4}.
+To see how to extend @racket[select-instructions], we should view the
+difference, we typeset the differences compared to @ch4-tech{Asm-pred-lang v4}.
 
 @bettergrammar*-diff[asm-pred-lang-v4 asm-pred-lang-v5]
 
-The only change in the language is the addition of jumps.
+The main difference is in the addition of the @racket[jump] instruction.
 Note that the "arguments" to the jump are not part of meaning of the
 instruction; they are just metadata used later by the compiler.
-
-To see how to extend @racket[select-instructions], we should view the difference
-compared to @tech{Imp-cmf-lang v5}.
-
-@bettergrammar*-diff[imp-cmf-lang-v5 asm-pred-lang-v5]
-
-The main difference is in the @racket[jump] instruction.
-Remember also that we assume the program is free from undefined behaviour, which
-we enforced in @racket[check-values-lang].
 
 @nested[#:style 'inset
 @defproc[(select-instructions (p imp-cmf-lang-v5.p))
