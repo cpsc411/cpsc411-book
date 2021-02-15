@@ -837,7 +837,7 @@ first basic block, and move the initial @nested-asm-lang-v5[tail] into an explic
 block.
 
 The target language is @deftech{Block-pred-lang v5}, typeset compared to
-@tech{Block-pred-lang v4} below.
+@ch4-tech{Block-pred-lang v4} below.
 
 @bettergrammar*-diff[block-pred-lang-v4 block-pred-lang-v5]
 
