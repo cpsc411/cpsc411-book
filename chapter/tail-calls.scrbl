@@ -857,6 +857,8 @@ Nothing else in the compiler needs to change.
 
 @section{Appendix: Languages}
 
+@declare-exporting[cpsc411/langs/v5]
+
 @deflangs[
 values-lang-v5
 values-unique-lang-v5
