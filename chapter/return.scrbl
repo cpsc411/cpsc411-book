@@ -563,7 +563,7 @@ another @imp-mf-lang-v6[return-point], @ie there are no nested
 @imp-mf-lang-v6[return-point]s.
 Our compiler can never generate this code, and there is no reason to support.
 
-The implicit return value, @imp-mf-lang-v6[value] in @imp-mf-value-v6[tail]
+The implicit return value, @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
 position, is no longer a valid.
 Instead, the run-time system will setup the first return address, and the final
 result is returned to the run-time system using the @tech{calling conventions}.
