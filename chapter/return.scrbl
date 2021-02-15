@@ -3,10 +3,8 @@
 @(require
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
-  #;(for-label cpsc411/reference/a6-solution)
+  (for-label cpsc411/reference/a6-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
-  (for-label (rename-in cpsc411/reference/a5-solution
-                        [check-values-lang v5:check-values-lang]))
   cpsc411/langs/v2
   cpsc411/langs/v3
   cpsc411/langs/v4
