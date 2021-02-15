@@ -608,9 +608,9 @@ After implementing the calling conventions, we have two abstractions that we
 need to implement.
 
 First, we must implement frames, or more specifically, a @tech{stack of frames}
-(also know as a @tech{stack}).
-@tech{Non-tail calls} cannot reuse their frame since some @tech{abstract
-locations} may be @tech{live} (will be @tech{undead}) after the call.
+(also known as a @tech{stack}).
+@tech{Non-tail calls} cannot reuse their frame since some @ch2-tech{abstract
+locations} may be @ch-ra-tech{live} (will be @ch-ra-tech{undead}) after the call.
 In general, there will not be enough registers to keep them all around, so we
 store them on the frame.
 But if the caller starts writing to the frame, it would overwrite live values.
@@ -619,9 +619,9 @@ So we need to install a new frame for the caller before executing the
 We've already collected the new frame variables, and we need to modify the
 register allocator to determine the size and allocate new frames.
 This requires explicitly manipulating the frame base pointer, which also changes
-how @tech{frame variables} are implemented.
+how @ch2-tech{frame variables} are implemented.
 
-Second, we need to implement @imp-mf-lang-v6[return-points].
+Second, we need to implement @imp-mf-lang-v6[return-point]s.
 These will be compiled to raw labels, so we essentially preserve them until a
 low-level language with access to raw labels.
 
@@ -672,11 +672,11 @@ our new abstractions.
 
 First, we extend @racket[canonicalize-bind].
 We define @deftech{Imp-cmf-lang v6} below.
-We typeset the differences compared to @tech{Imp-cmf-lang v5}.
+We typeset the differences compared to @ch5-tech{Imp-cmf-lang v5}.
 
 @bettergrammar*-diff[imp-cmf-lang-v5 imp-cmf-lang-v6]
 
-We simply extend @tech{Imp-cmf-lang v5} with our new abstractions, including
+We simply extend @ch5-tech{Imp-cmf-lang v5} with our new abstractions, including
 @tech{non-tail calls} and return points.
 We also require the @imp-cmf-lang-v6[new-frames] declaration in the @imp-cmf-lang-v6[info] field.
 
@@ -705,7 +705,7 @@ This canonicalizes @tech{Imp-mf-lang v6} with respect to the equations:
 Next we impose some of the machine restrictions on our language with
 @racket[select-instructions].
 We define @deftech{Asm-pred-lang v6} below, with changes typeset with respect to
-@tech{Asm-pred-lang v5}.
+@ch5-tech{Asm-pred-lang v5}.
 
 @bettergrammar*-diff[asm-pred-lang-v5 asm-pred-lang-v6]
 
@@ -1531,6 +1531,8 @@ Compile the @tech{Paren-x64-fvars v6} to @tech{Paren-x64 v6} by reifying
 @figure["fig:v6-graph" "Overview of Compiler Version 6" v6-graph]
 
 @section{Appendix: Languages}
+
+@declare-exporting[cpsc411/langs/v6]
 
 @deflangs[
 values-lang-v6

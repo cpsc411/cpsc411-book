@@ -69,6 +69,8 @@
 (define ch4-tech (curry tech #:tag-prefixes '("book:" "chp4:")))
 (define ch5-tech (curry tech #:tag-prefixes '("book:" "chp5:")))
 
+(define ch-ra-tech (curry tech #:tag-prefixes '("book:" "chp-reg-alloc:")))
+
 (define (Chref n x) (Secref #:tag-prefixes `("book:" ,(format "chp~a:" n)) x))
 
 (define-syntax-rule (typeset-passlist id ...)
