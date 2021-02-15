@@ -814,7 +814,7 @@ decorating programs with their @a3-tech{register assignments}.
 Finally, we actually replace @a2-tech{abstract locations} with @a2-tech{physical
 locations}.
 
-@bettergrammar*-diff[asm-pred-lang-v5/assignments para-asm-lang-v5]
+@bettergrammar*-diff[asm-pred-lang-v5/assignments nested-asm-lang-v5]
 
 We need to extend the implementation to traverse each block, and support jump
 statements.
