@@ -726,7 +726,7 @@ operations of the source language.
 We first extend @racket[uncover-locals] to find locals in non-tail calls and
 return points.
 Below we define @deftech{Asm-pred-lang-v6/locals}.
-We typeset changes compared to @tech{Asm-pred-lang-v5/locals}.
+We typeset changes compared to @ch5-tech{Asm-pred-lang v5/locals}.
 
 @bettergrammar*-diff[asm-pred-lang-v5/locals asm-pred-lang-v6/locals]
 
@@ -754,7 +754,7 @@ and remove variables from the set as they are assigned.
 }
 
 Next we extend @racket[undead-analysis].
-We desgin @deftech{Asm-pred-lang-v6/undead} below, typeset with respect to @tech{Asm-pred-lang-v5/undead}.
+We desgin @deftech{Asm-pred-lang-v6/undead} below, typeset with respect to @ch5-tech{Asm-pred-lang v5/undead}.
 
 @bettergrammar*-diff[asm-pred-lang-v5/undead asm-pred-lang-v6/undead]
 
