@@ -552,9 +552,12 @@ We use the following heuristics to implement @racket[check-values-lang]:
 @nested[#:style 'inset
 @defproc[(check-values-lang (p Values-lang-v5?))
           Values-lang-v5?]{
-Validates that the @tech{Values-lang v5} is well bound and well typed: all
-procedure calls pass the correct number of arguments, and all
-@values-lang-v5[binop] and @values-lang-v5[relop] are never used with labels.
+Validates that the @tech{Values-lang v5} is syntactically well-formed, well
+bound and well typed: all procedure calls pass the correct number of arguments,
+and all @values-lang-v5[binop] and @values-lang-v5[relop] are never used with
+labels.
+You may want to separet this into two problems: first checking syntax, then type
+checking.
 }
 ]
 
