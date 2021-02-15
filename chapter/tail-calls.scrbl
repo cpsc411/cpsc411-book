@@ -39,7 +39,7 @@ L2 [label="Proc-imp-mf-lang v5"];
 L3 [label="Imp-mf-lang v5"];
 L4 [label="Imp-cmf-lang v5"];
 L5 [label="Asm-pred-lang v5"];
-L10 [label="Para-asm-lang v5"];
+L10 [label="Nested-asm-lang v5"];
 L11 [label="Block-pred-lang v5"];
 L12 [label="Block-asm-lang v4"];
 L12a [label="Para-asm-lang v4"];
@@ -827,18 +827,18 @@ described in the @object-code{assignment} info field.
 
 @subsection{Exposing Basic Blocks}
 The last update need to make is to @racket[expose-basic-blocks].
-We design the source, @deftech{Para-asm-lang v5} below, typeset compared to
+We design the source, @deftech{Nested-asm-lang v5} below, typeset compared to
 @ch4-tech{Nested-asm-lang v4}
 
-@bettergrammar*-diff[para-asm-lang-v4 para-asm-lang-v5]
+@bettergrammar*-diff[nested-asm-lang-v4 nested-asm-lang-v5]
 
-The main difference is the inclusion of @para-asm-lang-v5[jump] expressions and
+The main difference is the inclusion of @nested-asm-lang-v5[jump] expressions and
 block definitions.
 These do not complicate the process of exposing basic blocks much.
 We simply need to traverse each block, exposing new blocks in the process.
 
 Note that we again need to impose the convention that execution begins with the
-first basic block, and move the initial @para-asm-lang-v5[tail] into an explicit
+first basic block, and move the initial @nested-asm-lang-v5[tail] into an explicit
 block.
 
 The target language is @deftech{Block-pred-lang v5}, typeset compared to
@@ -847,9 +847,9 @@ The target language is @deftech{Block-pred-lang v5}, typeset compared to
 @bettergrammar*-diff[block-pred-lang-v4 block-pred-lang-v5]
 
 @nested[#:style 'inset
-@defproc[(expose-basic-blocks (p para-asm-lang-v5?))
+@defproc[(expose-basic-blocks (p nested-asm-lang-v5?))
           block-pred-lang-v5]{
-Compile the @tech{Para-asm-lang v5} to @tech{Block-pred-lang v5}, eliminating
+Compile the @tech{Nested-asm-lang v5} to @tech{Block-pred-lang v5}, eliminating
 all nested expressions by generate fresh basic blocks and jumps.
 }
 ]
@@ -873,6 +873,6 @@ asm-pred-lang-v5/locals
 asm-pred-lang-v5/undead
 asm-pred-lang-v5/conflicts
 asm-pred-lang-v5/assignments
-para-asm-lang-v5
+nested-asm-lang-v5
 block-pred-lang-v5
 ]
