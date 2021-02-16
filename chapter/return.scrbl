@@ -758,11 +758,11 @@ We desgin @deftech{Asm-pred-lang-v6/undead} below, typeset with respect to @ch5-
 
 @bettergrammar*-diff[asm-pred-lang-v5/undead asm-pred-lang-v6/undead]
 
-We add two new @asm-pred-lang-v6[info] fields: @asm-pred-lang-v6[undead-out] and @asm-pred-lang-v6[call-undead].
-The @asm-pred-lang-v6[undead-out] field will continue to store the
-@tech{undead-set-tree}, which we must updated to track
+We add two new @asm-pred-lang-v6[info] fields: @asm-pred-lang-v6/undead[undead-out] and @asm-pred-lang-v6/undead[call-undead].
+The @asm-pred-lang-v6/undead[undead-out] field will continue to store the
+@ch-ra-tech{undead-set tree}, which we must updated to track
 @asm-pred-lang-v6[return-point]s.
-The @asm-pred-lang-v6[call-undead] is the set of all locations that are live
+The @asm-pred-lang-v6/undead[call-undead] is the set of all locations that are live
 after @emph{any} non-tail call in a block.
 
 The @asm-pred-lang-v6[call-undead] field stores @emph{every}
