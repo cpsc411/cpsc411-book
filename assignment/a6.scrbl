@@ -121,7 +121,18 @@ convention registers.
 
 @exercise{Extend @racket[uncover-locals] with support for return points.}
 
-@exercise{Extend @racket[undead-analysis] with support for return points.}
+@exercise{Extend @racket[undead-analysis] with support for return points.
+
+@margin-note{
+Hint:
+
+The simplest way to get the @asm-pred-lang-v6/undead[call-undead] locations is
+to use a single mutable variable that is local to the helper function that
+processes definition.
+See @racket[box]
+}
+
+}
 
 @exercise{Extend @racket[conflict-analysis] with support for return points.}
 
