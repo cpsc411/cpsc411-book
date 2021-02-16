@@ -765,7 +765,7 @@ The @asm-pred-lang-v6/undead[undead-out] field will continue to store the
 The @asm-pred-lang-v6/undead[call-undead] is the set of all locations that are live
 after @emph{any} non-tail call in a block.
 
-The @asm-pred-lang-v6[call-undead] field stores @emph{every}
+The @asm-pred-lang-v6/undead[call-undead] field stores @emph{every}
 abstract location or frame variable that is in the undead-out set of a return
 point.
 These must be allocated separately from other other variables, so we store them
@@ -806,11 +806,6 @@ There are three kinds of sub-trees:
 }
 
 @racketblock[
-(define (undead-set? x)
-  (and (list? x)
-       (andmap loc? x)
-       (= (set-count x) (length x))))
-
 (define (undead-set-tree? ust)
   (match ust
     (code:comment "for an instruction")
@@ -823,13 +818,6 @@ There are three kinds of sub-trees:
     [`(,(? undead-set-tree?) ...) #t]
     [else #f]))
 ]
-
-The @asm-pred-lang-v6[undead-set-tree] corresponding to a
-@asm-pred-lang-v6[begin] can
-have as elements either @asm-pred-lang-v6[undead-sets], for @asm-pred-lang-v6[set!]
-instructions, or @asm-pred-lang-v6[undead-set-trees] for @asm-pred-lang-v6[return-point]
-instructions.
-
 
 Analyzing non-tail jumps is no different than other jumps; we reuse the
 "arguments" annotated on the jump as the undead-out set, and discard the
@@ -845,21 +833,11 @@ We model this as treating a @asm-pred-lang-v6[return-point] as assigning the
 @nested[#:style 'inset
 @defproc[(undead-analysis (p asm-pred-lang-v6/locals?))
           asm-pred-lang-v6/undead?]{
-Performs @tech{undead analysis}, compiling @tech{Asm-pred-lang v6/locals} to
-@tech{Asm-pred-lang v6/undead} by decorating programs with their @a3-tech{undead
-set trees}.
+Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
+@tech{Asm-pred-lang v6/undead} by decorating programs with their
+@ch-ra-tech{undead-set trees}.
 }
 ]
-
-@todo{
-hint:
-
-The simplest way to get the @object-code{call-undead} locations is to use a
-single mutable variable that is local to the helper function that processes
-@object-code{b}s.
-Since the helper for instructions will need access to it, essentially all the
-helpers must be locally defined in the helper for @object-code{b}.
-}
 
 @examples[#:eval sb
 (pretty-display
@@ -932,14 +910,20 @@ edge cases.
                (jump ra.13 rbp rax))))))))
 ]
 
+Next we update the @racket[conflict-analysis].
+Below, we define @deftech{Asm-pred-lang v6/conflicts}, typeset with differences
+compared to @ch5-tech{Asm-pred-lang v5/conflicts}.
+
+@bettergrammar*-diff[asm-pred-lang-v5/conflicts asm-pred-lang-v6/conflicts]
+
 We need to assign the new-frame variables to frame locations.
 However, we also reuse frame locations when possible, to minimize the size of
 frame and thus memory usage.
 @todo{Don't we also need to include all physical locations in conflicts?}
 
-This is simple to solve.
+This is straightforward to solve.
 We run @racket[conflict-analysis], but also collect conflicts between
-@tech{abstract locations} and @tech{physical locations}.
+@ch2-tech{abstract locations} and @tech{physical locations}.
 
 Recall that that @racket[current-return-value-register] is assigned by a non-tail call.
 Also note that @racket[current-frame-base-pointer-register] and
@@ -948,9 +932,9 @@ everything, even though we have removed them from the
 @racket[current-assignable-registers] set.
 
 The interpretation of the conflict graph will be somewhat more difficult than in
-prior assignments.
-It might contain conflicts for physical locations, which will never matter since
-we don't try to physical locations.
+prior versions.
+It might contain conflicts between physical locations, which will never matter
+since we don't try to assign physical locations.
 @;The code will be extremely similar to @racket[register-conflict-analysis], and
 @;you might want to design a single function that abstracts each.
 
@@ -960,22 +944,22 @@ we don't try to physical locations.
 @margin-note{If we our frame allocation was more clever, we would need to adjust
 the conflict analysis to make all caller saved registers in conflict with a
 non-tail call.
-However, we just assign all call-undead variables to the frame, so we don't
+However, we instead assign all call-undead variables to the frame, so we don't
 need to do very much for non-tail calls.
 }
 
 @nested[#:style 'inset
 @defproc[(conflict-analysis (p asm-pred-lang-v6/undead?))
           asm-pred-lang-v6/conflicts?]{
-Performs @a3-tech{conflict analysis}, compiling @tech{Asm-pred-lang v6/undead}
+Performs conflict analysis, compiling @tech{Asm-pred-lang v6/undead}
 to @tech{Asm-pred-lang v6/conflicts} by decorating programs with their
-@a3-tech{conflict graph}.
+conflict graph.
 }
 ]
 
 @subsection{Frame Allocation}
 
-@todo{This probably belong earlier, before unead and conflict analysis, because
+@todo{This probably belong earlier, before undead and conflict analysis, because
 this design motives those changes.}
 
 The size of a frame @racket[n] (in slots) for a given @tech{non-tail call} is
