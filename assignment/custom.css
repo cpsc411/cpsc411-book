@@ -8,22 +8,14 @@
 
 .navsettop {
     position: fixed;
+    z-index: 1;
+    background: #a7b0be;
+    height: auto;
 }
+
 
 .tocset {
     position: fixed;
     overflow-y: scroll;
     height: 88%;
-}
-
-.navright {
-    z-index: 1;
-    position: fixed;
-    background: #a7b0be;
-}
-
-.navleft {
-    z-index: 1;
-    position: fixed;
-    background: #a7b0be;
 }
