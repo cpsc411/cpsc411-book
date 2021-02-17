@@ -3,7 +3,7 @@
 @(require
   (except-in "../chapter/return.scrbl" doc)
   (for-label cpsc411/compiler-lib)
-  (for-label cpsc411/reference/a5-solution)
+  (for-label cpsc411/reference/a6-solution)
   cpsc411/langs/v6)
 
 @(reset-exercise-counter!)
@@ -27,7 +27,7 @@ This assignment is due @(due 'a6).
 
 @todo{Design component?}
 
-@subsubsub*section{Learning Objectives}
+@;subsubsub*section{Learning Objectives}
 @todo{Update these}
 @;@itemlist[
 @;@item{Students should be able to identify the advantages of calling
@@ -63,6 +63,7 @@ impose-calling-conventions
 undead-analysis
 expose-basic-blocks
 implement-fvars
+assign-registers
 ]
 
 @emph{Minor modifications to passes}
@@ -75,7 +76,6 @@ canonicalize-bind
 select-instructions
 uncover-locals
 conflict-analysis
-assign-registers
 replace-locations
 ]
 
@@ -86,6 +86,13 @@ resolve-predicates
 patch-instructions
 generate-x64
 ]
+
+@emph{Removed passes}
+@typeset-passlist[
+assign-homes
+assign-homes-opt
+]
+
 
 @section{Reading}
 The reading for this week is @Secref[#:tag-prefixes '("book:"
@@ -199,3 +206,8 @@ You may want to use @racket[fvar->addr].
 You shouldn't assume that the @racket[current-frame-base-pointer-register] is
 @paren-x64-v6[rbp], and should use the parameter instead.
 }
+
+@exercise{Modify @racket[patch-instructions] to support instructions with
+@para-asm-lang-v6[addr]s instead of @nested-asm-lang-fvars-v6[fvars].}
+
+@exercise{Extend @racket[generate-x64] to support the the new @paren-x64-v6[binop].}

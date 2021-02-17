@@ -3,15 +3,14 @@
 @(require
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
-  #;(for-label cpsc411/reference/a6-solution)
+  (for-label cpsc411/reference/a6-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
-  (for-label (rename-in cpsc411/reference/a5-solution
-                        [check-values-lang v5:check-values-lang]))
   cpsc411/langs/v2
   cpsc411/langs/v3
   cpsc411/langs/v4
   cpsc411/langs/v5
-  cpsc411/langs/v6)
+  cpsc411/langs/v6
+  (for-label cpsc411/langs/v6))
 
 @(provide (all-defined-out))
 
@@ -38,34 +37,22 @@ L2 [label="Proc-imp-mf-lang v6"];
 L3 [label="Imp-mf-lang v6"];
 L4 [label="Imp-cmf-lang v6"];
 L5 [label="Asm-pred-lang v6"];
-L10 [label="Nested-asm-lang v6"];
+L6 [label="Asm-pred-lang v6/locals"];
+L7 [label="Asm-pred-lang v6/undead"];
+L8 [label="Asm-pred-lang v6/conflicts"];
+L81 [label="Asm-pred-lang v6/pre-framed"];
+L82 [label="Asm-pred-lang v6/framed"];
+L83 [label="Asm-pred-lang v6/spilled"];
+L9 [label="Asm-pred-lang v6/assignments"];
+L10 [label="Nested-asm-lang-fvars v6"];
+L10_1 [label="Nested-asm-lang v6"];
 L11 [label="Block-pred-lang v6"];
 L12 [label="Block-asm-lang v6"];
 L12_1 [label="Para-asm-lang v6"];
-L13 [label="Paren-x64-fvars v6"];
 L14 [label="x64"];
 L15 [label="integer"]
 
 /* Register allocator */
-
-subgraph DoNotcluster0 {
-  graph [labeljust=right,
-    style=filled,
-    color=lightgrey,
-    fontname="Courier",
-    fontsize=12,
-    label = "assign-homes-opt";
-  ];
-  edge [fontname="Courier", fontsize=10]
-
-  L6 [label="Asm-pred-lang v6/locals"];
-  L7 [label="Asm-pred-lang v6/undead"];
-  L8 [label="Asm-pred-lang v6/conflicts"];
-  L81 [label="Asm-pred-lang v6/pre-framed"];
-  L82 [label="Asm-pred-lang v6/framed"];
-  L83 [label="Asm-pred-lang v6/spilled"];
-  L9 [label="Asm-pred-lang v6/assignments"];
-}
 
 edge [fontname="Courier", fontsize=12, labeljust=right]
 
@@ -78,9 +65,6 @@ L82 -> L83 [label=" assign-registers"];
 L83 -> L9 [label=" assign-frame-variables"];
 L9 -> L10 [label=" replace-locations"];
 
-L5 -> L10 [label=" assign-homes-opt"];
-
-
 L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
 L1 -> L2 [label=" sequentialize-let"];
@@ -88,11 +72,11 @@ L2 -> L3 [label=" impose-calling-conventions"]
 L3 -> L4 [label=" canonicalize-bind"];
 L4 -> L5 [label=" select-instructions"];
 
-L10 -> L11 [label=" expose-basic-blocks"];
+L10 -> L10_1 [label=" implement-fvars"];
+L10_1 -> L11 [label=" expose-basic-blocks"];
 L11 -> L12 [label=" resolve-predicates"]
 L12 -> L12_1 [label=" flatten-program"];
-L12_1 -> L13 [label=" patch-instructions"];
-L13 -> L16 [label=" implement-fvars"];
+L12_1 -> L16 [label=" patch-instructions"];
 L16 -> L14 [label=" generate-x64"];
 L14 -> L15 [label=" execute"];
 
@@ -1214,6 +1198,13 @@ to frame variables in the new frame.
                  z.3))))
        (apply L.swap.1 1 2)))))]
 
+
+Because the frame allocator sits in the middle of our register allocation
+pipeline, the optimized eallocator @racket[assign-homes-opt] is no longer a drop-in
+replacement for the naive @racket[assign-homes].
+We therefore remove @racket[assign-homes-opt] and in-line the passes in the
+@racket[current-pass-list].
+
 @subsection{Adjusting the Register Allocator}
 Frames are now implemented and all new-frame variables and variables live across
 a call are assigned to frame locations.
@@ -1227,41 +1218,6 @@ A separate pass (which looks suspiciously like
 @racket[assign-call-undead-variables]) handles spilling.
 
 @todo{This commented out discussion?!}
-@;We must also remove an extra register from the
-@;@racket[current-assignable-registers].
-@;Since we now have non-tail calls and indirect calls, @asm-pred-lang-v6[rax]
-@;cannot be used both as a temporary register and as the return value.
-@;There are situations where we need a temporary register, but @object-code{rax}
-@;is live.
-@;Consider this expression:
-@;@racketblock[
-@;`(begin
-@;   (return-point L.rp.1
-@;     ...)
-@;   (set! factn-1.11 rax)
-@;   (set! tmp.17 (* x.9 factn-1.11))
-@;   (set! rax tmp.17)
-@;   (jump ra.13 rbp rax))
-@;]
-@;The return address is stored in @racket[ra.13], but because it is
-@;@object-code{call-undead}, it is assigned to a frame location.
-@;@racket[patch-instructions] will need to move the value to a register, since
-@;@tt{jmp} in @a0-tech{x64} cannot jump to a memory address.
-@;However, it cannot use @object-code{rax} as a temporary register, since it would
-@;be in conflict with anything assigned directly before the jump.
-@;Suddenly, @racket[patch-instructions] has a register allocation problem!
-@;
-@;The simplest solution is to reserve extra registers, forbidding the register
-@;allocator from using them, and using these temporary registers, as we did
-@;before.
-@;@margin-note*{In fact, we need two temporary registers now, due to an edge case
-@;introduced in @secref[#:tag-prefixes '("a4:")]{top} when we changed
-@;@a4-tech{Paren-asm v2}.
-@;Consider an instruction like @object-code{(set! (rbp + 0) (+ (rbp + 8)
-@;2147483648))}.}
-@;We define two temporary registers in the parameter
-@;@racket[current-patch-instructions-registers] in @share{a6-compiler-lib.rkt},
-@;which defaults to @racket['#,(current-patch-instructions-registers)].
 @;@digression{A more general solution that will produce better code in general is
 @;to run the undead and conflict analysis, register allocator, spilling, and patch
 @;instructions in a giant fixed point iteration.
@@ -1326,15 +1282,17 @@ by allocating all abstract locations in the locals set to free frame locations.
 
 Finally, we actually replace @ch2-tech{abstract locations} with
 @ch2-tech{physical locations}.
-Below we define @deftech{Nested-asm-lang v6}, typeset with differences compared
+Below we define @deftech{Nested-asm-lang-fvars v6}, typeset with differences compared
 to @ch5-tech{Nested-asm-lang v5}.
 
-@bettergrammar*-diff[nested-asm-lang-v5 nested-asm-lang-v6]
+@bettergrammar*-diff[nested-asm-lang-v5 nested-asm-lang-fvars-v6]
+
+We need to update the pass to handle @nested-asm-lang-fvars-v6[return-point]s.
 
 @nested[#:style 'inset
 @defproc[(replace-locations [p asm-pred-lang-v6/assignments?])
-         nested-asm-lang-v6?]{
-Compiles @tech{Asm-pred-lang v6/assignments} to @tech{Nested-asm-lang v6} by
+         nested-asm-lang-fvars-v6?]{
+Compiles @tech{Asm-pred-lang v6/assignments} to @tech{Nested-asm-lang-fvars v6} by
 replacing all @ch2-tech{abstract location} with @tech{physical locations} using the
 assignment described in the @asm-pred-lang-v6/assignments[assignment] info
 field.
@@ -1365,8 +1323,93 @@ field.
        (apply L.swap.1 1 2)))))
 ]
 
+@section{Adjusting Frame Variables}
+We changed the invariants on @nested-asm-lang-v6[fbp], the
+@racket[current-frame-base-pointer-register], when added the @tech{stack of
+frames}.
+We now allow it to be incrememented and decrememented by an integer literal.
+This affects how we implement frame variables.
+
+Previously, the frame variables @nested-asm-lang-fvars-v6[fv1] represented the address
+@paren-x64-v6[(fbp - 8)] in all contexts.
+However, after now the compilation is non-trivial, as it must be aware of
+increments and decrements to the @nested-asm-lang-fvars-v6[fbp].
+
+Consider the example snippet
+@racketblock[
+`(begin
+   (set! rbp (+ rbp 8))
+   (return-point L.rp.8
+     (begin
+       (set! rdi fv3)
+       (jump L.f.1)))
+   (set! rbp (- rbp 8)))
+]
+
+In this example, the frame variable @nested-asm-lang-v6[fv3] is being passed to
+the procedure @nested-asm-lang-v6[L.f.1] in a non-tail call.
+@nested-asm-lang-v6[fv3] does not refer to 3rd frame variable on caller's, but
+the 3rd frame variable on the callee's frame.
+Since the frame is allocated prior to the return point, we need to fix-up this
+index by translating frame variables relative to frame allocations introduced
+around return points.
+
+To do this, we change @racket[implement-fvars] to be aware of the current
+@nested-asm-lang-v6[fbp] offset.
+The simplest way to do this is to relocate @racket[implement-fvars] in the
+compiler pipeline, to before @racket[expose-basic-blocks].
+This allows the compiler to make use of the nesting structure of the program
+while tracking changes to @nested-asm-lang-v6[fbp].
+
+To update @racket[implement-fvars], we need to keep an accumulator of the
+current offset from the base of the frame.
+On entry to a block, frame variables start indexing from the base of the frame,
+so the offset is 0.
+So, @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
+(@racket[(- (* 3 (current-word-size-bytes)) 0)]).
+After an increment operation, such as @nested-asm-lang-v6[(set! fbp (- fbp
+24))], @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 0)]
+(@racket[(- (* 3 (current-word-size-bytes)) 24)]).
+After a decrement, such as @paren-x64-v6[(set! fbp (- fbp 24))]
+@nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
+
+@todo{Should create an example to use here and in allocate-frames.}
+
+Recall that @nested-asm-lang-v6[fbp] is only incremented or decremented by
+integer literal values, like those generated by @racket[allocate-frames].
+Other assignments to @nested-asm-lang-v6[fbp] are invalid invalid programs.
+This means we don't have to consider complicated data flows into
+@nested-asm-lang-v6[fbp].
+
+The source language for @racket[implement-fvars], @deftech{Nested-asm-lang-fvars v6},
+is defined below typeset with respect to @deftech{Nested-asm-lang v5}.
+
+@bettergrammar*-diff[nested-asm-lang-v5 nested-asm-lang-fvars-v6]
+
+The language does not change much, only adding a new @nested-asm-lang-v6[binop].
+
+The target language simply changes @nested-asm-lang-fvars-v6[fvar]s to
+@nested-asm-lang-v6[addr]s.
+We define @deftech{Nested-asm-lang-v6} below.
+
+@bettergrammar*-diff[nested-asm-lang-fvars-v6 nested-asm-lang-v6]
+
+All languages following this pass need to be updated to use
+@nested-asm-lang-v6[addr]s instead of @nested-asm-lang-fvars-v6[fvars].
+This should not affect most passes.
+
+@nested[#:style 'inset
+@defproc[(implement-fvars (p paren-x64-fvars-v6?))
+          paren-x64-v6?]{
+Compile the @tech{Paren-x64-fvars v6} to @tech{Paren-x64 v6} by reifying
+@paren-x64-fvars-v4[fvar]s into displacement mode operands.
+}
+]
+
+@todo{Add a good example}
+
 @section{Implementing Return Points}
-To accommodate non-tail calls, we introduced a new abstractions: return
+Finally, to accommodate non-tail calls, we introduced a new abstractions: return
 points.
 We must now implement this abstraction.
 
@@ -1438,82 +1481,32 @@ all nested expressions by generate fresh basic blocks and jumps.
        (apply L.swap.1 1 2)))))
 ]
 
-@section{Adjusting Frame Variables}
-Finally, we changed the invariants on @paren-x64-fvars-v6[fbp], the
-@racket[current-frame-base-pointer-register], when added the @tech{stack of
-frames}.
-We now allow it to be incrememented and decrememented by an integer literal.
-This affects how we implement frame variables.
+@section{Final Passes}
 
-Previously, the frame variables @paren-x64-fvars-v6[fv1] represented the address
-@paren-x64-v6[(fbp + 8)] in all contexts.
-However, after now the compilation is non-trivial, as it must be aware of
-increments and decrements to the @paren-x64-fvars-v6[fbp].
+The only two passes that should require changes are @racket[patch-instructions]
+and @racket[generate-x64].
 
-Consider the example snippet
-@racketblock[
-`(begin
-   (set! rbp (+ rbp 8))
-   (return-point L.rp.8
-     (begin
-       (set! rdi fv3)
-       (jump L.f.1)))
-   (set! rbp (- rbp 8)))
-]
+@racket[patch-instructions] should be updated to work over
+@para-asm-lang-v6[addr]s instead of @nested-asm-lang-fvars-v6[fvars]s.
+This can be done by changing a few predicates.
 
-In this example, the frame variable @paren-x64-fvars-v6[fv3] is being passed to
-the procedure @paren-x64-fvars-v6[L.f.1] in a non-tail call.
-@paren-x64-fvars-v6[fv3] does not refer to 3rd frame variable on caller's, but
-the 3rd frame variable on the callee's frame.
-Since the frame is allocated prior to the return point, we need to fix-up this
-index by translating frame variables relative to frame allocations introduced
-around return points.
-
-To do this, we change @racket[implement-fvars] to be aware of the current
-@paren-x64-fvars-v6[fbp] offset.
-On entry to a block, frame variables start indexing from the base of the frame,
-so the offset is 0.
-So, @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
-(@racket[(- (* 3 (current-word-size-bytes)) 0)]).
-After an increment operation, such as @paren-x64-fvars-v6[(set! fbp (- fbp
-24))], @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 0)]
-(@racket[(- (* 3 (current-word-size-bytes)) 24)]).
-After a decrement, such as @paren-x64-v6[(set! fbp (- fbp 24))]
-@paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
-
-@todo{Should create an example to use here and in allocate-frames.}
-
-Recall that @paren-x64-fvars-v6[fbp] is only incremented or decremented by
-integer literal values, like those generated by @racket[allocate-frames].
-Other assignments to @paren-x64-fvars-v6[fbp] are invalid invalid programs.
-This means we don't have to consider complicated data flows into
-@paren-x64-fvars-v6[fbp].
-
-Between @racket[expose-basic-blocks] and @racket[implement-fvars],
-the two passes @racket[resolve-predicates] and @racket[patch-instructions]
-require no changes except to recognize the additional @paren-x64-v6[binop]
-@paren-x64-v6[-].
-
-The source language for @racket[implement-fvars], @deftech{Paren-x64-fvars v6},
-is defined below typeset with respect to @deftech{Parenx-64-fvars v4}.
-
-@bettergrammar*-diff[paren-x64-fvars-v4 paren-x64-fvars-v6]
-
-The language does not change much, only adding a new @paren-x64-fvars-v6[binop.]
-However, the structure of the pass does change significantly since the key
-invariant on @paren-x64-fvars-v6[fbp] has changed.
-This invariant isn't explicit in the syntax, so this change in the specification
-is difficult to specify formally.
-
-@nested[#:style 'inset
-@defproc[(implement-fvars (p paren-x64-fvars-v6?))
-          paren-x64-v6?]{
-Compile the @tech{Paren-x64-fvars v6} to @tech{Paren-x64 v6} by reifying
-@paren-x64-fvars-v4[fvar]s into displacement mode operands.
+@defproc[(patch-instructions [p para-asm-lang-v6?]) paren-x64-v6?]{
+Compile the @tech{Para-asm-lang v6} to @tech{Paren-x64 v6} by patching
+instructions that have no @ch1-tech{x64} analogue into to a sequence of
+instructions and an auxiliary register from
+@racket[current-patch-instructions-registers].
 }
-]
 
-@todo{Add a good example}
+@racket[generate-x64] needs to be updated to generate the new
+@paren-x64-v6[binop].
+Ideally, there is a separate helper for generating @paren-x64-v6[binop]s, so
+this is only a minimal change.
+
+@defproc[(generate-x64 [p paren-x64-v6])
+         (and/c string? x64-instructions?)]{
+Compile the @tech{Paren-x64 v6} program into a valid sequence of @ch1-tech{x64}
+instructions, represented as a string.
+}
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
 
@@ -1537,9 +1530,11 @@ asm-pred-lang-v6/pre-framed
 asm-pred-lang-v6/framed
 asm-pred-lang-v6/spilled
 asm-pred-lang-v6/assignments
-para-asm-lang-v6
+nested-asm-lang-fvars-v6
+nested-asm-lang-v6
 block-pred-lang-v6
-paren-x64-fvars-v6
+block-asm-lang-v6
+para-asm-lang-v6
 paren-x64-v6
 paren-x64-rt-v6
 ]
