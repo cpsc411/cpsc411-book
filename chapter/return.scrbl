@@ -1006,7 +1006,7 @@ where:
 @itemlist[
 
 @item{@racket[nb] is the number of bytes required to save @racket[n] slots on
-the frame, @ie @racket[(* n word-size-bytes)].}
+the frame, @ie @racket[(* n (current-word-size-bytes))].}
 
 @item{@racket[fbp] is the value of the parameter
 @racket[current-frame-base-pointer-register].}
@@ -1131,17 +1131,20 @@ To adjust the callee's frame, we transform @racket[`(return-point ,rp ,tail)]
 into
 @racketblock[
 `(begin
-   (set! ,fbp (+ ,fbp ,nb))
+   (set! ,fbp (- ,fbp ,nb))
    (return-point ,rp ,tail)
-   (set! ,fbp (- ,fbp ,nb)))
+   (set! ,fbp (+ ,fbp ,nb)))
 ]
 where:
 @itemlist[
 @item{@racket[nb] is the number of bytes required to save @racket[n] slots on
-the frame, @ie @racket[(* n word-size-bytes)].
+the frame, @ie @racket[(* n (current-word-size-bytes))].
 }
 @item{@racket[fbp] is @racket[(current-frame-base-pointer-register)].}
 ]
+Recall that the stack grows downward, so we @emph{subtract} @racket[nb] bytes
+from the current frame base pointer to allocate a frame of with @racket[n]
+slots.
 
 @margin-note{We could allocate a different sized frame for each call, but this
 would require associating @asm-pred-lang-v6/pre-framed[call-undead] sets with
@@ -1283,9 +1286,9 @@ We typeset the differences with respect to @tech{Asm-pred-lang-v6/framed}.
 @nested[#:style 'inset
 @defproc[(assign-registers (p asm-pred-lang-v6/framed?))
           asm-pred-lang-v5/spilled?]{
-Performs @a3-tech{graph-colouring register allocation}, compiling
+Performs graph-colouring register allocation, compiling
 @tech{Asm-pred-lang v6/framed} to @tech{Asm-pred-lang v6/spilled} by
-decorating programs with their @a3-tech{register assignments}.
+decorating programs with their register assignments.
 }
 ]
 
@@ -1321,16 +1324,18 @@ Compiles @tech{Asm-pred-lang-v6/spilled} to @tech{Asm-pred-lang-v6/assignments}
 by allocating all abstract locations in the locals set to free frame locations.
 }]
 
-Finally, we actually replace @a2-tech{abstract locations} with @a2-tech{physical
-locations}.
+Finally, we actually replace @ch2-tech{abstract locations} with
+@ch2-tech{physical locations}.
+Below we define @deftech{Nested-asm-lang v6}, typeset with differences compared
+to @ch5-tech{Nested-asm-lang v5}.
 
-@bettergrammar*-diff[asm-pred-lang-v6/assignments para-asm-lang-v6]
+@bettergrammar*-diff[nested-asm-lang-v5 nested-asm-lang-v6]
 
 @nested[#:style 'inset
 @defproc[(replace-locations [p asm-pred-lang-v6/assignments?])
-         para-asm-lang-v6?]{
-Compiles @tech{Asm-pred-lang v6/assignments} to @tech{Asm-pred-lang v6} by
-replacing all @tech{abstract location} with @tech{physical locations} using the
+         nested-asm-lang-v6?]{
+Compiles @tech{Asm-pred-lang v6/assignments} to @tech{Nested-asm-lang v6} by
+replacing all @ch2-tech{abstract location} with @tech{physical locations} using the
 assignment described in the @asm-pred-lang-v6/assignments[assignment] info
 field.
 }
@@ -1369,7 +1374,7 @@ To implement return points, we need to compile all the instructions following
 the return points into labeled blocks, since that is our low-level
 implementation of labels.
 We lift all the instructions following the return point in to a new block, and
-merge the tail implementing the call into the @object-code{begin} of the caller.
+merge the tail implementing the call into the @block-asm-lang-v6[begin] of the caller.
 Essentially, we transform:
 @racketblock[
 `(begin
@@ -1390,7 +1395,7 @@ lifts many inline blocks into top-level explicitly labeled blocks, and should
 now do the same for return points.
 
 The target language of the transformation is @deftech{Block-pred-lang v6},
-defined below as a change over @tech{Block-pred-lang v5}.
+defined below as a change over @ch5-tech{Block-pred-lang v5}.
 
 @bettergrammar*-diff[block-pred-lang-v5 block-pred-lang-v6]
 
@@ -1400,9 +1405,9 @@ Note that only @block-pred-lang-v6[-] has been added to the
 @block-pred-lang-v6[binop]s.
 
 @nested[#:style 'inset
-@defproc[(expose-basic-blocks (p para-asm-lang-v6?))
+@defproc[(expose-basic-blocks (p nested-asm-lang-v6?))
          block-pred-lang-v6?]{
-Compile the @tech{Para-asm-lang v6} to @tech{Block-pred-lang v6}, eliminating
+Compile the @tech{Nested-asm-lang v6} to @tech{Block-pred-lang v6}, eliminating
 all nested expressions by generate fresh basic blocks and jumps.
 }
 ]
@@ -1468,18 +1473,18 @@ To do this, we change @racket[implement-fvars] to be aware of the current
 @paren-x64-fvars-v6[fbp] offset.
 On entry to a block, frame variables start indexing from the base of the frame,
 so the offset is 0.
-So, @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp + 24)]
-(@racket[(- (* 3 word-size-bytes) 0)]).
-After an increment operation, such as @paren-x64-fvars-v6[(set! fbp (+ fbp
-24))], @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp + 0)]
-(@racket[(- (* 3 word-size-bytes) 24)]).
+So, @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
+(@racket[(- (* 3 (current-word-size-bytes)) 0)]).
+After an increment operation, such as @paren-x64-fvars-v6[(set! fbp (- fbp
+24))], @paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 0)]
+(@racket[(- (* 3 (current-word-size-bytes)) 24)]).
 After a decrement, such as @paren-x64-v6[(set! fbp (- fbp 24))]
-@paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp + 24)] again.
+@paren-x64-fvars-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
 
-@todo{Should create an example to use here and in assign-frames.}
+@todo{Should create an example to use here and in allocate-frames.}
 
 Recall that @paren-x64-fvars-v6[fbp] is only incremented or decremented by
-integer literal values, like those generated by @racket[assign-frames].
+integer literal values, like those generated by @racket[allocate-frames].
 Other assignments to @paren-x64-fvars-v6[fbp] are invalid invalid programs.
 This means we don't have to consider complicated data flows into
 @paren-x64-fvars-v6[fbp].
