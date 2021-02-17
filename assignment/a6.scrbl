@@ -24,6 +24,8 @@ contexts.
 
 This assignment is due @(due 'a6).
 
+You can use the interrogator to get limited access to the reference solution:
+@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a6}.
 
 @todo{Design component?}
 
