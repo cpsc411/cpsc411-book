@@ -61,6 +61,8 @@ replace-locations
 conflict-analysis
 uncover-locals
 select-instructions
+canonicalize-bind
+sequentialize-let
 uniquify
 ]
 
