@@ -21,3 +21,9 @@
     position: fixed;
     background: #a7b0be;
 }
+
+.navleft {
+    z-index: 1;
+    position: fixed;
+    background: #a7b0be;
+}
