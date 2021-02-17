@@ -44,7 +44,7 @@ L9 [label="Block-asm-lang v4"];
 L17 [label="Paren-x64-fvars v4"];
 L10 [label="Para-asm-lang v4"];
 L13 [label="x64"];
-L14 [label="integer"]
+L14 [label="int64"]
 
 /* Register allocator */
 
@@ -321,7 +321,7 @@ indicated in the jump.
 
 @nested[#:style 'inset
 @defproc[(interp-paren-x64 (p paren-x64-v4?))
-         (integer-in/c 0 255)]{
+         int64?]{
 Interpret the @tech{Paren-x64 v4} program @racket[p] as a value, returning the
 exit code for @racket[p].
 }
@@ -329,7 +329,7 @@ exit code for @racket[p].
 @defproc[(interp-loop (c (listof paren-x64-rt-v4.s))
                       (m dict?)
                       (pc natural-number/c))
-         (integer-in/c 0 255)]{
+         int64?]{
 The main loop of the interpreter for @tech{Paren-x64-rt v4}.
 @racket[code] does not change.
 @racket[memory] is a @racket[dict?] mapping @tech{physical locations} (as
