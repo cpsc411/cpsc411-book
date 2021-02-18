@@ -1521,7 +1521,7 @@ instructions and an auxiliary register from
 Ideally, there is a separate helper for generating @paren-x64-v6[binop]s, so
 this is only a minimal change.
 
-@defproc[(generate-x64 [p paren-x64-v6])
+@defproc[(generate-x64 [p paren-x64-v6?])
          (and/c string? x64-instructions?)]{
 Compile the @tech{Paren-x64 v6} program into a valid sequence of @ch1-tech{x64}
 instructions, represented as a string.
