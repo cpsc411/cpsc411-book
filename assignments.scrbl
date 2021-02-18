@@ -24,9 +24,8 @@ gradually design and implement new layers of abstraction as languages.
 @include-section{assignment/a4.scrbl}
 @include-section{assignment/a5.scrbl}
 @include-section{assignment/a6.scrbl}
-@margin-note{Assignments ~6--~10 still being re-written}
-@;include-section{assignment/a6.scrbl}
-@;include-section{assignment/a7.scrbl}
+@include-section{assignment/a7.scrbl}
+@margin-note{Assignments ~8--~11 still being re-written}
 @;include-section{assignment/a8.scrbl}
 @;include-section{assignment/a9.scrbl}
 @;include-section{assignment/a10.scrbl}
