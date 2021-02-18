@@ -100,7 +100,7 @@ subgraph DoNotcluster1 {
 @title[#:tag "top" #:tag-prefix "chp-immediates:"]{Data types: Immediates}
 
 @(define (ch-v6-tech . rest)
-  (apply tech #:prefix-tags '("book:" "chp-return:") rest))
+  (apply tech #:tag-prefixes '("book:" "chp-return:") rest))
 
 @section{Preface: What's wrong with @ch-v6-tech{Values-lang v6}}
 @ch-v6-tech{Values-lang v6} gained the ability to express non-tail calls, an
@@ -441,7 +441,7 @@ First, we add each of these operations as a @paren-x64-v7[binop] to
 @deftech{Paren-x64 v7} below.
 The differences are typeset with respect to @ch-v6-tech{Paren-x64 v6}.
 
-@bettergramar*-diff[paren-x64-v6 paren-x64-v7]
+@bettergrammar*-diff[paren-x64-v6 paren-x64-v7]
 
 @defproc[(generate-x64 [p paren-x64-v7?])
          (and/c string? x64-instructions?)]{
@@ -463,7 +463,7 @@ interpreted as an integer sometimes.
 
 We assume that each @values-bits-lang-v7[binop] is well-typed; they shouldn't be
 used with labels as arguments, the and calls to
-@values-bit-lang-v7[arithmetic-shift-right] follow the restrictions required by
+@values-bits-lang-v7[arithmetic-shift-right] follow the restrictions required by
 @ch1-tech{x64}.
 
 The new operations do not have large effects on the language designs or compiler
@@ -499,12 +499,12 @@ slightly.
 Below, we define the expanded grammar @deftech{Exprs-bit-lang v7/context}.
 We typeset the differences compared to @tech{Values-bits-lang v7}
 
-@bettergrammar*[values-bits-lang-v7 exprs-bits-lang-v7/context]
+@bettergrammar*-diff[values-bits-lang-v7 exprs-bits-lang-v7/contexts]
 
 Now we can see the the main difference, semantically, is additional nesting in
 the value context.
 Calls and binary operations can now take nested @values-bits-lang-v7[value]
-expressions rather than @value-bits-lang-v7[triv]s.
+expressions rather than @values-bits-lang-v7[triv]s.
 While this means we can collapse the syntax, separating the syntax semantically
 helps us see the true difference and see that the essence of the transformation
 is let-binding intermediate results to make all operands trivial.
@@ -648,23 +648,23 @@ The complicated cases are for operations on numbers, but even these are mostly
 unchanged due to some handy algebraic facts.
 Recall that every fixnum @racket[n] is represented by a @tech{ptr} whose
 value is @racket[(* 8 n)].
-For @exprs-bits-lang[+] and @exprs-bits-lang[-], this means we don't need to do anything
+For @exprs-bits-lang-v7[+] and @exprs-bits-lang-v7[-], this means we don't need to do anything
 at all, since @tt{8x + 8y = 8(x + y)}, and similarly @tt{8x - 8y =
 8(x - y)}.
-Similarly, @exprs-bits-lang[<], @exprs-bits-lang[<=], @exprs-bits-lang[>],
-@exprs-bits-lang[>=], and @exprs-bits-lang[eq?] all work unchanged on
+Similarly, @exprs-bits-lang-v7[<], @exprs-bits-lang-v7[<=], @exprs-bits-lang-v7[>],
+@exprs-bits-lang-v7[>=], and @exprs-bits-lang-v7[eq?] all work unchanged on
 @tech{ptrs}.
 However, these are boolean operations in @tech{Exprs-data-lang v7}, so
 their implementation must return a boolean @tech{ptr}.
 
-Only @exprs-bits-lang[*] poses a problem, since @tt{8x * 8y = 64(x * y)}.
+Only @exprs-bits-lang-v7[*] poses a problem, since @tt{8x * 8y = 64(x * y)}.
 However, we do not need to adjust both arguments: we observe that @tt{8x *
 y = 8(x * y)}, and similarly @tt{x * 8y = 8(x * y)}.
-We only need to shift one operand before performing @exprs-bits-lang[*] to get the
+We only need to shift one operand before performing @exprs-bits-lang-v7[*] to get the
 correct result as a @tech{ptr}.
 If either argument is constant, we can perform the shift at compile time,
 completely eliminating the additional overhead.
-Otherwise, we translate @exprs-bits-lang[(* e_1 e_2)] to (roughly) @exprs-bits-lang[(*
+Otherwise, we translate @exprs-bits-lang-v7[(* e_1 e_2)] to (roughly) @exprs-bits-lang-v7[(*
 e_1 (arithmetic-shift-right e_2 3))].
 
 Next, we translate @exprs-bits-lang-v7[if], which should be translated from an
@@ -678,20 +678,20 @@ Recall from earlier that our representation allows us to treat anything that is
 not false as true by a simple @exprs-bits-lang-v7[bitwise-xor] and comparison to
 0, but we might want to leave that for a more general optimization.
 
-When translating the booleans @exprs-bits-lang[unops] and @exprs-bits-lang[binops]
-@exprs-bits-lang[binops]
+When translating the booleans @exprs-bits-lang-v7[unops] and @exprs-bits-lang-v7[binops]
+@exprs-bits-lang-v7[binops]
 on @tech{ptrs}, we need to produce something that the translation of
-@exprs-bits-lang[if] can consume.
-@exprs-bits-lang[if] is expecting a boolean value, so each
-@exprs-bits-lang[unop] should be translated to an expression that returns a
+@exprs-bits-lang-v7[if] can consume.
+@exprs-bits-lang-v7[if] is expecting a boolean value, so each
+@exprs-bits-lang-v7[unop] should be translated to an expression that returns a
 boolean.
 As we saw earlier, type predicates are implemented by masking the @tech{ptr}
-using @exprs-bits-lang[bitwise-and], and comparing the result to the tag using
-@exprs-bits-lang[=].
-But the target language @exprs-bits-lang[=] is a relop, not a boolean operation,
-so we translate @exprs-bits-lang[(fixnum? e)] to
+using @exprs-bits-lang-v7[bitwise-and], and comparing the result to the tag using
+@exprs-bits-lang-v7[=].
+But the target language @exprs-bits-lang-v7[=] is a relop, not a boolean operation,
+so we translate @exprs-bits-lang-v7[(fixnum? e)] to
 @;@exprs-bits-lang{(if (eq? (bitwise-and e #b111) #b000) ##b00001110 #b00000110)}.
-@exprs-bits-lang[(if (= (bitwise-and e #b111) #b000) #t #f)].
+@exprs-bits-lang-v7[(if (= (bitwise-and e #b111) #b000) #t #f)].
 Our representation of booleans supports optimizing this, as described earlier,
 but we should leave that optimization for a separate pass.
 
@@ -745,6 +745,43 @@ You are allowed to shadow @exprs-unique-lang-v7{prim-f}s.
          exprs-unique-lang-v7]{
 Resolves all @ch2-tech{lexical identifiers} to @ch2-tech{abstract locations}.
 }
+
+@section[#:tag "sec:overview"]{Appendix: Overview}
+
+@figure["fig:v7-graph" "Overview of Compiler Version 7" v7-graph]
+
+@section{Appendix: Languages}
+
+@declare-exporting[cpsc411/langs/v7]
+
+@deflangs[
+exprs-lang-v7
+exprs-unique-lang-v7
+exprs-unsafe-data-lang-v7
+exprs-bits-lang-v7
+exprs-bits-lang-v7/contexts
+values-bits-lang-v7
+proc-imp-mf-lang-v7
+imp-mf-lang-v7
+imp-cmf-lang-v7
+asm-pred-lang-v7
+asm-pred-lang-v7/locals
+asm-pred-lang-v7/undead
+asm-pred-lang-v7/conflicts
+asm-pred-lang-v7/pre-framed
+asm-pred-lang-v7/framed
+asm-pred-lang-v7/spilled
+asm-pred-lang-v7/assignments
+nested-asm-lang-fvars-v7
+nested-asm-lang-v7
+block-pred-lang-v7
+block-asm-lang-v7
+para-asm-lang-v7
+paren-x64-v7
+paren-x64-rt-v7
+]
+
+
 
 @;  LocalWords:  lang rkt TODO eg eval behaviour pm url todo subsubsub tt ids
 @;  LocalWords:  GitHub secref emph itemlist primops uniquify Rice's Exprs eq
