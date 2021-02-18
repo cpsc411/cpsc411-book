@@ -19,8 +19,7 @@
 @(define sb
    (make-cached-eval
     "ch6-eval"
-    '(require racket/pretty cpsc411/v1-reference/a6-solution cpsc411/compiler-lib)
-    '(current-stack-size 512)))
+    '(require racket/pretty cpsc411/reference/a6-solution cpsc411/compiler-lib)))
 
 @define[v6-graph
 @dot->svg{
@@ -828,30 +827,36 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
  ((compose
    undead-analysis
    uncover-locals
-   select-instructions)
+   select-instructions
+   canonicalize-bind
+   impose-calling-conventions
+   sequentialize-let)
   '(module
      (define L.swap.1
        (lambda (x.1 y.2)
          (if (< y.2 x.1)
              x.1
-             (let ([z.3 (apply L.swap.1 y.2 x.1)])
+             (let ([z.3 (call L.swap.1 y.2 x.1)])
                z.3))))
-     (apply L.swap.1 1 2))))
+     (call L.swap.1 1 2))))
 
 (parameterize ([current-parameter-registers '()])
   (pretty-display
    ((compose
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))
+       (call L.swap.1 1 2)))))
 
 ]
 
@@ -863,15 +868,9 @@ edge cases.
 (pretty-display
  (undead-analysis
   '(module
-     (define L.main.5
-       ((new-frames ()) (locals (ra.12)))
-       (begin
-         (set! ra.12 r15)
-         (set! fv0 5)
-         (set! r15 ra.12)
-         (jump L.fact.4 rbp r15 fv0)))
+     ((new-frames ()) (locals (ra.12)))
      (define L.fact.4
-       ((new-frames (nfv.16))
+       ((new-frames ((nfv.16)))
         (locals (ra.13 x.9 tmp.14 tmp.15 new-n.10 nfv.16 factn-1.11 tmp.17)))
        (begin
          (set! x.9 fv0)
@@ -880,7 +879,8 @@ edge cases.
              (begin (set! rax 1) (jump ra.13 rbp rax))
              (begin
                (set! tmp.14 -1)
-               (set! tmp.15 (+ x.9 tmp.14))
+               (set! tmp.15 x.9)
+               (set! tmp.15 (+ tmp.15 tmp.14))
                (set! new-n.10 tmp.15)
                (return-point
                    L.rp.6
@@ -889,9 +889,15 @@ edge cases.
                    (set! r15 L.rp.6)
                    (jump L.fact.4 rbp r15 nfv.16)))
                (set! factn-1.11 rax)
-               (set! tmp.17 (* x.9 factn-1.11))
+               (set! tmp.17 x.9)
+               (set! tmp.17 (* tmp.17 factn-1.11))
                (set! rax tmp.17)
-               (jump ra.13 rbp rax))))))))
+               (jump ra.13 rbp rax)))))
+     (begin
+       (set! ra.12 r15)
+       (set! fv0 5)
+       (set! r15 ra.12)
+       (jump L.fact.4 rbp r15 fv0)))))
 ]
 
 Next we update the @racket[conflict-analysis].
@@ -1090,19 +1096,22 @@ to frame locations.
 (parameterize ([current-parameter-registers '()])
   (pretty-display
    ((compose
-     pre-assign-frame-variables
+     assign-call-undead-variables
      conflict-analysis
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))
+       (call L.swap.1 1 2)))))
 ]
 
 Now we can allocate frames for each non-tail call.
@@ -1165,20 +1174,23 @@ to frame variables in the new frame.
 (parameterize ([current-parameter-registers '()])
   (pretty-display
    ((compose
-     assign-frames
-     pre-assign-frame-variables
+     allocate-frames
+     assign-call-undead-variables
      conflict-analysis
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))
+       (call L.swap.1 1 2)))))
 ]
 
 @examples[#:eval sb
@@ -1188,15 +1200,18 @@ to frame variables in the new frame.
      conflict-analysis
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))]
+       (call L.swap.1 1 2)))))]
 
 
 Because the frame allocator sits in the middle of our register allocation
@@ -1304,23 +1319,25 @@ field.
   (pretty-display
    ((compose
      replace-locations
-     discard-call-live
      assign-frame-variables
      assign-registers
-     assign-frames
-     pre-assign-frame-variables
+     allocate-frames
+     assign-call-undead-variables
      conflict-analysis
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))
+       (call L.swap.1 1 2)))))
 ]
 
 @section{Adjusting Frame Variables}
@@ -1462,23 +1479,25 @@ all nested expressions by generate fresh basic blocks and jumps.
      expose-basic-blocks
      implement-fvars
      replace-locations
-     discard-call-live
      assign-frame-variables
      assign-registers
-     assign-frames
-     pre-assign-frame-variables
+     allocate-frames
+     assign-call-undead-variables
      conflict-analysis
      undead-analysis
      uncover-locals
-     select-instructions)
+     select-instructions
+     canonicalize-bind
+     impose-calling-conventions
+     sequentialize-let)
     '(module
        (define L.swap.1
          (lambda (x.1 y.2)
            (if (< y.2 x.1)
                x.1
-               (let ([z.3 (apply L.swap.1 y.2 x.1)])
+               (let ([z.3 (call L.swap.1 y.2 x.1)])
                  z.3))))
-       (apply L.swap.1 1 2)))))
+       (call L.swap.1 1 2)))))
 ]
 
 @section{Final Passes}
