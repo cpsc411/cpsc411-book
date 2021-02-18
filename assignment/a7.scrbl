@@ -51,7 +51,7 @@ overwriting your files, but your file in the Git repository should be named
 
 @emph{Completely new passes}
 @itemlist[
-@item{@racket[a-normalize]}
+@item{@racket[remove-complex-opera*]}
 @item{@racket[specify-representation]}
 @item{@racket[implement-safe-primops]}
 ]
@@ -62,8 +62,8 @@ overwriting your files, but your file in the Git repository should be named
 @item{@racket[select-instructions]}
 ]
 
-@emph{No modifications to other passes} (if your compiler has been designed with
-good abstractions).
+@emph{No modifications to other passes} (if your compiler has been abstracted
+with respect to binops.).
 
 @section{Language Diagram}
 
