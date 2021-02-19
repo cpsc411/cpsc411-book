@@ -219,7 +219,7 @@ Paren-asm-sub.
       [`(set! ,loc1 ,loc2)
        #:when (and (location? loc1) (location? loc2))
        (TODO)]
-      [`(set! ,loc1 (,binop ,loc2 loc3))
+      [`(set! ,loc1 (,binop ,loc2 ,loc3))
        #:when (and (location? loc1)
                    (Paren-asm-sub-binop? binop)
                    (location? loc2)
