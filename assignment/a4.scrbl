@@ -187,6 +187,16 @@ You may want to use @racket[fresh-label] from @racketmodname[cpsc411/compiler-li
 @exercise{
 Design and implement @racket[optimize-predicates].
 You are not required to generate the "best" code (whatever that means).
+
+You can do a better job by passing an environment and recording
+known values, or sets of possible values, in @nested-asm-lang-v4[set!]
+statements, although in general the value may be "unknown".
+
+You can do an even better job by defining an abstract interpretation for each
+relational and binary operator that attempts to compute a value even when one
+operand may be unknown.
+Abstracting this from the main traversal logic will give you powerful
+optimization.
 }
 
 
