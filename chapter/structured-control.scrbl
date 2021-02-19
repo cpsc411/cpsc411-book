@@ -781,7 +781,7 @@ This means it has to define some abstract notion of the value of a statement.
 In the worst case, such an abstract value will represent "any run-time value",
 meaning that we don't have enough static information to predict the result.
 However, we might be able to evaluate a predicate determine that in
-@obejct-code{(begin (set! x.1 5) (> x.1 5))}, @object-code{x.1} is surely 5, and
+@object-code{(begin (set! x.1 5) (> x.1 5))}, @object-code{x.1} is surely 5, and
 to @object-code{(not (true))} is surely @object-code{(false)} in the abstract
 interpreter, and if so, this justifies optimizations.
 

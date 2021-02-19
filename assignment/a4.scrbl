@@ -4,7 +4,8 @@
   (except-in "a2.scrbl" doc)
   (except-in "../chapter/structured-control.scrbl" doc)
   (for-label cpsc411/compiler-lib)
-  (for-label cpsc411/reference/a4-solution))
+  (for-label cpsc411/reference/a4-solution)
+  cpsc411/langs/v4)
 
 @(reset-exercise-counter!)
 @(reset-challenge-counter!)
