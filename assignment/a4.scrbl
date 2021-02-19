@@ -151,12 +151,12 @@ Remember to use the auxiliary registers from
 }
 
 @challenge{
-In @ch4-tech{Block-asm-lang v4}, it's unnecessary to have a jump when the target of the
+In @ch4-tech{Para-asm-lang v4}, it's unnecessary to have a jump when the target of the
 jump is the next instruction.
 Design and implement an optimization pass, called @racket[inline-jump], that
 eliminates these unnecessary jumps.
-The source language is @ch4-tech{Block-asm-lang v4} and target is
-@ch4-tech{Block-asm-lang v4}
+The source language is @ch4-tech{Para-asm-lang v4} and target is
+@ch4-tech{Para-asm-lang v4}
 }
 
 @challenge{
