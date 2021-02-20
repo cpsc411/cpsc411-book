@@ -4,6 +4,7 @@
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
   (for-label cpsc411/reference/a4-solution)
+  cpsc411/reference/a4-solution
   (for-label cpsc411/langs/v4)
   cpsc411/langs/v2
   cpsc411/langs/v3
@@ -889,7 +890,7 @@ WARNING: datatype is non-canonical since Undead-set-tree can be an
          An Undead-set-tree is meant to be traversed simultaneously with an
          Undead-block-lang/tail, so this ambiguity is not a problem.
 interp. a tree of Undead-sets.  The structure of the tree mirrors the
-  structure of a Block-locals-lang tail. There are three kinds of sub-trees:
+  structure of a Asm-pred-lang. There are three kinds of sub-trees:
 (1) an instruction node is simply an undead sets;
 (2) an if node has an undead-set for the condition and two branch sub-trees.
 (3) a begin node is a list of undead set trees, culminating in a sub-tree;
@@ -898,28 +899,44 @@ interp. a tree of Undead-sets.  The structure of the tree mirrors the
 @todo{Changed this example to remove jump. Should also just compute the example instead of manually doing it.}
 For example, consider the following @tech{Undead-set-tree}.
 @racketblock[
-`((x.1)
-  (x.1 y.2)
-  ((x.1 y.2 b.3)
-   (x.1 y.2 c.4 b.3)
-   ((x.1 y.2 c.4)
-    ()
-    ((y.2 c.4)
-     (x.1 y.2)))))
+(unsyntax
+ (info-ref
+   (cadr
+    (undead-analysis
+     `(module
+          ((locals (x.1 y.2 b.3 c.4)))
+          (begin
+            (set! x.1 5)
+            (set! y.2 x.1)
+            (begin
+              (set! b.3 x.1)
+              (set! b.3 (+ b.3 y.2))
+              (set! c.4 b.3)
+              (if (= c.4 b.3)
+                  (halt c.4)
+                  (begin
+                    (set! x.1 c.4)
+                    (halt c.4))))))
+     ))
+   'undead-out)
+  )
 ]
 This corresponds to the following @asm-pred-lang-v4[tail].
 @racketblock[
-`(begin
-   (set! x.1 5)
-   (set! y.2 x.1)
+`(module
+   ((locals (x.1 y.2 b.3 c.4)))
    (begin
-      (set! b.3 (+ x.1 y.2))
-      (set! c.4 b.3)
-      (if (eq? c.4 b.3)
-          (halt c.4)
-          (begin
+     (set! x.1 5)
+     (set! y.2 x.1)
+     (begin
+       (set! b.3 x.1)
+       (set! b.3 (+ b.3 y.2))
+       (set! c.4 b.3)
+       (if (= c.4 b.3)
+           (halt c.4)
+           (begin
              (set! x.1 c.4)
-             (halt c.4)))))
+             (halt c.4))))))
 
 ]
 
