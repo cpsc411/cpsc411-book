@@ -543,7 +543,8 @@ For historical reasons, we call this pass @racket[remove-complex-opera*].
          values-bits-lang-v7?]{
 Performs the monadic form transformation, unnesting all non-trivial operators
 and operands to @exprs-bits-lang-v7[binop]s, @exprs-bits-lang-v7[call]s, and
-@exprs-bits-lang-v7[relops]s.
+@exprs-bits-lang-v7[relops]s, making data flow explicit and and simple to
+implement imperatively.
 }
 
 @;We've already seen a transformation that can elaborate this into

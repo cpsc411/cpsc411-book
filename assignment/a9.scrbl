@@ -689,6 +689,31 @@ The source language is @tech{Closure-lang v9} and the target language is
 @subsection{implement-closures}
 Now we implement closures as procedures.
 
+@todo{Need to add proceudres now; removed from prior milestone}
+@;@item{A @deftech{procedure} is a data structure representing a value that can be
+@;called as a function.
+@;Essentially, it is a wrapper around labels so we can check applications.
+@;Starting in this language, application must use a procedure instead of
+@;referencing a label directly.
+@;We construct a procedure using @exprs-unsafe-data-lang-v8[(make-procedure e_1 e_2)], where
+@;@exprs-unsafe-data-lang-v8[e_1] must evaluate to a label and @exprs-unsafe-data-lang-v8[e_2] is the number
+@;of expected arguments.
+@;The predicate @exprs-unsafe-data-lang-v8[procedure?] should return @exprs-unsafe-data-lang-v8[#t] for any
+@;value constructed this way, and #f for any other value---@exprs-unsafee-data-lang-v8[(eq?
+@;(procedure? (make-procedure e_1 e_2)) #t)].
+@;We extract the label of a procedure with @exprs-unsafe-data-lang-v8[(unsafe-procedure-label
+@;e_1)], where @exprs-unsafe-data-lang-v8[e_1] is a procedure.
+@;We get the arity of a procedure with @exprs-unsafe-data-lang-v8[(unsafe-procedure-arity e_1)],
+@;where @exprs-unsafe-data-lang-v8[e_1] is a procedure.
+@;}
+@;We remove @object-code{make-procedure} and @object-code{procedure-label}, which
+@;are used internally.
+@;The surface programmer will only be able to define safe procedures using
+@;@object-code{lambda}.
+@;However, we do allow the user to dynamically test whether a value is a procedure
+@;and how many arguments it takes.
+
+
 Our procedure object is going to be extended compared to last assignment.
 Previously, we only had a label and an arity as part of a procedure.
 All procedures were defined at the top-level and could not have lexical
