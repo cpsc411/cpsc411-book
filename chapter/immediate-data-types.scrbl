@@ -16,7 +16,7 @@
 @(define sb
    (make-cached-eval
     "ch7-eval"
-    '(require racket/pretty cpsc411/reference/a6-solution cpsc411/compiler-lib)))
+    '(require racket/pretty cpsc411/reference/a7-solution cpsc411/compiler-lib)))
 
 @define[v7-graph
 @dot->svg{
