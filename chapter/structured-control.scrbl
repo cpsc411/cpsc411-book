@@ -381,7 +381,7 @@ The pass should use @racket[current-frame-base-pointer].
 
 Next we typeset @deftech{Para-asm-lang v4} compared to @ch2-tech{Para-asm-lang v2}.
 
-@bettergrammar*[para-asm-lang-v4]
+@bettergrammar*-diff[para-asm-lang-v2 para-asm-lang-v4]
 
 While @para-asm-lang-v4[halt] is still an instruction, we assume that there is
 exactly one @emph{dynamic} halt and that it is the final instruction executed in
