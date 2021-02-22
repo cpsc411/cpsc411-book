@@ -527,9 +527,6 @@ Instead, we require that @object-code{halt} appears at the end of a block, and
 assume only one @object-code{halt} instruction is ever executed during
 exectuion.
 
-Note that now there is an @object-code{info} field for each block.
-This gives us the flexibility to write analyses over each block separately.
-
 To implement @tech{Block-asm-lang v4}, we simply flatten blocks, moving the
 @object-code{label} from the @object-code{define} to the first instruction in
 the block using @object-code{with-label}.
