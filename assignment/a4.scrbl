@@ -138,9 +138,9 @@ to implement the new instructions jump and compare instructions that don't
 exist in @ch1-tech{x64} by instruction sequences that are valid in
 @ch4-tech{Paren-x64 v4}.
 
-It will be tricky to implement the instruction @object-code{(compare addr addr)}
-with only one auxiliary register.
-You can do it in four @ch4-tech{Paren-x64 v4} instructions.
+@;It will be tricky to implement the instruction @object-code{(compare addr addr)}
+@;with only one auxiliary register.
+@;You can do it in four @ch4-tech{Paren-x64 v4} instructions.
 
 Remember to use the auxiliary registers from
 @racket[current-patch-instructions-registers].
