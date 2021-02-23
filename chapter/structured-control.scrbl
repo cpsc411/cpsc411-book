@@ -771,17 +771,17 @@ For example, we can express the following rewrites:
 #:row-properties  '(bottom-border ())
 (list
  (list @bold{Source} "⇒" @bold{Target})
- (list @object-code{(> 1 0)} "⇒" @object-code{(true)})
- (list @object-code{(< 1 0)} "⇒" @object-code{(false)})
- (list @object-code{(< opand_1 (max-int 64))} "⇒" @object-code{(true)})
- (list @object-code{(= opand_1 opand_1)} "⇒" @object-code{(true)})
- (list @object-code{(= int64_1 int64_2)} "⇒" @object-code{(false)}))
+ (list @nested-asm-lang-v4[(begin (set! reg 1) (> reg 0))] "⇒" @nested-asm-lang-v4[(begin (set! reg 1) (true))])
+ (list @nested-asm-lang-v4[(begin (set! reg 1) (< reg 0))] "⇒" @nested-asm-lang-v4[(begin (set! reg 1) (false))])
+ (list @nested-asm-lang-v4[(begin (set! reg opand_1) (< (max-int 64)))] "⇒" @nested-asm-lang-v4[(begin (set! reg opand_1) (true))])
+ (list @nested-asm-lang-v4[(begin (set! reg opand_1) (= reg opand_1))] "⇒" @nested-asm-lang-v4[(begin (set! reg opand_1) (true))])
+ (list @nested-asm-lang-v4[(begin (set! reg int64_1) (= reg int64_2))] "⇒" @nested-asm-lang-v4[(false)]))
 ]
 
 The language doesn't allow us to express relational opreations directly on
 @object-code{opand}s, so we have to be a little more clever to record the
-possible values of @tech{abstract locations}, and detect @object-code{(> aloc
-0)}, when @object-code{aloc} is surely greater than 0.
+possible values of @tech{abstract locations}, and detect @object-code{(> loc
+0)}, when @object-code{loc} is surely greater than 0.
 
 More generally, we might define an @deftech{abstract interpreter}.
 This interpreter would run during compile-time, and thus over possibly
@@ -790,11 +790,15 @@ This means it has to define some abstract notion of the value of a statement.
 In the worst case, such an abstract value will represent "any run-time value",
 meaning that we don't have enough static information to predict the result.
 However, we might be able to evaluate a predicate determine that in
-@object-code{(begin (set! x.1 5) (> x.1 5))}, @object-code{x.1} is surely 5, and
-to @object-code{(not (true))} is surely @object-code{(false)} in the abstract
-interpreter, and if so, this justifies optimizations.
+@nested-asm-lang-v4[(begin (set! fv0 5) (> fv0 5))], @nested-asm-lang-v4[fv0] is
+surely 5, and to @nested-asm-lang-v4[(not (true))] is surely
+@nested-asm-lang-v4[(false)] in the abstract interpreter, and if so, this
+justifies optimizations.
 
-@question{Can you think of any predicates that require using nested @object-code{if}
+Note that when rewriting predicates, we must be careful to preserve any effects,
+since we can't (locally) know whether they're necessary or not.
+
+@question{Can you think of any predicates that require using nested @nested-asm-lang-v4[if]
 statements?}
 @todo{Can i?}
 
