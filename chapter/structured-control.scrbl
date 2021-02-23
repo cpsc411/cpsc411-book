@@ -248,6 +248,17 @@ The instruction @object-code{je l} corresponds to @object-code{(jump-if = l)}.
 set, and corresponds to @object-code{(jump-if < l)}.
 The rest of the instructions follow this pattern.
 
+We make an additional simplifying restriction in @tech{Paren-x64 v4} compared to
+@ch1-tech{x64}.
+We assume that a @paren-x64-v4[compare] instruction is always followed
+immediately by a @paren-x64-v4[jump-if], and similarly, that any
+@paren-x64-v4[jump-if] is immediately preceeded by a @paren-x64-v4[compare].
+This is necessay since other instructions in @ch1-tech{x64}, such as binary
+operations, can affect comparison flags.
+However, we do not want to try to reason about how the flags are affected by
+arbitrary comparison, and our compiler will always generate a
+compare-and-then-conditional-jump sequence of instructions.
+
 To implement @tech{Paren-x64 v4}, we define the procedure @racket[generate-x64],
 which simply converts each instruction to its @ch1-tech{x64} string form.
 
