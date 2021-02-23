@@ -183,6 +183,14 @@ any nested @object-code{tail}s and replaces those nested @object-code{tail}s
 with jumps.
 
 You may want to use @racket[fresh-label] from @racketmodname[cpsc411/compiler-lib].
+
+In Racket, you can pass multiple return values using @racket[values], and bind them using
+@racket[let-values], @racket[let-values*], or @racket[define-values].
+You should use @racket[fresh-label] to generate new unique labels.
+@todo{elaborate}
+
+Alternatively, you may simply use mutable state.
+See @racket[box], @racket[set-box!], and @racket[unbox].
 }
 
 @exercise{

@@ -731,16 +731,15 @@ code, so for efficiency and simplicity, it is beneficial to maintain
 To implement @tech{Nested-asm-lang v4}, we define the procedure
 @racket[expose-basic-blocks].
 The strategy for writing this is slightly complex.
-Each helper for processing a nonterminal may need to introduce new basic blocks.
-In Racket, you can pass multiple return values using @racket[values], and bind them using
-@racket[let-values], @racket[let-values*], or @racket[define-values].
-You should use @racket[fresh-label] to generate new unique labels.
-@todo{elaborate}
+Each helper for processing a nonterminal may need to introduce new basic blocks,
+and transforming a nested @nested-asm-lang-v4[if] expressions requires knowning
+the target of each branch.
 
-The transformer for predicates should transform predicates and generate an
+The transformation for predicates should transform predicates and generate an
 @nested-asm-lang-v4[if] statement whose branches are jumps.
-The helper takes two additional inputs, a "true" and a "false" label, used to
-generate the output @nested-asm-lang-v4[if] instruction.
+When processing a @nested-asm-lang-v4[pred], we need takes two additional
+inputs, a "true" and a "false" label, used to generate the output
+@nested-asm-lang-v4[if] instruction.
 For a base predicate, such as @nested-asm-lang-v4[(true)] or
 @nested-asm-lang-v4[(relop aloc triv)], you can generate an @nested-asm-lang-v4[if]
 statement.
