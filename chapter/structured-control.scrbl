@@ -209,43 +209,43 @@ Labels are too complex to define by grammar; instead, they're defined by the
 @racket[label?] predicate in @racketmodname[cpsc411/compiler-lib].
 
 In @tech{Paren-x64 v4}, we model labels with the @object-code{(with-label label s)}
-instruction, which defines a label @object-code{label} at the instruction
-@object-code{s} in the instruction sequence.
-This corresponds to the @ch1-tech{x64} string @object-code{label:\n s}.
+instruction, which defines a label @paren-x64-v4[label] at the instruction
+@paren-x64-v4[s] in the instruction sequence.
+This corresponds to the @ch1-tech{x64} string @tt{label:\n s}.
 Note that they can be nested, allowing the same behavior as chaining labels in
 @ch1-tech{x64}.
 For convenience, we assume all labels are symbols of the form
-@object-code{L.<name>.<number>}, and are globally unique.
+@paren-x64-v4[L.<name>.<number>], and are globally unique.
 
-Note that @object-code{(with-label label s)} does @emph{not} behave like a
+Note that @paren-x64-v4[(with-label label s)] does @emph{not} behave like a
 @racket[define] in Racket or in @ch3-tech{Values-lang v3}.
-The instruction @object-code{s} gets executed after the previous instruction in
+The instruction @paren-x64-v4[s] gets executed after the previous instruction in
 the sequence, even if the previous instruction was not a jump.
-@object-code{with-label} additionally names the instruction so we can jump to it
+@paren-x64-v4[with-label] additionally names the instruction so we can jump to it
 later, the same as a label in @ch1-tech{x64}.
 
-The new comparison instruction @object-code{(compare reg opand)} corresponds to
-the @ch1-tech{x64} instruction @object-code{cmp reg, opand}.  This instruction
-compares @object-code{reg} to @object-code{opand} and sets some flags in the
-machine describing their relation, such as whether @object-code{reg} is less
-than @object-code{opand}, or whether they are equal.  The flags are used by the
+The new comparison instruction @paren-x64-v4[(compare reg opand)] corresponds to
+the @ch1-tech{x64} instruction @tt{cmp reg, opand}.  This instruction
+compares @paren-x64-v4[reg] to @paren-x64-v4[opand] and sets some flags in the
+machine describing their relation, such as whether @paren-x64-v4[reg] is less
+than @paren-x64-v4[opand], or whether they are equal.  The flags are used by the
 next condition jump instruction.
 
 The conditional jump instructions in @ch1-tech{x64}, in the same order as the
-definition of @object-code{relop}, are: @object-code{jl label},
-@object-code{jle label}, @object-code{je label},
-@object-code{jge label}, @object-code{jg label}, and @object-code{jne label}
+definition of @paren-x64-v4[relop], are: @tt{jl label},
+@tt{jle label}, @tt{je label},
+@tt{jge label}, @tt{jg label}, and @tt{jne label}
 and
-Each corresponds to "jump to @object-code{trg} if the comparison flag is set to
+Each corresponds to "jump to @paren-x64-v4[trg] if the comparison flag is set to
 ___".
-For example, the instruction @object-code{je label} jumps to @object-code{label}
+For example, the instruction @tt{je label} jumps to @paren-x64-v4[label]
 if the comparison flag "equal" is set.
 
 In @tech{Paren-x64 v4}, we abstract the various conditional jump instructions
 into a single instruction with multiple flags.
-The instruction @object-code{je l} corresponds to @object-code{(jump-if = l)}.
-@object-code{jl l} jumps to @object-code{l} if comparison flag "less than" is
-set, and corresponds to @object-code{(jump-if < l)}.
+The instruction @tt{je l} corresponds to @paren-x64-v4[(jump-if = l)].
+@tt{jl l} jumps to @paren-x64-v4[l] if comparison flag "less than" is
+set, and corresponds to @paren-x64-v4[(jump-if < l)].
 The rest of the instructions follow this pattern.
 
 We make an additional simplifying restriction in @tech{Paren-x64 v4} compared to
