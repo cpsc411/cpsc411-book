@@ -247,6 +247,14 @@ translate value-oriented operations into location-oriented instruction.
 }
 
 @exercise{
+Redesign and extend the implementation of @racket[sequentialize-let].
+}
+
+@exercise{
+Redesign and extend the implementation of @racket[canonicalize-bind].
+}
+
+@exercise{
 Redesign and extend the implementation of @racket[uniquify].
 
 You may find this implementation of alpha equivalence for
