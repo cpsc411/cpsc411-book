@@ -487,7 +487,7 @@ Flatten all nested @nested-asm-lang-v2[begin] expressions.
 ]
 
 @section{Abstracting Physical Locations}
-We are still required to think about @tech{physical locations}---the registers
+We are still required to think about @deftech{physical locations}---the registers
 and frame variables of @ch1-tech{x64}.
 We don't usually care which location a value is stored in, so long as it is
 stored @emph{somewhere}.

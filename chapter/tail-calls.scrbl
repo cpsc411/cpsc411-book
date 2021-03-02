@@ -204,9 +204,10 @@ Every @tech{call} will first set those locations and pass control to the @tech{p
 @;In the process, the caller will need to ensure that it does not need the values
 @;in those physical locations.
 Every @tech{procedure} will read from those locations on entry, and move the
-@tech{arguments} into its own @tech{abstract locations}.
-This way, no procedure needs to know about another's abstract locations, and we
-maintain the per-block regsiter allocator we've used until now.
+@tech{arguments} into its own @ch2-tech{abstract locations}.
+This way, no procedure needs to know about another's @ch2-tech{abstract
+locations}, and we maintain the per-block regsiter allocator we've used until
+now.
 
 @digression{
 @todo{This digression seems... more important than a digression.}
@@ -227,7 +228,7 @@ possible.
 Unfortunately, using them requires that we expose @ch2-tech{physical locations}
 through every layer of abstraction up to the point where we implement the
 calling convention.
-That's every language from @a4-tech{Para-asm v2} to @a4-tech{Block-lang}.
+@;That's every language from @a4-tech{Para-asm v2} to @a4-tech{Block-lang}.
 This makes all our abstractions only partial abstractions, and injects undefined
 behavior back into our intermediate languages.
 
