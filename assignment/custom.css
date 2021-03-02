@@ -10,12 +10,15 @@
     position: fixed;
     z-index: 1;
     background: #a7b0be;
-    height: auto;
+    height: 6rem;
 }
 
 
 .tocset {
     position: fixed;
     overflow-y: scroll;
-    height: 88%;
+    top: 0rem;
+    bottom: 0;
+    margin: 6rem 0 0 0;
+    padding: 0rem 0.5rem 0.5rem 0.5rem;
 }
