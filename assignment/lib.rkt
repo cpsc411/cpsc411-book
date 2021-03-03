@@ -6,6 +6,7 @@
   racket/syntax
   racket/function)
  racket/dict
+ racket/runtime-path
  with-cache
  (except-in scribble/manual racketgrammar*)
  scribble/example
@@ -30,6 +31,11 @@
   scribble/manual
   scribble/example
   "../config.rkt"))
+
+(define-runtime-path custom-css "custom.css")
+
+(define (load-custom-css)
+  (elem #:style (make-style "" (list (make-css-addition custom-css)))))
 
 (define (digression . c)
   (make-nested-flow
