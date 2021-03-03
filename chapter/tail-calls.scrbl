@@ -548,7 +548,11 @@ We use the following heuristics to implement @racket[check-values-lang]:
   @item{An @values-lang-v5[if] expression @values-lang-v5[(if pred tail_1
   tail_2)] is only well typed if @values-lang-v5[pred] is a well-typed
   predicate.}
+  @item{Every procedure must return an @values-lang-v5[int64].}
 ]
+
+Finally, we have one restriction imposed by the run-time system: the final
+result of the program must be an @values-lang-v5[int64].
 
 @nested[#:style 'inset
 @defproc[(check-values-lang (p Values-lang-v5?))
