@@ -540,8 +540,8 @@ We use the following heuristics to implement @racket[check-values-lang]:
   is bound to a procedure with @racket[n] @tech{parameters} and there are exactly
   @racket[n] @tech{arguments} in @values-lang-v5[call].}
   @item{A binary operation @values-lang-v5[(binop triv_1 triv_2)] is only well
-  typed, and has type integer, if both @values-lang-v5[value_1] and
-  @values-lang-v5[value_2] have type integer.}
+  typed, and has type integer, if both @values-lang-v5[triv_1] and
+  @values-lang-v5[triv_2] have type integer.}
   @item{A relational operation @values-lang-v5[(relop triv_1 triv_2)] is only well
   typed if both @values-lang-v5[triv_1] and @values-lang-v5[triv_2] have type
   integer.}
