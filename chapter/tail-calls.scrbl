@@ -750,9 +750,9 @@ convention translation decorated the jump with the locations used by the
 procedure call, our undead analysis is trivial.
 The @a3-tech{undead-out set} of a jump statement @asm-pred-lang-v5[(jump triv_1
 triv_2 ...)] is the set @racket[triv_2 ...].
-We simply move this set into the @a3-tech{undead set tree} for the jump instruction,
-discarding it from the instruction in the process.
-@todo{If I use Kent's fixpoint algorithm, this can't be discarded here.}
+@;We simply move this set into the @a3-tech{undead set tree} for the jump instruction,
+@;discarding it from the instruction in the process.
+@;@todo{If I use Kent's fixpoint algorithm, this can't be discarded here.}
 
 This requires no changes to the @a3-tech{undead set tree}.
 
@@ -815,6 +815,7 @@ locations}.
 
 We need to extend the implementation to traverse each block, and support jump
 statements.
+In the process, we also discard the undead annotations on the jump instruction.
 
 @nested[#:style 'inset
 @defproc[(replace-locations [p asm-pred-lang-v5/assignments.p?])
