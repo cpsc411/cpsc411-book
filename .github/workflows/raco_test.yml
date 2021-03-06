@@ -30,8 +30,10 @@ jobs:
       run: |
         # required for raco test
         # NOTE: at-exp-lib a built-time dependency; build first to prevent race conditions
+        # Same with data-enumerate-lib, which seems to trigger similar bugs
         raco pkg install --batch --auto compiler-lib \
-        at-exp-lib
+        at-exp-lib \
+        data-enumerate-lib
     - name: Checkout private dependencies
       uses: actions/checkout@v2
       with:
