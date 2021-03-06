@@ -19,7 +19,7 @@
     "scribble-doc"
     ("base" #:version "7.4")
     "racket-doc"
-    #;"cpsc411-doc"
+    "cpsc411-doc"
     "cpsc411-lib"
     "cpsc411-reference-lib"
     "racket-graphviz"
