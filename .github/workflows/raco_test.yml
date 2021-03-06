@@ -47,7 +47,6 @@ jobs:
         path: cpsc411-book
     - name: Install dependencies
       run: |
-        # Use -j 1 to avoid race conditions; there seem to be a lot in 7.4
         raco pkg install --batch --auto \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2020w2 \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc#2020w2 \
