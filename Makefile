@@ -18,7 +18,7 @@ all: help
 
 build: build/.done
 
-build/.done: .racodeps assignment/* appendix/*.scrbl chapter/* *.scrbl Makefile config.rkt
+build/.done: .racodeps assignment/* appendix/*.scrbl chapter/*.scrbl *.scrbl Makefile config.rkt
 	scribble --dest-name build --htmls --redirect-main "https://www.students.cs.ubc.ca/~cs-411/docs/" ++xref-in setup/xref load-collections-xref ++style assignment/custom.css index.scrbl
 	touch $@
 
