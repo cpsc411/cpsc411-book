@@ -30,10 +30,10 @@ jobs:
       run: |
         # required for raco test
         # NOTE: at-exp-lib a built-time dependency; build first to prevent race conditions
-        # Same with data-enumerate-lib, which seems to trigger similar bugs
+        # redex-lib and deps seems to need to be built first, or redex-gen causes problems
         raco pkg install --batch --auto compiler-lib \
         at-exp-lib \
-        data-enumerate-lib
+        redex-lib
     - name: Checkout private dependencies
       uses: actions/checkout@v2
       with:
@@ -48,7 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         # Use -j 1 to avoid race conditions; there seem to be a lot in 7.4
-        raco pkg install -j 1 --batch --auto \
+        raco pkg install --batch --auto \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2020w2 \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc#2020w2 \
           ./compilers2.0/cpsc411-priv/cpsc411-reference-tests \
