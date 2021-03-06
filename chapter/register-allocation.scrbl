@@ -77,7 +77,7 @@ Unfortunately, our implementation strategy has a severe limitation.
 While it's simple and works, it's extremely slow!
 Each and every variable assignment or reference accesses memory.
 While memory accesses have improved a lot compared to old computers due to
-caching, accessing memory are still orders of magintude slower than accessing a
+caching, accessing memory are still orders of magnitude slower than accessing a
 register when our variable is not in the cache (and, in general, it won't be in
 cache).
 Our compiler will have better performance if we help the machine out by using
@@ -199,7 +199,7 @@ This is also necessary if we want to handle linking, or separate compilation.
 
 We cannot in general decide the value of a variable at a given instruction.
 Instead, we focus on analyzing each @emph{assignment} to a variable, which
-change the value of the variable.
+changes the value of the variable.
 
 We assume that any variable that gets used, or might get used, might @emph{not}
 be @tech{dead}, @ie we assume it is @deftech{undead}, and consider a variable
@@ -232,7 +232,7 @@ That is, the @tech{undead-in set} for an instruction @object-code{s_i} is the
 
 Each iteration of the loop performs the following analysis on a particular
 instruction.
-We start making by assuming the @tech{undead-in set} is the same as the
+We start by assuming the @tech{undead-in set} is the same as the
 @tech{undead-out set}, then update it depending on what happens in the
 instruction.
 If a variable is @emph{used} in the instruction, it @emph{ought to be}
@@ -259,7 +259,7 @@ A simple way is to create a data structure that maps each set to an instruction.
 
 Since our programs are trees of instructions, we represent the @tech{undead-out
 sets} for each instruction as a tree of @tech{undead-out sets}.
-We define the data @tech{undead-set tree} to mirror structure of
+We define the data @tech{undead-set tree} to mirror the structure of
 @ch2-tech{Asm-lang v2} programs.
 An @deftech{undead-set tree} is either:
 @itemlist[
@@ -276,7 +276,7 @@ for the second @asm-lang-v2[effect], and so on.
 ]
 An @tech{undead-set tree} @asm-lang-v2[(undead-set-tree? ...)] together with a
 list of instructions @asm-lang-v2[(effect ...)] can be traversed together using
-the template for for two trees simultaneously.
+the template for two trees simultaneously.
 This is similar to traversing two lists simultaneously:
 @racketblock[
 (define (fn-for-s-and-undead-outs ss undead-outs)
@@ -375,7 +375,7 @@ values might be in those variables at the same time.
 
 We start by defining what a conflict is precisely.
 
-@emph{True Definition of Conflict}
+@emph{True Definition of Conflict:}
 Any variable that gets a new value during an instruction is @deftech{in
 conflict} with every variable that (1) has a different value at the same time
 and (2) will still be used after that instruction.
@@ -383,7 +383,7 @@ and (2) will still be used after that instruction.
 Unfortunately, due to Rice's Theorem, we cannot decide either property.
 We cannot figure out the value of every variable before run time; if we could,
 compiling would not be necessary.
-We also do not know variables are @tech{live}, only which are @tech{undead}.
+We also do not know which variables are @tech{live}, only which are @tech{undead}.
 We therefore only approximate conflicts.
 
 To approximate conflicts, we ignore values, and once more focus on assignments
@@ -391,17 +391,17 @@ to variables.
 An assignment to the variable this means the variable @emph{might} take on a
 new value that @emph{might} be different than the value of any variable which
 @emph{might} be @tech{live} at that point.
-We have already approximate liveness via @tech{undead-out sets}, so what reminds
+We have already approximated liveness via @tech{undead-out sets}, so what remains
 is to approximate when a variable takes on a new value.
 We describe this, and slightly refine this criteria, below.
 
 We represent conflicts in a data structure called a @deftech{conflict graph}.
-Interpreted as an undirected graph, the variables as represented as nodes (also
+Interpreted as an undirected graph, the variables are represented as nodes (also
 known as vertexes), and conflicts between variables are represented as an edge
-the variable to each of the variables in the associated set.
+from the variable to each of the variables in the associated set of conflicts.
 If there is an edge between any two nodes, then they are in conflict.
 Interpreted as a dictionary, the @tech{conflict graph} maps each variable to a
-set variables with which it is in conflict.
+set of variables with which it is in conflict.
 
 @todo{Assigned vs defined; also "assigned" not defined before use (above and in
 undead analysis). "Assigned" is also bad since it overlaps with "register
@@ -419,11 +419,11 @@ We approximate the values of variables by assuming each @emph{definition}
 assigns a new unique value to the variable, and by assuming each variable in the
 @tech{undead-out set} also has a unique value.
 This approximation tells us that @asm-lang-v2[x.1] cannot be assigned the same
-@ch2-tech{physical location} as any variables in the @tech{undead-out set}.
+@ch2-tech{physical location} as any other variable in the @tech{undead-out set}.
 If @asm-lang-v2[x.2] is @tech[#:key "undead-out set"]{undead-out} at this
 instruction, and we try to put @asm-lang-v2[x.1] in the same @ch2-tech{physical
-location} as @asm-lang-v2[x.2], then the value of @asm-lang-v2[x.2] would have
-been overwritten by the value of @asm-lang-v2[(+ x.1 x.2)].
+location} as @asm-lang-v2[x.2], then the value of @asm-lang-v2[x.2] would be
+overwritten by the value of @asm-lang-v2[(+ x.1 x.2)].
 
 We can reduce the number of conflicts, and thus possibly fit more variables into
 registers, by observing that one instruction does tell us that two values will
@@ -452,17 +452,17 @@ We typeset the difference compared to @tech{Asm-lang v2/undead}.
 
 @bettergrammar*-diff[#:include (info) asm-lang-v2/undead asm-lang-v2/conflicts]
 
-The @asm-lang-v2/conflicts[info] field extended with a @tech{conflict graph},
+The @asm-lang-v2/conflicts[info] field is extended with a @tech{conflict graph},
 represented as an association list from a variable to @tech{undead-out sets}.
 
 As in @tech{Asm-lang v2/undead}, the @asm-lang-v2/conflicts[info] field also
 contains a declaration of the @ch2-tech{abstract locations} that may be used in the
 program, and (as usual) possibly other non-required but useful information.
 
-To implement conflict analysis, we simultaneously traverse an program with its
-@tech{undead-set tree}, and analysis each instruction according to the
+To implement conflict analysis, we simultaneously traverse a program with its
+@tech{undead-set tree}, and analyze each instruction according to the
 approxiate conflict definition above.
-We start with an graph that initially contains a node for every
+We start with a graph that initially contains a node for every
 @ch2-tech{abstract location} in the @asm-lang-v2/conflicts[locals] set, and
 extend the graph with conflicts as we discover them.
 
@@ -527,13 +527,13 @@ Decorates a program with its @tech{conflict graph}.
 ]}}
 
 @section{Register Allocation}
-Register allocation, as in the, the step the actually assigns @ch2-tech{abstract
+Register allocation, as in the step that actually assigns @ch2-tech{abstract
 locations} to @ch2-tech{physical locations}, takes the set of @ch2-tech{abstract
 locations} to assign homes, the conflict graph, and some set of assignable
 registers, and tries to assign the most @ch2-tech{abstract locations} to
 registers.
 As usual, Rice's Theorem tells us we'll never be able to decide the maximal
-number of variables we can fit in register.
+number of variables we can fit in registers.
 We'll have to approximate.
 
 @define[variable @ch2-tech{abstract location}]
@@ -550,7 +550,7 @@ effect on compile time compared to graph-colouring register allocation.
 }
 
 The core algorithm has a straight-forward recursive description.
-We recur over the set of @asm-lang-v2/conflicts[locals] and producing an
+We recur over the set of @asm-lang-v2/conflicts[locals] and produce an
 @emph{assignment}, @ie a dictionary mapping @ch2-tech{abstract locations} to
 @ch2-tech{physical locations}.
 @itemlist[
@@ -558,13 +558,13 @@ We recur over the set of @asm-lang-v2/conflicts[locals] and producing an
 assignment.}
 @item{Otherwise, choose a @tech{low-degree} @variable from the input set of
 @|variables|, if one exists.
-Otherwise, pick an arbitrary @ch2-tech{abstract locations} from the set.
+Otherwise, pick an arbitrary @ch2-tech{abstract location} from the set.
 
-A @deftech{low-degree} @ch2-tech{abstract locations} is one with fewer than
-@tt{k} conflicts, some for pre-defined @tt{k}.
+A @deftech{low-degree} @ch2-tech{abstract location} is one with fewer than
+@tt{k} conflicts, for some for pre-defined @tt{k}.
 We pick @tt{k} to be the number of registers in the set of assignable registers.
 }
-@item{Recur with the chosen @ch2-tech{abstract locations} removed from the input set and removed from
+@item{Recur with the chosen @ch2-tech{abstract location} removed from the input set and
 the conflict graph.
 The recursive call should return an assignment for all the remaining @|variables|.}
 @item{Attempt to select a register for the chosen @|variable|.
@@ -574,7 +574,7 @@ This attempt succeeds if a low-degree @variable was chosen, and @emph{might} fai
 otherwise (but it depends on which registers got allocated in the recursive
 call).
 @itemlist[
-@item{If you succeed in select a register, then add the assignment for
+@item{If you succeed in selecting a register, then add the assignment for
 the chosen @variable to the result of the recursive call.}
 @item{Otherwise, we cannot assign the choosen @variable to a register.
 Instead, we @emph{spill it}, @ie we assign it a fresh @ch2-tech{frame variable}.}
@@ -590,7 +590,7 @@ We can simplify the implementation of this algorithm by separting it into two
 parts: first, sort all @variables in degree order, then assign each register in
 sorted order.
 
-To describe the output of the regsiter allocator, we reuse @ch2-tech{Asm-lang
+To describe the output of the register allocator, we reuse @ch2-tech{Asm-lang
 v2/assignments}.
 Below, we typeset the changes compared to @tech{Asm-lang v2/conflicts}.
 Note only the @asm-lang-v2/assignments[info] field changes.
