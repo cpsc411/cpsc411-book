@@ -793,6 +793,8 @@ to @tech{Asm-pred-lang v5/conflicts} by decorating programs with their
 ]
 
 The graph colouring register alloctor does not need major changes.
+Below we define @deftech{Asm-pred-lang v5/assignments}, which only changes in
+the @asm-pred-lang-v5[info] field as usual.
 
 @bettergrammar*-diff[#:include (info) asm-pred-lang-v5/conflicts asm-pred-lang-v5/assignments]
 
@@ -800,16 +802,16 @@ The allocator should run the same algorithm as before, but this time, on each
 block separately.
 
 @nested[#:style 'inset
-@defproc[(assign-registers (p asm-pred-lang-v5/conflicts.p?))
-         asm-pred-lang-v5/assignments.p?]{
-Performs @a3-tech{graph-colouring register allocation}, compiling
+@defproc[(assign-registers (p Asm-pred-lang-v5/conflicts?))
+         Asm-pred-lang-v5/assignments?]{
+Performs graph-colouring register allocation, compiling
 @tech{Asm-pred-lang v5/conflicts} to @tech{Asm-pred-lang v5/assignments} by
-decorating programs with their @a3-tech{register assignments}.
+decorating programs with their register assignments.
 }
 ]
 
-Finally, we actually replace @a2-tech{abstract locations} with @a2-tech{physical
-locations}.
+Finally, we actually replace @ch2-tech{abstract locations} with
+@ch2-tech{physical locations}.
 
 @bettergrammar*-diff[asm-pred-lang-v5/assignments nested-asm-lang-v5]
 
@@ -821,8 +823,8 @@ In the process, we also discard the undead annotations on the jump instruction.
 @defproc[(replace-locations [p asm-pred-lang-v5/assignments.p?])
          para-asm-lang-v5.p?]{
 Compiles @tech{Asm-pred-lang v5/assignments} to @tech{Asm-pred-lang v5} by replacing all
-@tech{abstract location} with @tech{physical locations} using the assignment
-described in the @object-code{assignment} info field.
+@ch2-tech{abstract location} with @ch2-tech{physical locations} using the assignment
+described in the @asm-pred-lang-v5[assignment] info field.
 }
 ]
 
