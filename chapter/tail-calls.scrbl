@@ -142,10 +142,10 @@ to an algorithm, while a procedure is code that executes algorithmically, and ma
 rely on machine state in addition to its declared inputs and outputs.}
 
 Normally, @tech{procedures} are thought about as composed of two features:
-@tech{call} and @tech{return}.
+@tech{call} and @ch6-tech{return}.
 However, these are two separate abstractions.
 In this chapter, we introduce only the @tech{call} abstraction.
-@tech{Procedures} can be called, but never @tech{return}.
+@tech{Procedures} can be called, but never @ch6-tech{return}.
 We limit where such as call can happen so we do not have to answer
 inconvenient questions.
 
@@ -193,9 +193,9 @@ The problem is deciding how to ensure the locations end up the same.
 @todo{Be careful with arguments vs parameters}
 
 @section{Calling Conventions Introduction}
-Introducing a calling convention solves the problem mentioned above.
+Introducing a @tech{calling convention} solves the problem mentioned above.
 
-The calling convention gives us a pattern to set up a call to @emph{any}
+The @deftech{calling convention} gives us a pattern to set up a call to @emph{any}
 procedure.
 We fix a set of @emph{@ch2-tech{physical locations}}.
 Both the caller and the callee agree that those locations are the only thing
@@ -322,7 +322,7 @@ When transforming a procedure @racket[`(lambda (,x_0 ... ,x_n-1 ,x_n ...
 ]
 where:
 @itemlist[
-@item{@racket[fv_0 _... fv_k-1] are the first @racket[k] @ch2-tech{frame variables}.
+@item{@racket[fv_0 _... fv_k-1] are the first @racket[k] @ch2-tech{frame variable}.
 }
 @item{@racket[r_0 _... r_n-1] are the @racket[n] physical locations from
 @racket[current-parameter-registers].}
@@ -361,8 +361,8 @@ but can enable better use of registers and optimizations.
 This time, we move values into the registers last, to keep there lives as short
 as possible.
 
-Here, we decorate the @imp-mf-lang-v5[jump] instruction with its @a3-tech{undead
-set}.
+Here, we decorate the @imp-mf-lang-v5[jump] instruction with its
+@ch-ra-tech{undead-out set}.
 Going top-down, it is not obvious why we would do this.
 @todo{Do I want to include this or leave it for lecture? I think I want the book
 to be self-contained, but I don't want to give away the question from the
@@ -379,11 +379,11 @@ all the way up to whatever this transformation targets.
 This means at least exposing @block-pred-lang-v5[jump] through the regsiter
 allocator.
 In @racket[undead-analysis], we will need to decide what set of locations is
-@a3-tech{undead after} a @block-pred-lang-v5[jump].
+@ch-ra-tech{undead} after a @block-pred-lang-v5[jump].
 In general, if we want to support separate compilation, we cannot answer that
 question.
 To design this @block-pred-lang-v5[jump] abstraction in a way we will be able to
-implement requires explicitly annotating it with its @a3-tech{undead set}.
+implement requires explicitly annotating it with its @ch-ra-tech{undead-out set}.
 }
 
 @;By loading the return address first, we keep live range of @racket[tmp-rp]
@@ -398,7 +398,7 @@ To do this, we need to ask a few questions.
 First: which target languages support the features needed in the target of our
 translation?
 If we look at the pipeline from the last chapter, @Secref[#:tag-prefixes
-'("chp4:")]{sec:overview}, we know the translation must come at least after
+'("book:" "chp4:")]{sec:overview}, we know the translation must come at least after
 @racket[sequentialize-let], since the target language will need to use
 imperative features introduced in that pass.
 Introducing calling conventions also generates @imp-mf-lang-v5[begin] statement
@@ -499,7 +499,7 @@ For example, the following is a valid @tech{Values-lang v5} program:
   (call even? 5))
 }
 
-We continue to require that the source program is well bound: all @tech{lexical
+We continue to require that the source program is well bound: all @ch3-tech{lexical
 identifiers} are defined before they are used.
 We also restrict procedure to not bind the same identifier twice.
 We could allow this and define a shadowing order, but this would always
@@ -636,7 +636,7 @@ compiled to a block that assigns the @tech{parameters}, as directed by the
 calling convention.
 
 Note that we now require @tech{physical locations} in the target language, so we
-must gradually expose @tech{physical locations} up to this language from the rest
+must gradually expose @ch2-tech{physical locations} up to this language from the rest
 of the compiler.
 
 @nested[#:style 'inset
@@ -737,7 +737,7 @@ Now our undead algorithm must change to analyze jumps.
 @bettergrammar*-diff[#:include (info tail) asm-pred-lang-v5/locals asm-pred-lang-v5/undead]
 
 When analyzing a @asm-pred-lang-v5[jump] statement, we need to compute its
-@a3-tech{undead-out set}.
+@ch-ra-tech{undead-out set}.
 
 @todo{Could be a design digression instead}
 In general, this is difficult.
@@ -751,24 +751,23 @@ Thankfully, none of that is necessary.
 Because jumps in our language only come from procedure calls, and our calling
 convention translation decorated the jump with the locations used by the
 procedure call, our undead analysis is trivial.
-The @a3-tech{undead-out set} of a jump statement @asm-pred-lang-v5[(jump triv_1
+The @ch-ra-tech{undead-out set} of a jump statement @asm-pred-lang-v5[(jump triv_1
 triv_2 ...)] is the set @racket[triv_2 ...].
-@;We simply move this set into the @a3-tech{undead set tree} for the jump instruction,
+@;We simply move this set into the @a3-tech{undead-set tree} for the jump instruction,
 @;discarding it from the instruction in the process.
 @;@todo{If I use Kent's fixpoint algorithm, this can't be discarded here.}
 
-This requires no changes to the @a3-tech{undead set tree}.
+This requires no changes to the @ch-ra-tech{undead-set tree}.
 
 Again, we also need to modify the analysis slightly to perform local analysis on
-each block, and store @a3-tech{undead set trees} in the info field for the
+each block, and store @ch-ra-tech{undead-set trees} in the info field for the
 corresponding block.
 
 @nested[#:style 'inset
-@defproc[(undead-analysis (p asm-pred-lang-v5/locals.p?))
-         asm-pred-lang-v5/undead.p?]{
-Performs @a3-tech{undead analysis}, compiling @tech{Asm-pred-lang v5/locals} to
-@tech{Asm-pred-lang v5/undead} by decorating programs with their @a3-tech{undead
-set trees}.
+@defproc[(undead-analysis (p Asm-pred-lang-v5/locals?))
+         Asm-pred-lang-v5/undead?]{
+Performs undead analysis, compiling @tech{Asm-pred-lang v5/locals} to
+@tech{Asm-pred-lang v5/undead} by decorating programs with their @ch-ra-tech{undead-set trees}.
 }
 ]
 
@@ -782,16 +781,16 @@ control-flow.
 The @racket[conflict-analysis] does not change significantly.
 We simply extend the algorithm to support jump statements.
 Note that @asm-pred-lang-v5[jump] only references but never defines an
-@a2-tech{abstract location}.
+@ch2-tech{abstract location}.
 
 Again, the analysis should perform local analysis on each block separately.
 
 @nested[#:style 'inset
-@defproc[(conflict-analysis (p asm-pred-lang-v5/undead.p?))
-         asm-pred-lang-v5/conflicts.p?]{
-Performs @a3-tech{conflict analysis}, compiling @tech{Asm-pred-lang v5/undead}
-to @tech{Asm-pred-lang v5/conflicts} by decorating programs with their
-@a3-tech{conflict graph}.
+@defproc[(conflict-analysis (p Asm-pred-lang-v5/undead?))
+         Asm-pred-lang-v5/conflicts?]{
+Performs conflict analysis, compiling @tech{Asm-pred-lang v5/undead}
+to @tech{Asm-pred-lang v5/conflicts} by decorating programs with their conflict
+graph.
 }
 ]
 
