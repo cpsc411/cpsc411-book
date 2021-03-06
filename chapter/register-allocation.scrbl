@@ -109,7 +109,7 @@ cannot be assigned to the same register.
 register that is different from any conflicting @ch2-tech{abstract locations}.
 }
 @item{Spilling: if we fail to find a register for an @ch2-tech{abstract
-locations}, put it in a @ch2-tech{frame variable}.
+location}, put it in a @ch2-tech{frame variable}.
 }
 ]
 
@@ -167,7 +167,7 @@ We will replace @racket[assign-homes] with @racket[assign-homes-opt].
 @defproc[(assign-homes-opt [p asm-lang-v2?]) nested-asm-lang-v2?]{
 Compiles @ch2-tech{Asm-lang v2} to @ch2-tech{Nested-asm-lang v2}, replacing each
 @ch2-tech{abstract location} with a @ch2-tech{physical location}.
-This version perform graph-colouring register allocation.
+This version performs graph-colouring register allocation.
 }
 }
 
@@ -240,7 +240,7 @@ If a variable is @emph{used} in the instruction, it @emph{ought to be}
 might not be used, but the variable is at least acting like its
 @tech{live}---and is added to the @tech{undead-in set}.
 If a variable is @emph{assigned}, @ie its value is overwritten, in the
-instruction, it is @emph{definitely} @tech{dead} at that point and we remove it
+instruction, it is @emph{definitely} @tech{dead} at that point, and we remove it
 from the @tech{undead-in set}.
 
 
@@ -252,7 +252,7 @@ values are live after the program.
 For example, in @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
 v1}, we assume @object-code{rax} is live out.
 
-This algorithm creates the @tech{undead-out sets} for each instructions so that
+This algorithm creates the @tech{undead-out sets} for each instruction so that
 later passes can associate each instruction with its @tech{undead-out set}.
 There are many ways to associate the @tech{undead-out sets} with instructions.
 A simple way is to create a data structure that maps each set to an instruction.
@@ -384,16 +384,16 @@ Unfortunately, due to Rice's Theorem, we cannot decide either property.
 We cannot figure out the value of every variable before run time; if we could,
 compiling would not be necessary.
 We also do not know which variables are @tech{live}, only which are @tech{undead}.
-We therefore only approximate conflicts.
+Therefore, we can only approximate conflicts.
 
 To approximate conflicts, we ignore values, and once more focus on assignments
 to variables.
-An assignment to the variable this means the variable @emph{might} take on a
-new value that @emph{might} be different than the value of any variable which
+An assignment to the variable means the it @emph{might} take on a
+new value that @emph{might} be different from the value of any variable which
 @emph{might} be @tech{live} at that point.
 We have already approximated liveness via @tech{undead-out sets}, so what remains
 is to approximate when a variable takes on a new value.
-We describe this, and slightly refine this criteria, below.
+Below, we describe how to approximate conflcits and slightly refine these criteria.
 
 We represent conflicts in a data structure called a @deftech{conflict graph}.
 Interpreted as an undirected graph, the variables are represented as nodes (also
@@ -429,7 +429,7 @@ We can reduce the number of conflicts, and thus possibly fit more variables into
 registers, by observing that one instruction does tell us that two values will
 be the same.
 A move instruction, such as @object-code{(set! x.1 x.2)}, is an instruction that
-simply defines the value of one variables to be that of another.
+simply defines the value of one variable to be that of another.
 
 @emph{Approximation of Conflict}
 @itemlist[
