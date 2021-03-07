@@ -822,11 +822,10 @@ statements.
 In the process, we also discard the undead annotations on the jump instruction.
 
 @nested[#:style 'inset
-@defproc[(replace-locations [p asm-pred-lang-v5/assignments.p?])
-         para-asm-lang-v5.p?]{
-Compiles @tech{Asm-pred-lang v5/assignments} to @tech{Asm-pred-lang v5} by replacing all
-@ch2-tech{abstract location} with @ch2-tech{physical locations} using the assignment
-described in the @asm-pred-lang-v5[assignment] info field.
+@defproc[(replace-locations [p asm-pred-lang-v5/assignments?])
+         nested-asm-lang-v5?]{
+Replaces all @ch2-tech{abstract location} with @ch2-tech{physical locations}
+using the assignment described in the @asm-pred-lang-v5[assignment] info field.
 }
 ]
 
