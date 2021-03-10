@@ -308,7 +308,7 @@ better use of registers, so we should generate accesses to registers first to
 limit their live ranges.
 }
 
-@item{When transforming a @tech{tail call}, @racket[`(call ,v ,v_0 ... ,v_n-1
+@item{When transforming a @ch5-tech{tail call}, @racket[`(call ,v ,v_0 ... ,v_n-1
 ,v_n ... ,v_n+k-1)], we generate:
 
 @racketblock[
@@ -918,7 +918,7 @@ frame and thus memory usage.
 
 This is straightforward to solve.
 We run @racket[conflict-analysis], but also collect conflicts between
-@ch2-tech{abstract locations} and @tech{physical locations}.
+@ch2-tech{abstract locations} and @ch2-tech{physical locations}.
 
 Recall that that @racket[current-return-value-register] is assigned by a non-tail call.
 Also note that @racket[current-frame-base-pointer-register] and
