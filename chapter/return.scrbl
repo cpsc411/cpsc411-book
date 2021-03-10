@@ -168,7 +168,7 @@ to jump after their computation is complete.
 
 We also add subtraction as a @values-lang-v6[binop].
 This week, we start to need subtraction a lot more and it's tiring to encode it
-when @a0-tech{x64} supports it.
+when @ch1-tech{x64} supports it.
 This requires almost no changes to the compiler if it parameterized by the set
 of @values-lang-v6[binop]s.
 
@@ -643,7 +643,7 @@ These increment/decrement operations can be interpreted as "pushing" and
 "popping" a new frame on and off the @deftech{stack of frames} (which we will
 usually shorten to just @deftech{stack}).
 
-This usage of @tech{stack} differs from what @tech{x64} provides.
+This usage of @tech{stack} differs from what @ch1-tech{x64} provides.
 We now require the @tech{stack} to be frame-aligned, and any accesses outside of
 the current frame boundaries results in undefined behaviour.
 
