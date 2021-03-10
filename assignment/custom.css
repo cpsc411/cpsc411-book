@@ -10,17 +10,18 @@
     position: fixed;
     z-index: 1;
     background: #a7b0be;
-    height: 6rem;
+    top: 0;
+    left: 0;
 }
-
 
 .tocset {
     position: fixed;
     overflow-y: scroll;
     top: 0rem;
     bottom: 0;
-    margin: 6rem 0 0 0;
     padding: 0rem 0.5rem 0.5rem 0.5rem;
+    background-color: hsl(216, 15%, 70%);
+    border-top: 6rem solid hsl(216, 15%, 70%);
 }
 
 /*
