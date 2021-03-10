@@ -1421,10 +1421,9 @@ All languages following this pass need to be updated to use
 This should not affect most passes.
 
 @nested[#:style 'inset
-@defproc[(implement-fvars (p paren-x64-fvars-v6?))
-          paren-x64-v6?]{
-Compile the @tech{Paren-x64-fvars v6} to @tech{Paren-x64 v6} by reifying
-@paren-x64-fvars-v4[fvar]s into displacement mode operands.
+@defproc[(implement-fvars (p nested-asm-lang-fvars-v6?))
+          nested-asm-lang-v6?]{
+Reifies @nested-asm-lang-fvars-v6[fvar]s into displacement mode operands.
 }
 ]
 
