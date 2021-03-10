@@ -498,7 +498,11 @@ Finally, we expose @tech{non-tail calls} through @racket[sequentialize-let].
 Below we define @deftech{Proc-imp-mf-lang v6}, where we transform lexical
 binding into sequential imperitive assignments.
 
-@bettergrammar*-diff[proc-imp-mf-lang-v5 proc-imp-mf-lang-v6]
+@bettergrammar*-ndiff[
+#:labels ("v5 Diff (excerpts)" "Full")
+(#:exclude (triv opand relop int64 aloc label) proc-imp-mf-lang-v5 proc-imp-mf-lang-v6)
+(proc-imp-mf-lang-v6)
+]
 
 Note that this language contains a definition @proc-imp-mf-lang-v6[entry]
 designating the top-level tail used as the @tech{entry point} for each
