@@ -1320,7 +1320,7 @@ We need to update the pass to handle @nested-asm-lang-fvars-v6[return-point]s.
 @defproc[(replace-locations [p asm-pred-lang-v6/assignments?])
          nested-asm-lang-fvars-v6?]{
 Compiles @tech{Asm-pred-lang v6/assignments} to @tech{Nested-asm-lang-fvars v6} by
-replacing all @ch2-tech{abstract location} with @tech{physical locations} using the
+replacing all @ch2-tech{abstract location} with @ch2-tech{physical locations} using the
 assignment described in the @asm-pred-lang-v6/assignments[assignment] info
 field.
 }
