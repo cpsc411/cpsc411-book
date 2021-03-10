@@ -71,6 +71,7 @@ L2 -> L3 [label=" impose-calling-conventions"]
 L3 -> L4 [label=" canonicalize-bind"];
 L4 -> L5 [label=" select-instructions"];
 
+L10 -> L10 [label=" optimize-predicates"]
 L10 -> L10_1 [label=" implement-fvars"];
 L10_1 -> L11 [label=" expose-basic-blocks"];
 L11 -> L12 [label=" resolve-predicates"]
