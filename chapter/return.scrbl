@@ -1305,7 +1305,14 @@ Finally, we actually replace @ch2-tech{abstract locations} with
 Below we define @deftech{Nested-asm-lang-fvars v6}, typeset with differences compared
 to @ch5-tech{Nested-asm-lang v5}.
 
-@bettergrammar*-diff[nested-asm-lang-v5 nested-asm-lang-fvars-v6]
+@bettergrammar*-ndiff[
+#:labels ("v5 Diff (excerpts)" "vs Source Diff (excerpts)" "Full")
+(#:exclude (pred triv opand trg loc reg relop int64 aloc fvar label)
+ nested-asm-lang-v5 nested-asm-lang-fvars-v6)
+(#:exclude (pred triv opand trg loc reg relop int64 aloc fvar label)
+ asm-pred-lang-v6/assignments nested-asm-lang-fvars-v6)
+(nested-asm-lang-fvars-v6)
+]
 
 We need to update the pass to handle @nested-asm-lang-fvars-v6[return-point]s.
 
