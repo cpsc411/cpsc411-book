@@ -125,7 +125,7 @@ abstraction, which allows the language to essentially jump back from a
 Thankfully, we already have the abstractions required to implement this: labels,
 jumps, and a calling convention.
 All we need to do is slightly generalized the calling convention to introduce a
-new label at the @tech{return point} of a procedure call, store that label
+new label at the return point of a procedure call, store that label
 somewhere, and arrange for the caller to jump back to that label.
 
 @digression{
@@ -160,7 +160,7 @@ intended.
 Note that @values-lang-v6[tail] and @values-lang-v6[value] context now coincide.
 We do not collapse them yet, as imposing a distinction will improve our
 compiler, by allowing us to transform @ch5-tech{tail calls} (which need not
-@ch5-tech{return}) separately from @deftech{non-tail calls}, @ie
+@tech{return}) separately from @deftech{non-tail calls}, @ie
 @ch5-tech{calls} in any context other than @values-lang-v6[tail] context.
 This will let us maintain the performance characteristics of @ch5-tech{tail
 calls}, namely that they use a constant amount of stack space, and do not need
@@ -193,7 +193,7 @@ We must assume that we will always return to some prior call.
 
 }
 
-In @Secref[#:tag-prefixes '("book:" "chp5:")]{top}, we designed a @tech{calling
+In @Secref[#:tag-prefixes '("book:" "chp5:")]{top}, we designed a @ch5-tech{calling
 convention}, but only aimed to support @ch5-tech{calls} without @tech{return}.
 We need to modify it in three ways to support @tech{return}, and @tech{non-tail calls}.
 
@@ -204,22 +204,22 @@ call} or @tech{non-tail call}.
 We therefore design our calling convention to enable any procedure to
 @tech{return}.
 
-We modify our @tech{calling convention}, designating a register
+We modify our @ch5-tech{calling convention}, designating a register
 @racket[current-return-address-register] in which to pass the
-@deftech{return address}, the label to which the @tech{procedure} will jump
+@deftech{return address}, the label to which the @ch5-tech{procedure} will jump
 after it is finish executing.
-On entry to any @tech{procedure}, we load the
+On entry to any @ch5-tech{procedure}, we load the
 @racket[current-return-address-register] into a fresh @ch2-tech{abstract
 location}, which we call @imp-mf-lang-v6[aloc_tmp-ra].
 This is necessary since the @racket[current-return-address-register] needs to be
 available immediately for any new calls, but we will not need the
 @tech{return address} until the end of the procedure.
 
-For convenience, we slightly generalize from @tech{procedures} and define
+For convenience, we slightly generalize from @ch5-tech{procedures} and define
 @tech{entry points} that load the @racket[current-return-address-register].
 An @deftech{entry point} is the top-level @proc-imp-mf-lang-v6[tail] expression
 that begins execution of code.
-This happens either as the body of a @tech{procedure}, or as the initial
+This happens either as the body of a @ch5-tech{procedure}, or as the initial
 @proc-imp-mf-lang-v6[tail] in a module @proc-imp-mf-lang-v6[(module tail)].
 
 @digression{
@@ -228,7 +228,7 @@ final value to the run-time system, uniformly, and allows us to eliminate the
 @imp-mf-lang-v5[halt] instruction.
 This isn't necessary; we could continue to support
 @imp-mf-lang-v5[halt] and treat the module-level @tech{entry point} separate
-from @tech{procedures}.
+from @ch5-tech{procedures}.
 However, there is no benefit to doing so, and it clutters the compiler with
 special cases.
 The only benefit of keeping @imp-mf-lang-v5[halt] would be saving a single jump
@@ -243,7 +243,7 @@ as the @racket[current-return-address-register].
 Second, we need to modify @tech{non-tail calls} to create the @tech{return
 address} and update the @racket[current-return-address-register] prior to
 jumping to the procedure.
-Since we do not have access to labels @tech{Imp-mf-lang v5}, we will need to
+Since we do not have access to labels @ch5-tech{Imp-mf-lang v5}, we will need to
 introduce an abstraction for creating a @tech{return address} in our new
 intermediate language.
 After returning, the code at the @tech{return address} will read from a
@@ -347,7 +347,7 @@ where:
 @racket[current-return-value-register].}
 @item{@racket[fbp] is the physical location storing the frame base pointer,
 @racket[current-frame-base-pointer-register].}
-@item{@racket[tmp-ra] is the designated @tech{abstract location} created for the
+@item{@racket[tmp-ra] is the designated @ch2-tech{abstract location} created for the
 current @tech{entry point}.}
 ]
 
@@ -506,7 +506,7 @@ binding into sequential imperitive assignments.
 
 Note that this language contains a definition @proc-imp-mf-lang-v6[entry]
 designating the top-level tail used as the @tech{entry point} for each
-@tech{procedure} and for the module as a whole.
+@ch5-tech{procedure} and for the module as a whole.
 There is no syntactic distinction, but making a semantic distinction will
 simplify our implementation of the @tech{calling convention} to support @tech{return}.
 
