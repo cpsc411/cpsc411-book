@@ -1367,18 +1367,18 @@ increments and decrements to the @nested-asm-lang-fvars-v6[fbp].
 Consider the example snippet
 @racketblock[
 `(begin
-   (set! rbp (+ rbp 8))
+   (set! rbp (- rbp 8))
    (return-point L.rp.8
      (begin
        (set! rdi fv3)
        (jump L.f.1)))
-   (set! rbp (- rbp 8)))
+   (set! rbp (+ rbp 8)))
 ]
 
 In this example, the frame variable @nested-asm-lang-v6[fv3] is being passed to
 the procedure @nested-asm-lang-v6[L.f.1] in a non-tail call.
-@nested-asm-lang-v6[fv3] does not refer to 3rd frame variable on caller's, but
-the 3rd frame variable on the callee's frame.
+@nested-asm-lang-v6[fv3] does not refer to 3rd frame variable on callee's, but
+the 3rd frame variable on the caller's frame.
 Since the frame is allocated prior to the return point, we need to fix-up this
 index by translating frame variables relative to frame allocations introduced
 around return points.
@@ -1396,11 +1396,11 @@ On entry to a block, frame variables start indexing from the base of the frame,
 so the offset is 0.
 So, @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
 (@racket[(- (* 3 (current-word-size-bytes)) 0)]).
-After an increment operation, such as @nested-asm-lang-v6[(set! fbp (- fbp
+After "pushing" or allocating a frame, such as @nested-asm-lang-v6[(set! fbp (- fbp
 24))], @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 0)]
 (@racket[(- (* 3 (current-word-size-bytes)) 24)]).
-After a decrement, such as @paren-x64-v6[(set! fbp (- fbp 24))]
-@nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
+After "popping" or deallocating a frame, such as @paren-x64-v6[(set! fbp (+ fbp
+24))] @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
 
 @todo{Should create an example to use here and in allocate-frames.}
 
