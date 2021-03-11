@@ -116,7 +116,7 @@ context, or to compute values as part of some computation to be used in
 @values-lang-v5[value] context.
 We can emulate these behaviours by manually writing our code in
 continuation-passing style (CPS) (sometimes known as "callback hell"), but
-we don't want to be sent to The Hague so we will not design a language that
+we don't want to be sent to The Hague, so we will not design a language that
 forces programmers use it.
 
 To allow @ch5-tech{calls} in arbitrary context, we need the @deftech{return}
@@ -303,7 +303,7 @@ where:
 
 The order of the @imp-mf-lang-v5[set!]s is not important for correctness, but
 can influence optimizations.
-We want limit the live ranges of registers to help the register allocator make
+We want to limit the live ranges of registers to help the register allocator make
 better use of registers, so we should generate accesses to registers first to
 limit their live ranges.
 }
@@ -334,7 +334,7 @@ current @tech{entry point}.}
 }
 
 @item{When transforming a base @imp-mf-lang-v6[value] (either a
-@imp-mf-lang-v6[triv] or @imp-mf-lang-v6[(binop triv triv)]) @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
+@imp-mf-lang-v6[triv] or @imp-mf-lang-v6[(binop opand opand)]) @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
 position we generate:
 @racketblock[
 `(begin
@@ -373,7 +373,7 @@ where:
 @item{@racket[rp-label] is a fresh label.
 
 Intuitively, we need some way to introduce a label at @emph{this instruction},
-so when the call is complete we can return to where this apply happened.
+so when the call is complete we can return to the instruction after the call.
 This @imp-mf-lang-v6[return-point] will be a new instruction in the target
 language that introduces a fresh label @racket[rp-label].
 
@@ -430,7 +430,7 @@ But to do undead analysis, we really need both of those occurrences of
 @racket['fv0] to be unique.
 We've assumed all locations are uniquely identified by name, but the return
 point changes the interpretation of frame variables, so two occurrences of
-of the same frame variable are not necessarily the same.
+the same frame variable are not necessarily the same.
 We want to avoid introducing such an ambiguous location.
 
 Instead, we'll generate something like this:
@@ -496,7 +496,7 @@ top-level @ch3-tech{lexical identifiers} into unique labels, and all other
 
 Finally, we expose @tech{non-tail calls} through @racket[sequentialize-let].
 Below we define @deftech{Proc-imp-mf-lang v6}, where we transform lexical
-binding into sequential imperitive assignments.
+binding into sequential imperative assignments.
 
 @bettergrammar*-ndiff[
 #:labels ("v5 Diff (excerpts)" "Full")
@@ -534,7 +534,7 @@ Below, we typeset the differences compared to @ch5-tech{Imp-mf-lang v5}.
 @todo{Jump disappears from value context, transformed into effect context.
 Should point that out.. and double check.}
 
-We now allow @imp-mf-lang-v6[(jump triv triv ...)] in @imp-mf-lang-v6[value]
+We now allow @imp-mf-lang-v6[(jump trg opand ...)] in @imp-mf-lang-v6[value]
 position.
 This corresponds to the addition of @tech{non-tail calls} to the source
 language.
@@ -552,8 +552,8 @@ another @imp-mf-lang-v6[return-point], @ie there are no nested
 Our compiler can never generate this code, and there is no reason to support.
 
 The implicit return value, @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
-position, is no longer a valid.
-Instead, the run-time system will setup the first return address, and the final
+position, is no longer valid.
+Instead, the run-time system will set the first return address, and the final
 result is returned to the run-time system using the @tech{calling conventions}.
 The run-time system initializes the @racket[current-return-address-register] to
 be the address of the exit procedure.
@@ -563,7 +563,7 @@ To implement @tech{return}, we modify every @tech{entry point} to store the
 Then we explicitly @tech{return} the base expressions in @imp-mf-lang-v6[value]
 context.
 
-To implement @imp-mf-lang-v6[fvar]s later, we requires that
+To implement @imp-mf-lang-v6[fvar]s later, we require that
 @racket[current-frame-base-pointer-register] is assigned only by
 incrementing or decrementing it by an integer literal.
 Other uses @racket[current-frame-base-pointer-register] are @emph{invalid
@@ -644,7 +644,7 @@ These increment/decrement operations can be interpreted as "pushing" and
 usually shorten to just @deftech{stack}).
 
 This usage of @tech{stack} differs from what @ch1-tech{x64} provides.
-We now require the @tech{stack} to be frame-aligned, and any accesses outside of
+We now require the @tech{stack} to be frame-aligned, and any accesses outside
 the current frame boundaries results in undefined behaviour.
 
 To compute the size of each caller's frame, we need to know how many variables
@@ -690,7 +690,7 @@ This canonicalizes @tech{Imp-mf-lang v6} with respect to the equations:
 }
 ]
 
-Next we impose some of the machine restrictions on our language with
+Next we impose some machine restrictions on our language with
 @racket[select-instructions].
 We define @deftech{Asm-pred-lang v6} below, with changes typeset with respect to
 @ch5-tech{Asm-pred-lang v5}.
@@ -742,13 +742,13 @@ and remove variables from the set as they are assigned.
 }
 
 Next we extend @racket[undead-analysis].
-We desgin @deftech{Asm-pred-lang-v6/undead} below, typeset with respect to @ch5-tech{Asm-pred-lang v5/undead}.
+We design @deftech{Asm-pred-lang-v6/undead} below, typeset with respect to @ch5-tech{Asm-pred-lang v5/undead}.
 
 @bettergrammar*-diff[asm-pred-lang-v5/undead asm-pred-lang-v6/undead]
 
 We add two new @asm-pred-lang-v6[info] fields: @asm-pred-lang-v6/undead[undead-out] and @asm-pred-lang-v6/undead[call-undead].
 The @asm-pred-lang-v6/undead[undead-out] field will continue to store the
-@ch-ra-tech{undead-set tree}, which we must updated to track
+@ch-ra-tech{undead-set tree}, which we must update to track
 @asm-pred-lang-v6[return-point]s.
 The @asm-pred-lang-v6/undead[call-undead] is the set of all locations that are live
 after @emph{any} non-tail call in a block.
@@ -756,7 +756,7 @@ after @emph{any} non-tail call in a block.
 The @asm-pred-lang-v6/undead[call-undead] field stores @emph{every}
 abstract location or frame variable that is in the undead-out set of a return
 point.
-These must be allocated separately from other other variables, so we store them
+These must be allocated separately from other variables, so we store them
 separately.
 
 First, we update the definition of @racket[undead-set-tree?]
@@ -779,7 +779,7 @@ WARNING: datatype is non-canonical since Undead-set-tree can be an
          Asm-pred-lang tail, so this ambiguity is not a problem.
 
 interp. a tree of Undead-sets.
-The structure of the tree mirrors the structure of a Block-locals-lang tail.
+The structure of the tree mirrors the structure of a Asm-pred-lang tail.
 There are three kinds of sub-trees:
 
 (1) a set! node is simply an undead set;
@@ -807,7 +807,7 @@ There are three kinds of sub-trees:
     [else #f]))
 ]
 
-Analyzing non-tail jumps is no different than other jumps; we reuse the
+Analyzing non-tail jumps is no different from other jumps; we reuse the
 "arguments" annotated on the jump as the undead-out set, and discard the
 annotation.
 
@@ -920,7 +920,7 @@ This is straightforward to solve.
 We run @racket[conflict-analysis], but also collect conflicts between
 @ch2-tech{abstract locations} and @ch2-tech{physical locations}.
 
-Recall that that @racket[current-return-value-register] is assigned by a non-tail call.
+Recall that @racket[current-return-value-register] is assigned by a non-tail call.
 Also note that @racket[current-frame-base-pointer-register] and
 @racket[current-return-value-register] are likely to end up in conflict with
 everything, even though we have removed them from the
@@ -936,7 +936,7 @@ since we don't try to assign physical locations.
 @;@todo{Should detect fvars and add a conflict with rbp? Or just assume rbp is
 @;always live.}
 
-@margin-note{If we our frame allocation was more clever, we would need to adjust
+@margin-note{If our frame allocation was more clever, we would need to adjust
 the conflict analysis to make all caller saved registers in conflict with a
 non-tail call.
 However, we instead assign all call-undead variables to the frame, so we don't
@@ -1220,7 +1220,7 @@ to frame variables in the new frame.
 
 
 Because the frame allocator sits in the middle of our register allocation
-pipeline, the optimized eallocator @racket[assign-homes-opt] is no longer a drop-in
+pipeline, the optimized allocator @racket[assign-homes-opt] is no longer a drop-in
 replacement for the naive @racket[assign-homes].
 We therefore remove @racket[assign-homes-opt] and in-line the passes in the
 @racket[current-pass-list].
@@ -1356,7 +1356,7 @@ field.
 We changed the invariants on @nested-asm-lang-v6[fbp], the
 @racket[current-frame-base-pointer-register], when added the @tech{stack of
 frames}.
-We now allow it to be incrememented and decrememented by an integer literal.
+We now allow it to be incremented and decremented by an integer literal.
 This affects how we implement frame variables.
 
 Previously, the frame variables @nested-asm-lang-fvars-v6[fv1] represented the address
@@ -1406,7 +1406,7 @@ After a decrement, such as @paren-x64-v6[(set! fbp (- fbp 24))]
 
 Recall that @nested-asm-lang-v6[fbp] is only incremented or decremented by
 integer literal values, like those generated by @racket[allocate-frames].
-Other assignments to @nested-asm-lang-v6[fbp] are invalid invalid programs.
+Other assignments to @nested-asm-lang-v6[fbp] are invalid programs.
 This means we don't have to consider complicated data flows into
 @nested-asm-lang-v6[fbp].
 
@@ -1437,12 +1437,12 @@ Reifies @nested-asm-lang-fvars-v6[fvar]s into displacement mode operands.
 @todo{Add a good example}
 
 @section{Implementing Return Points}
-Finally, to accommodate non-tail calls, we introduced a new abstractions: return
+Finally, to accommodate non-tail calls, we introduced a new abstraction: return
 points.
 We must now implement this abstraction.
 
 To implement return points, we need to compile all the instructions following
-the return points into labeled blocks, since that is our low-level
+the return points into labelled blocks, since that is our low-level
 implementation of labels.
 We lift all the instructions following the return point in to a new block, and
 merge the tail implementing the call into the @block-asm-lang-v6[begin] of the caller.
@@ -1462,7 +1462,7 @@ into:
 ]
 
 This transformation is part of the @racket[expose-basic-blocks] pass, which
-lifts many inline blocks into top-level explicitly labeled blocks, and should
+lifts many inline blocks into top-level explicitly labelled blocks, and should
 now do the same for return points.
 
 The target language of the transformation is @deftech{Block-pred-lang v6},
