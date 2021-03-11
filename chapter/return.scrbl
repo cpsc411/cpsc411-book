@@ -1568,18 +1568,3 @@ para-asm-lang-v6
 paren-x64-v6
 paren-x64-rt-v6
 ]
-
-@; Local Variables:
-@; eval: (put 'nd-match 'racket-indent-function 1)
-@; eval: (put 'return-point 'racket-indent-function 1)
-@; eval: (put 'module 'racket-indent-function 0)
-@; eval: (put 'for/foldr 'racket-indent-function 2)
-@; End:
-
-@;  LocalWords:  lang rkt eg eval NB abi pm subsubsub itemlist emph pre fvars
-@;  LocalWords:  fvar undead secref asm uniquify Paren deftech racketgrammar
-@;  LocalWords:  unsyntax bnf cmp binop int neq eq lib rbp racketblock fv tmp
-@;  LocalWords:  rp ie opands ra fb fp rv nfv rax addr CPS ctx aloc trg loc rx
-@;  LocalWords:  opand triv rloc reg rsp rbx rcx rdx rsi rdi regexp alocs ust
-@;  LocalWords:  rlocs andmap listof datatype interp factn fbp nb todo tt jmp
-@;  LocalWords:  unspillable unspillables nop dispoffset ss foldr url NASM mov
