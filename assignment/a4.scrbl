@@ -57,6 +57,7 @@ undead-analysis
 
 @typeset-passlist[
 generate-x64
+implement-fvars
 patch-instructions
 replace-locations
 conflict-analysis
@@ -132,6 +133,8 @@ the sequence.
 It will help to struture the main loop to match the interface of something like
 @racket[interp-loop], although you are not required to define it this way.
 }
+
+@exercise{Redesign and extend the implementation of @racket[implement-fvars].}
 
 @exercise{Redesign and extend the implementation of @racket[patch-instructions]
 to implement the new instructions jump and compare instructions that don't
@@ -264,6 +267,6 @@ you may be unfamiliar with.
 }
 
 @exercise{
-Design and implement the function @racket[interp-values-lang], an interpreter
+Redesign and extend the function @racket[interp-values-lang], an interpreter
 for @ch4-tech{Values-lang v4}.
 }
