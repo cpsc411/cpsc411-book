@@ -377,11 +377,12 @@ so when the call is complete we can return to the instruction after the call.
 This @imp-mf-lang-v6[return-point] will be a new instruction in the target
 language that introduces a fresh label @racket[rp-label].
 
-Note that our non-tail calls can appear as the right-hand side of a
-@imp-mf-lang-v6[(set! aloc value)] instruction.
+Note that our non-tail calls can appear in value position, for example, as the
+right-hand side of a @imp-mf-lang-v6[(set! aloc value)] instruction.
 Recall that after the non-tail call, the return value of the procedure
 will be stored in @racket[(current-return-value-register)].
-We can translate this instruction as:
+When normalizing the @imp-mf-lang-v6[set!] instructions
+@racket[canonicalize-bind], we can translate this instruction as:
 @racketblock[
 `(begin
    ,translation-of-non-tail-call
@@ -685,7 +686,13 @@ This canonicalizes @tech{Imp-mf-lang v6} with respect to the equations:
 (list
 @imp-mf-lang-v6[(set! aloc (if pred value_1 value_2))]
 "="
-@imp-mf-lang-v6[(if pred (set! aloc value_1) (set! aloc value_2))]))
+@imp-mf-lang-v6[(if pred (set! aloc value_1) (set! aloc value_2))])
+(list
+@imp-mf-lang-v6[(set! aloc (return-point label tail))]
+"="
+@imp-mf-lang-v6[(begin (return-point label tail) (set! aloc
+,(current-return-value-register)))])
+)
 ]
 }
 ]
