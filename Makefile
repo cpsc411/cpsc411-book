@@ -60,7 +60,6 @@ docs-server:
     --exclude license/\
     --exclude bitsyntax/\
     --exclude browser/\
-    --exclude 'demo-*'/\
     --exclude compatibility/\
     --exclude cookies/\
     --exclude frog/\
