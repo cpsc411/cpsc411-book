@@ -96,7 +96,7 @@ docs-server:
     --exclude docindex.sqlite\
     --exclude '*.rktd'\
     --exclude '*.sxref'\
-    $PLTHOME/racket/doc/ cs-411@remote.students.cs.ubc.ca:public_html/docs/
+    ${PLTHOME}/racket/doc/ cs-411@remote.students.cs.ubc.ca:public_html/docs/
 
 #%.html: %.scrbl .racodeps
 #	scribble --html --redirect-main "https://docs.racket-lang.org" ++xref-in setup/xref load-collections-xref ++style assignment/custom.css $<
