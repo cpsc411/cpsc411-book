@@ -4,6 +4,7 @@
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
   (for-label cpsc411/reference/a6-solution)
+  (for-label (only-in cpsc411/reference/a6-solution [check-values-lang v5:check-values-lang]))
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v2
   cpsc411/langs/v3
@@ -555,7 +556,7 @@ Our compiler can never generate this code, and there is no reason to support.
 The implicit return value, @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
 position, is no longer valid.
 Instead, the run-time system will set the first return address, and the final
-result is returned to the run-time system using the @tech{calling conventions}.
+result is returned to the run-time system using the @ch5-tech{calling conventions}.
 The run-time system initializes the @racket[current-return-address-register] to
 be the address of the exit procedure.
 
