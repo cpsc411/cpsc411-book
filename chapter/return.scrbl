@@ -575,6 +575,7 @@ Later passes will assume this in order to compute frame variable locations.
 The @imp-mf-lang-v6[info] field records all the new frames created in the block,
 and will be used later to push new frames on to the stack, and assign new-frame
 variables to frame locations.
+There should be one frame for each non-tail call, even if that frame is empty.
 The new-frame variables should be in order.
 Each new-frame variable must only appear in one list in the
 @imp-mf-lang-v6[new-frames] field.
