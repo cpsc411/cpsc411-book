@@ -1406,10 +1406,11 @@ so the offset is 0.
 So, @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
 (@racket[(- (* 3 (current-word-size-bytes)) 0)]).
 After "pushing" or allocating a frame, such as @nested-asm-lang-v6[(set! fbp (- fbp
-24))], @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 0)]
-(@racket[(- (* 3 (current-word-size-bytes)) 24)]).
+8))], @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 16)]
+(@racket[(+ (* 3 (current-word-size-bytes)) -8)]).
 After "popping" or deallocating a frame, such as @paren-x64-v6[(set! fbp (+ fbp
-24))] @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)] again.
+8))] @nested-asm-lang-v6[fv3] corresponds to @paren-x64-v6[(fbp - 24)]
+(@racket[(+ (* 3 (current-word-size-bytes)) 0)]) again.
 
 @todo{Should create an example to use here and in allocate-frames.}
 
