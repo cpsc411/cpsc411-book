@@ -577,10 +577,10 @@ and will be used later to push new frames on to the stack, and assign new-frame
 variables to frame locations.
 The new-frame variables should be in order.
 Each new-frame variable must only appear in one list in the
-@object-code{new-frames} field.
-Recall that @object-code{aloc}s are unique, and the @object-code{new-frames}
-field represents newly defined @object-code{aloc}s.
-It would not make sense for the same @object-code{aloc} to appear in two frames.
+@imp-mf-lang-v6[new-frames] field.
+Recall that @imp-mf-lang-v6[aloc]s are unique, and the @imp-mf-lang-v6[new-frames]
+field represents newly defined @imp-mf-lang-v6[aloc]s.
+It would not make sense for the same @imp-mf-lang-v6[aloc] to appear in two frames.
 
 @nested[#:style 'inset
 @defproc[(impose-calling-conventions [p proc-imp-mf-lang-v6?]) imp-mf-lang-v6?]{
