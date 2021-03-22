@@ -106,20 +106,14 @@ This should involve a change to a single function if your compiler has been
 abstracted over @paren-x64-v7[binop]s.
 }
 
-@exercise{Redesign and extend the implementation of
-@racket[select-instructions].
-
-This should not change much, but be sure you do not put the second operand to an
-@values-bits-lang-v7[arithmetic-shift-right] into an @values-bits-lang-v7[aloc].
-}
-
 @exercise{Design and implement the function @racket[remove-complex-opera*].
 
 If you follow the template for the @emph{target} grammar, rather than the
 source, similar to the design of validation passes, you can avoiding generating
 unnecessary auxiliary variables.
-This pass is simplified if you use a procedural accumulator (a continuation) for
+This approach is simplified if you use a procedural accumulator (a continuation) for
 helpers that might need to generate auxiliary bindings.
+However, (as always) you're free to write a naive but correct implementation.
 
 When transforming calls, @values-bits-lang-v7[(call e e ...)], be sure to
 enforce left-to-right evaluation order.
