@@ -173,17 +173,6 @@ Our goal in this assignment is to implement the following language,
 
 @bettergrammar*[exprs-lang-v7]
 
-@racketblock[
-(define (ascii-char-literal? x)
-  (and (char? x) (<= 40 (char->integer x) 176)))
-
-(define (int61? x)
-  (int-size? 61 x))
-
-(define (uint8? x)
-  (<= 0 x 255))
-]
-
 We add a bunch of new values in @tech{Exprs-lang v7}, including booleans, the
 empty list, the void object, (printable) ASCII character literals, and an error
 value.
