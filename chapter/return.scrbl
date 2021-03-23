@@ -710,8 +710,8 @@ There are no new restrictions for @asm-pred-lang-v6[return-point].
 We simply extend the pass to support @asm-pred-lang-v6[jumps] in effect context.
 
 @nested[#:style 'inset
-@defproc[(select-instructions (p imp-cmf-lang-v5?))
-         asm-pred-lang-v5?]{
+@defproc[(select-instructions (p imp-cmf-lang-v6?))
+         asm-pred-lang-v6?]{
 Compiles @tech{Imp-cmf-lang v6} to @tech{Asm-pred-lang v6}, selecting
 appropriate sequences of abstract assembly instructions to implement the
 operations of the source language.
