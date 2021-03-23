@@ -164,7 +164,7 @@ With only algebraic expressions and no data types, it becomes difficult to
 enforce safety without adding a more sophisticated type system with type
 annotations.
 With only data types and no algebraic expressions, implementing the compiler
-passes is more tedious because implementing pointer manipulation operating to
+passes is more tedious because implementing pointer manipulation operations to
 implement data type tags benefits from algebraic expressions.
 }
 
