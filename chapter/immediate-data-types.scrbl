@@ -351,7 +351,7 @@ character 7 is not.
 The representation of booleans is a bit tricky.
 We don't quite introduce a new tag for booleans, and then add a single bit in
 the payload.
-Instead, we essentially represent @exprs-lang-v7[(true)] and @exprs-lang-v7[(false)]
+Instead, we essentially represent @exprs-lang-v7[#t] and @exprs-lang-v7[#f]
 as separate data types, whose tags are @code{#b110} (@racket[#b110]) and
 @code{#b1110} (@racket[#b1110]).
 It makes masking a boolean slightly more complex.
@@ -361,11 +361,11 @@ of whether the fourth bit is set.
 (eq? (bitwise-and #b00001110 #b11110111) #b110)
 (eq? (bitwise-and #b00000110 #b11110111) #b110)
 ]
-The benefit is that any immediate that is not @exprs-lang-v7[(false)]
-can be interpreted as @exprs-lang-v7[(true)] using @exprs-lang-v7[bitwise-xor],
+The benefit is that any immediate that is not @exprs-lang-v7[#f]
+can be interpreted as @exprs-lang-v7[#t] using @exprs-lang-v7[bitwise-xor],
 instead of converting to a boolean and using an arithmetic shift to compute the
 value of the boolean.
-Only @exprs-lang-v7[(false)] is 0 when "xor"'d with the non-fixnum immediate tag,
+Only @exprs-lang-v7[#f] is 0 when "xor"'d with the non-fixnum immediate tag,
 @code{#b110}.
 @examples[
 (eq? (arithmetic-shift #b00000110 -3) 0)
@@ -376,6 +376,8 @@ Only @exprs-lang-v7[(false)] is 0 when "xor"'d with the non-fixnum immediate tag
 (eq? (bitwise-and #b00001110 #b111) 0)
 (eq? (bitwise-xor #b011011100101110 #b110) 0)
 ]
+
+@todo{Why not just... (!= #b110)?}
 
 The representation of @exprs-lang-v7[error] is inefficient.
 We only require 8 bits of data for the error code, so 24 bits are wasted.
