@@ -409,28 +409,31 @@ This instruction requires that its second operand be an integer literal between
 We will assume this constraint in the intermediate languages, and
 never expose this operation in @tech{Exprs-lang v7}.}
 
-@item{@tt{and @paren-x64-v7[loc], @paren-x64-v7[triv]}
+@item{@tt{and @paren-x64-v7[loc], @paren-x64-v7[op]}
 
-Compute the bitwise "and" of @paren-x64-v7[loc] and @paren-x64-v7[triv], storing
+Compute the bitwise "and" of @paren-x64-v7[loc] and @paren-x64-v7[op], storing
 the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[triv] is an integer, it
-must be an @paren-x64-v7[int32].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
 }
 
-@item{@tt{or @paren-x64-v7[loc], @paren-x64-v7[triv]}
+@item{@tt{or @paren-x64-v7[loc], @paren-x64-v7[op]}
 
-Compute the bitwise "inclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[triv],
+Compute the bitwise "inclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
 storing the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[triv] is an integer, it
-must be an @paren-x64-v7[int32].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
 }
 
-@item{@tt{xor @paren-x64-v7[loc], @paren-x64-v7[triv]}
+@item{@tt{xor @paren-x64-v7[loc], @paren-x64-v7[op]}
 
-Compute the bitwise "exclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[triv],
+Compute the bitwise "exclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
 storing the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[triv] is an integer, it
-must be an @paren-x64-v7[int32].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
 }
 ]
 
