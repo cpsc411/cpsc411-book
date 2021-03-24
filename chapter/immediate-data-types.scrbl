@@ -777,13 +777,3 @@ para-asm-lang-v7
 paren-x64-v7
 paren-x64-rt-v7
 ]
-
-
-
-@;  LocalWords:  lang rkt TODO eg eval behaviour pm url todo subsubsub tt ids
-@;  LocalWords:  GitHub secref emph itemlist primops uniquify Rice's Exprs eq
-@;  LocalWords:  racketgrammar fixnum uint ascii binop unop deftech primop int
-@;  LocalWords:  racketblock lib nasm Dybvig Chez ptr fixnums immediates xor
-@;  LocalWords:  ptrs Paren sar loc ie triv reg trg opand cmp addr fbp bnf ior
-@;  LocalWords:  dispoffset unsyntax neq binops aloc rloc fvar fvars pre CPS
-@;  LocalWords:  undead fx codeblock falsey unops
