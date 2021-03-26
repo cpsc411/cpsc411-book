@@ -744,7 +744,8 @@ You are allowed to shadow @exprs-unique-lang-v7{prim-f}s.
 
 @defproc[(uniquify [p exprs-lang-v7])
          exprs-unique-lang-v7]{
-Resolves all @ch2-tech{lexical identifiers} to @ch2-tech{abstract locations}.
+Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
+other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
