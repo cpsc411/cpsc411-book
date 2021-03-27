@@ -263,6 +263,13 @@ apparently adding a new form of physical location.
 By making them separate forms, we only need to patch the new instructions, and
 leave old code untouched.
 
+In @racket[patch-instructions], we also lift the restriction on
+@para-asm-lang-v8[index], so @para-asm-lang-v8[int64]s can appear as an
+@para-asm-lang-v8[index].
+This makes @para-asm-lang-v8[index] and @para-asm-lang-v8[opand] coincide,
+syntactically, but they are conceptually different so we maintain separate
+non-terminal definitions.
+
 @defproc[(patch-instructions [s para-asm-lang-v8])
          paren-x64-mops-v8]{
 Patches instructions that have no @ch1-tech{x64} analogue into to a sequence of
