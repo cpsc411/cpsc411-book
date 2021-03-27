@@ -5,7 +5,7 @@
                  (eval . (put 'module 'racket-indent-function 0))
                  (eval . (put 'return-point 'racket-indent-function 1))
                  (eval . (put 'nd-match 'racket-indent-function 1))))
- (nil . (ispell-buffer-session-localwords
+ (nil . ((ispell-buffer-session-localwords
          "lang" "rkt" "TODO" "eg" "eval"
          "behaviour" "pm" "url" "todo" "subsubsub" "tt" "ids" "GitHub"
          "secref" "emph" "itemlist" "primops" "uniquify" "Rice's"
@@ -19,4 +19,4 @@
          "rp" "opands" "ra" "fb" "fp" "rv" "nfv" "rax" "ctx" "rx" "rsp"
          "rbx" "rcx" "rdx" "rsi" "rdi" "regexp" "alocs" "ust" "rlocs"
          "andmap" "listof" "datatype" "interp" "factn" "nb" "jmp"
-         "unspillable" "unspillables" "nop" "ss" "foldr" "NASM" "mov")))
+         "unspillable" "unspillables" "nop" "ss" "foldr" "NASM" "mov"))))
