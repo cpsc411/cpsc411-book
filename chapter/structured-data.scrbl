@@ -606,7 +606,7 @@ After allocating, we initialize the data structures using
 @exprs-bits-lang-v8/contexts[mset!].
 For example, we would transform @racket[`(cons ,e_1 ,e_2)].
 @racketblock[
-`(let ([x.1 (bitwise-xor (alloc 16) 1)])
+`(let ([x.1 (bitwise-ior (alloc 16) ,(current-pair-tag))])
    (begin
      (mset! (bitwise-xor x.1 ,(current-pair-tag)) 0 ,e_1)
      (mset! (bitwise-xor x.1 ,(current-pair-tag)) 8 ,e_2)
@@ -620,7 +620,7 @@ language to initialize the vector.
 
 We can optimize memory operations to avoid masking the pointer by taking
 advantage of pointer arithmetic.
-For example, @exprs-bits-lang-v8/contexts[(bitwise-xor (alloc 16) #b001)] is the same as
+For example, @exprs-bits-lang-v8/contexts[(bitwise-ior (alloc 16) #b001)] is the same as
 @exprs-bits-lang-v8/contexts[(+ (alloc 16) 1)].
 We can therefore adjust the index by -1 to access the base of the pointer,
 instead of masking the pointer.
