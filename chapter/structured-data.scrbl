@@ -188,7 +188,7 @@ multiple of 8.
 
 All languages with direct access to registers, including @tech{Paren-x64 v8},
 are now parameterized by a new register,
-@racket[current-heap-allocation-pointer-register] (abbreviated
+@racket[current-heap-base-pointer-register] (abbreviated
 @object-code{hbp}).
 The run-time system initializes this register to point to the base of the heap.
 Allocation is implemented by copying the current value of this pointer, and
