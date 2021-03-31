@@ -14,6 +14,7 @@
 @include-section{chapter/return.scrbl}
 @include-section{chapter/immediate-data-types.scrbl}
 @include-section{chapter/structured-data.scrbl}
+@include-section{chapter/closure.scrbl}
 @include-section{appendix/racket-prelim.scrbl}
 @include-section{appendix/recipe.scrbl}
 
