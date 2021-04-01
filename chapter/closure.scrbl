@@ -142,6 +142,10 @@ They can be used as the foundations for object systems, and provide a safe,
 lexically scoped alternative to function pointers.
 
 This week, we'll add first-class functions as values in @deftech{Exprs-lang v9}:
+@bettergrammar*-ndiff[
+(exprs-lang-v8 exprs-lang-v9)
+(exprs-lang-v9)
+]
 @racketgrammar*[
 [p     (module b ... e)]
 [b     (define x (lambda (x ...) e))]
