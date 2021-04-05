@@ -438,9 +438,9 @@ Even a variable @tech{bound} in a @lam-free-lang-v9[letrec] is considered
       x.1)))
 ]
 
-However, the @closures-lang-v9[letrec] does bind those variables, so they do not
+However, the @closure-lang-v9[letrec] does bind those variables, so they do not
 contribute to the free variable set for the context surrounding the
-@closures-lang-v9[letrec].
+@closure-lang-v9[letrec].
 @examples[#:eval sb
 (uncover-free
  `(module
