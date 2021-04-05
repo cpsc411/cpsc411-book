@@ -326,7 +326,7 @@ Below, we define @deftech{Closure-lang v9}.
 
 @bettergrammar*-ndiff[
 #:labels ("Source/Target Diff (excerpts)" "Full")
-(#:exclude (pred v effect aloc label fixnum uint8 ascii-char-literal)
+(#:exclude (primop pred v effect aloc fixnum uint8 ascii-char-literal)
  lam-free-lang-v9 closure-lang-v9)
 (closure-lang-v9)
 ]
@@ -341,7 +341,7 @@ To encode closures, we temporarily add a new data type for closures.
 We add a new form, @closure-lang-v9[cletrec], which only binds closures.
 Closures can, in general, have recursive self-references, so this is a variant
 of the @closure-lang-v9[letrec] form.
-We also add a new primop form for dereferencing the value of lexical variables
+We also add a new form for dereferencing the value of lexical variables
 from the closure @closure-lang-v9[(closure-ref e e)].
 The next pass implements closures using the procedure data type.
 
