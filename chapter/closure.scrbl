@@ -60,26 +60,127 @@ Now, @exprs-lang-v9[lambda] can appear in any expression.
 We can still define procedures at the top-level using @exprs-lang-v9[define],
 although the semantics will change slightly.
 
+We add a new data structure to the language as well: @exprs-lang-v9[procedure]s.
+These are implicitly constructed by @exprs-lang-v9[lambda].
+They support two additional operations: @exprs-lang-v9[procedure?] and
+@exprs-lang-v9[procedure-arity], for inspecting how many formal paramters they
+take.
+
 This is a syntactically small change, but it has massive implications.
 
-@section{Closures and Closure Conversion}
+@section{Procedures, Closures and Closure Conversion}
 So far, procedures in our language have been compiled directly to labeled
-@deftech{code}---suspended computation that is closed execpt for it's declared
+@deftech{code}---a suspended computation that is closed execpt for it's declared
 parameters.
 We have not treated procedures as values, nor considered what happens if a
 procedure appears in value context.
 The closest representation of the value of a procedure we had was the label to
 its @tech{code}.
-In our source language, we disallowed passing procedures as values, to ensure
-safety.
+In earlier source languages, we disallowed passing procedures as values, to
+ensure safety.
 
-To support first-class procedures, we need to compile procedures to a more
-sophisticated data structure.
-We compile procedures to a data structure representing a @deftech{closure}, a
-procedure paired with the values of free variables from the environment in which
-the procedure was created.
-This allows us to pass the procedure as data, and for us to create procedures
-that refer to variables outside of their own scope.
+@subsection{The Procedure}
+To support first-class procedures, we need to compile procedures to a
+data structure.
+This data structure allows us to construct a procedure value, pass it around and
+return it, call it (safety), and captures both the procedure's @tech{code}, but
+also any information we need about the procedure.
+
+To add a new data structure, we need a new @tech{primary tag} and a new
+collection of primitive operations.
+We use the tag @code{#b010} for procedures.
+
+Here is our updated list of tags:
+@itemlist[
+@item{@code{#b000}, @deftech{fixnums}, fixed-sized integers}
+@item{@code{#b001}, @tech{pairs}}
+@item{@code{#b010}, @tech{procedures}}
+@item{@code{#b011}, @tech{vectors}}
+@item{@code{#b100}, @emph{unused}}
+@item{@code{#b101}, @emph{unused}}
+@item{@code{#b110}, non-fixnum immediates (booleans, etc)}
+@item{@code{#b111}, @emph{unused}}
+]
+
+In the source language, we expose the primitive operations @exprs-lang-v9[procedure?] and
+@exprs-lang-v9[procedure-arity].
+However, the compiler intermediate languages will expose a few more operations
+that the compiler needs to make use of to implement procedure calls.
+
+Every instance of @exprs-lang-v9[lambda] compiles to a procedure.
+The procedure now has three pieces of information: its arity for dynamic
+checking; the label to its @deftech{code}, the computation it executes when
+invoked; and its @deftech{environment}, the values of the free variables used in
+the definition of the procedure.
+We compile each application of a procedure to dereference and call the label of
+the procedure, but also to pass a reference to the procedure itself as a parameter.
+Essentially, the procedure is an object, and receives itself as an argument.
+Each "free variable" @tt{x} is a field of that object, and are compiled to
+references to @tt{self.x}.
+
+The procedure interface is described below:
+@itemlist[
+@item{@proc-exposed-lang-v9[(make-procedure e_label e_arity e_size)]
+
+Creates a procedure whose label is @proc-exposed-lang-v9[e_label], which expects
+@proc-exposed-lang-v9[e_arity] number of arguments, and has an environment of size
+@proc-exposed-lang-v9[e_size].
+
+@proc-exposed-lang-v9[make-procedure] does not perform any error checking; it must be
+applied to a label and two fixnum @a7-tech{ptrs}.
+This is safe because no user can access @proc-exposed-lang-v9[make-procedure]
+directly.
+Only the compiler generates uses of this operator, and surely our compiler uses
+it correctly.
+
+In the source language, @proc-exposed-lang-v9[make-procedure] is not exposed
+directly; instead, @exprs-lang-v9[lambda] is compiled down to this primitive.
+}
+@item{@proc-exposed-lang-v9[(unsafe-procedure-ref e_proc e_index)]
+
+Return the value at index @proc-exposed-lang-v9[e_index] in the environment of the
+procedure @proc-exposed-lang-v9[e_proc].
+
+As with all unsafe operators, this does not perform any checking.
+
+In the source language, @proc-exposed-lang-v9[unsafe-procedure-ref] is not
+exposed directly.
+This is used to access variables outside of the procedure's scope, but in scope
+at the time the procedure is created.
+We use this to implement @tech{closures}, which we describe shortly.
+}
+@item{@proc-exposed-lang-v9[(unsafe-procedure-set! e_proc e_index e_val)]
+
+Set the value at index @proc-exposed-lang-v9[e_index] in the environment of the
+procedure @proc-exposed-lang-v9[e_proc] to be @proc-exposed-lang-v9[e_val].
+
+In the source language, @proc-exposed-lang-v9[unsafe-procedure-set!] is not
+exposed directly.
+}
+@item{@proc-exposed-lang-v9[(unsafe-procedure-label e_proc)]
+
+Returns the label to the @tech{code} for the procedure @proc-exposed-lang-v9[e_proc].
+}
+@item{@proc-exposed-lang-v9[(call e_label es ...)]
+
+Call the @tech{code} whose label is @proc-exposed-lang-v9[e_label] with the
+arguments @proc-exposed-lang-v9[es].
+
+This is essentially the same as the @exprs-lang-v9[call] primitive in previous
+chapters, although we now allow labels to be computes and passed as values.
+It is unsafe and with no dynamic checks, so some earlier pass must insert
+dynamic checks to ensure safety.
+}
+]
+
+Our procedure data structure is essentially a vector containing a label to the
+@tech{code} and the values of each free variable in its @tech{environment}.
+
+The challenge in implement procedures is primarily in compiling
+@exprs-lang-v9[lambda] down to the procedure primitives, then specifying the
+representation of these procedure primitives in terms of calls to labelled
+@tech{code}.
+All compiler passes below @racket[specify-representation] remain unchanged.
 
 Until now, all procedures were bound at the top-level in a set of
 mutually-recursive definitions.
@@ -93,8 +194,19 @@ binding all @closure-lang-v9[aloc]s in @closure-lang-v9[e_2].
 For now, we only consider a restricted form of @closure-lang-v9[letrec] that
 only binds procedures.
 
-We represent a @tech{closure} essentially as a vector containing a label to the
-@tech{code} and the values of each free variable in its @tech{environment}.
+@subsection{The Closure}
+Our procedure data structure implements a @deftech{closure}, a
+procedure's @tech{code} paired with the values of free variables from the
+environment in which the procedure was created.
+This allows us to create procedures that refer to variables outside of their own
+scope, but still retain references to those variables even when the procedure is
+passed to a different scope.
+
+As an intermediate step in compiling first-class procedures, we introduce
+explicit @tech{closure} primitives which compile to the procedure primitives.
+There is no primary tag for this data strucure, since it will be implemented by
+the lower-level procedure data type.
+
 @tech{Closures} support two operations.
 First, you can call a @tech{closure} with @closure-lang-v9[(closure-call e es ...)], which
 essentially extracts the label from the @tech{closure} @closure-lang-v9[e]
@@ -129,6 +241,17 @@ performs no dynamic checks.
 The environment is 0-indexed.
 }
 ]
+Each of these primitives compile down to the analogous procedure primitives.
+
+@subsection{Closure Conversion}
+The main problem with compiling first-class procedure is that we need to lift
+their code to the top-level, but they have references to free variables which go
+out of scope if we move the procedure definition.
+We deal with this by converting all procedures to @tech{closures}, rebinding the
+free variables in the @tech{code} as explicit dereferences from the
+@tech{closure}'s @tech{environment}, then lifting the now-closed @tech{code}
+definitions to the top-level.
+This process is called @deftech{closure conversion}.
 
 Before we can perform @tech{closure conversion}, we must discover which variables in a
 @closure-lang-v9[lambda] are @tech{free} with respect to the procedure's scope.
@@ -156,8 +279,6 @@ but we have to be careful with the binding structures of
 @racket[check-exprs-lang], but they can be @tech{free} relative to a particular
 scope.}
 
-@deftech{Closure conversion} is the process of transforming all first-class
-proeceudres into an explicit data structure representing the @tech{closure}.
 There are two parts to @tech{closure conversion}:
 @itemlist[
 @item{Transform each @closure-lang-v9[lambda].
@@ -168,15 +289,15 @@ We can think of this as adding a @tt{this} or @tt{self} argument to each procedu
 
 The @ch3-tech{abstract location} to which the the @closure-lang-v9[lambda] was
 previously bound must now be bound to a closure.
-The closure has @emph{n + 1} fields, where @racket[n] is the number of free
+The closure has @tt{n + 2} fields, where @racket[n] is the number of free
 variables in the @closure-lang-v9[lambda].
 The first field is the label to which the closure's @tech{code} is bound.
-The remaining fields are references to the lexical variables in the
+The final @tt{n} fields are references to the lexical variables in the
 @tech{environment} of the closure.
 
 In essence, we transform
 @racketblock[
-`(letrec ([,x (lambda (,xs ...) (free (,ys ...)) ,es)] ...)
+`(letrec ([,x (lambda ((free (,ys ...))) (,xs ...)  ,es)] ...)
    ,e)
 _=>
 `(letrec ([,l (lambda (,c ,xs ...)
@@ -207,20 +328,6 @@ We need to bind the operator to avoid duplicating code.
 
 }
 ]
-
-The data structure will include the label to the procedure's @tech{code},
-allowing us to compile labelled @tech{code} as before.
-
-Every instance of @exprs-lang-v9[lambda] compiles to a procedure.
-The procedure now has three pieces of information: its arity, the label to its
-@deftech{code}, the computation it executes when invoked, and its
-@deftech{environment}, the values of the free variables used in the definition
-of the procedure.
-We compile each application of a procedure to dereference and call the label of
-the procedure, but also to pass a reference to the procedure itself as a parameter.
-Essentially, the procedure is an object, and receives itself as an argument.
-Each "free variable" @tt{x} is a field of that object, and are compiled to
-references to @tt{self.x}.
 
 We already have the low-level abstractions in place to deal with
 @tech{closures}, so we design this assignment top-down.
@@ -253,10 +360,11 @@ We typeset the changes with respect to @tech{Exprs-lang v9}.
 (exprs-unique-lang-v9)
 ]
 
+@nested[#:style 'inset
 @defproc[(uniquify [p exprs-lang-v9]) exprs-unique-lang-v9]{
 Resolves top-level @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract
 locations}.
-}
+}]
 
 @subsection{implement-safe-primops}
 Not much changes in @racket[implement-safe-primops].
@@ -273,16 +381,80 @@ below.
 (exprs-unsafe-data-lang-v9)
 ]
 
-Note that this pass does not implement safe @exprs-unsafe-data-lang-v9[apply],
+Note that this pass does not implement safe @exprs-unsafe-data-lang-v9[call],
 but can be safely applied to arbitrary data---a later pass will implement
 dynamic checking for application.
 
+@nested[#:style 'inset
 @defproc[(implement-safe-primops [p exprs-unique-lang-v9?])
          exprs-unsafe-data-lang-v9?]{
 Implement safe primitive procedures by inserting procedure definitions for each
 primitive operation which perform dynamic tag checking, to ensure type and
 memory safety.
+}]
+
+@subsection{implement-safe-call}
+Now we implement @exprs-unsafe-data-lang-v9[call] in terms of
+@exprs-unsafe-lang-v9[unsafe-procedure-call] and
+@exprs-unsafe-lang-v9[unsafe-procedure-arity].
+Note that we cannot simply define @exprs-unsafe-data-lang-v9[call] as a procedure,
+like we did with other safe wrappers, since it must count its arguments, and we
+must support a variable number of arguments to the procedure.
+
+Below we define @deftech{exprs-unsafe-lang v9}.
+@bettergrammar*-ndiff[
+#:labels ("Source/Target Diff (excerpts)" "Full")
+(exprs-unsafe-data-lang-v9 exprs-unsafe-lang-v9)
+(exprs-unsafe-lang-v9)
+]
+
+We implement @exprs-unsafe-data-lang-v9[call] in terms of @exprs-unsafe-lang-v9[procedure?],
+@exprs-unsafe-lang-v9[unsafe-procedure-call] and @exprs-unsafe-lang-v9[unsafe-procedure-arity].
+The essence of the transformation is:
+@racketblock[
+`(call ,e ,es ...)
+_=>
+`(if (procedure? ,e)
+     (if (eq? (unsafe-procedure-arity ,e) ,(length es))
+         (unsafe-procedure-call ,e ,es ...)
+         ,bad-arity-error)
+     ,bad-proc-error)
+]
+
+@margin-note{If you keep track of the arity of procedures, you can optimize this
+transformation in some cases.}
+
+@;We subtract one from the length of the parameter list to account for the closure
+@;parameter.
+@;We could equivalently add one to the procedure arity, but since the length of
+@;the parameter list is known at compile-time, this saves us at least one run-time
+@;instruction.
+@;
+@;@digression{
+@;This pass assumes the closure argument must always be there.
+@;This design prevents us from optimizing away the closure parameter easily, a
+@;slight annoyance that is due to your professor missing this design mistake
+@;before releasing the assignment.
+@;A better design would place this pass before closure conversion, exposing
+@;@object-code{unsafe-apply} earlier.
+@;Then we would have access to the correct arity count without the closure
+@;argument, and closure conversion modify the @object-code{unsafe-apply} form
+@;without disrupting @object-code{procedure-arity}.
+@;
+@;We do not want to capture the closure parameter in the
+@;@object-code{procedure-arity} value, since this value is exposed to a user, and
+@;we do not want the user to know about the internal closure parameter.
+@;This internal parameter is not part of their code, so we should not burden them
+@;with it.
+@;}
+
+@nested[#:style 'inset
+@defproc[(implement-safe-call [p exprs-unsafe-data-lang-v9?])
+         exprs-unsafe-lang-v9?]{
+Implement @exprs-unsafe-data-lang-v9[call] as an unsafe procedure call with
+dynamic checks.
 }
+]
 
 @subsection{define->letrec}
 Some procedures now appear in local expressions, and some appear defined at the
@@ -323,76 +495,11 @@ Below we define @deftech{Just-Exprs-lang v9}.
 (just-exprs-lang-v9)
 ]
 
-@defproc[(define->letrec [p exprs-unsafe-data-lang-v9])
-          just-exprs-lang-v9?]{
-Elaborate top-level @exprs-unique-lang-v9[define]'s data into local recursively
-bound data using @just-exprs-lang-v9[letrec].
-}
-
-@subsection{optimize-direct-calls}
-Before we start compiling @just-exprs-lang-v9[lambda]s, we should try to get rid of
-them.
-@emph{Direct calls} to @just-exprs-lang-v9[lambda]s, such as @racket[(apply (lambda (x)
-x) 1)], are simple to rewrite to a @just-exprs-lang-v9[let] binding, such a
-@racket[(let ([x 1]) x)].
-A human programmer may not write this kind of code much, but most programs are
-not written by humans---compilers write far more programs.
-This optimization will speed-up compile time and run time for such simple
-programs.
-
-@exercise{Design and implement the function @racket[optimize-direct-calls].
-The source and target language are @tech{Just-Exprs-lang v9}.
-}
-
-@challenge{Direct calls are an instance of single-occurance procedures, which
-always safe to inline.
-Instead of dealing with them separately, we could design and implement a general
-purpose inlining pass, and direct calls would simply be one of many calls
-optimized.
-
-Design and implement an inlining optimization.
-}
-
-@subsection{dox-lambdas}
-The source language supports anonymous procedures, that is, first-class
-procedure values that are not necessarily bound to names.
-For example, we can write the following in Racket, creating and using procedures
-without ever binding them to names in a @just-exprs-lang-v9[letrec] or
-@just-exprs-lang-v9[let] form.
-@examples[
-((lambda (x f) (f x x)) 1 (lambda (x y) (+ x y)))
-]
-
-The equivalent in @tech{Exprs-lang v9} is:
-@racketblock[
-(call (lambda (x f) (apply f x x)) 1 (lambda (x y) (call + x y)))
-]
-
-First-class procedure values are great for functional programmers, who value
-freedom, but bad for compilers who feel it is their job to keep track of
-everything.
-
-We want to bind all procedures to names to simplify lifting code to the
-top-level and assigning labels later.
-
-We transform each @racket[`(lambda (,alocs ...) ,e)] into @racket[`(letrec
-([,tmp (lambda (,alocs ...) ,e)]) ,tmp)], where @racket[tmp] is a fresh
-@just-exprs-lang-v9[aloc].
-
-We define @deftech{Lam-opticon-lang v9}, in which we know the name of every
-procedure.
-
-@bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
-(#:exclude (prim-f aloc label fixnum uint8 ascii-char-literal)
- just-exprs-lang-v9 lam-opticon-lang-v9)
-(lam-opticon-lang-v9)
-]
-
+@nested[#:style 'inset
 @defproc[(dox-lambda [p just-exprs-lang-v9?])
          lam-opticon-lang-v9?]{
 Explicitly binds all procedures to @ch3-tech{abstract locations}.
-}
+}]
 
 @section{Closure Conversion}
 The rest of our compiler expects procedures to be little more than labeled
@@ -402,7 +509,6 @@ in their lexical scope.
 This means we cannot simply lift procedure definitions to the top-level, stick
 on a label, and generate a labelled procedure.
 
-@subsection{uncover-free}
 First, we uncover the @tech{free} variables in each @lam-free-lang-v9[lambda].
 We add these as an annotation on the @lam-free-lang-v9[lambda], which the next
 pass will use to generate @tech{closures}.
@@ -423,10 +529,11 @@ that have been used but were not in the defined set.
 On entry to the @lam-free-lang-v9[(lambda (aloc ...) e)], only the formal parameters
 @lam-free-lang-v9[(aloc ...)] are considered @tech{bound}.
 
+@nested[#:style 'inset
 @defproc[(uncover-free [p lam-opticon-lang-v9?])
          lam-free-lang-v9?]{
 Explicitly annotate procedures with their free variable sets.
-}
+}]
 
 The only complicated case is for @lam-free-lang-v9[letrec].
 Even a variable @tech{bound} in a @lam-free-lang-v9[letrec] is considered
@@ -434,7 +541,7 @@ Even a variable @tech{bound} in a @lam-free-lang-v9[letrec] is considered
 @examples[#:eval sb
 (uncover-free
  `(module
-    (letrec ([x.1 (lambda () (call x.1))])
+    (letrec ([x.1 (lambda () (unsafe-procedure-call x.1))])
       x.1)))
 ]
 
@@ -445,12 +552,11 @@ contribute to the free variable set for the context surrounding the
 (uncover-free
  `(module
     (letrec ([f.1 (lambda ()
-                    (letrec ([x.1 (lambda () (call x.1))])
+                    (letrec ([x.1 (lambda () (unsafe-procedure-call x.1))])
                       x.1))])
       f.1)))
 ]
 
-@subsection{convert-closures}
 Now, we make @tech{closures} explicit.
 
 Strictly speaking, all the previous languages had
@@ -466,18 +572,19 @@ Below, we define @deftech{Closure-lang v9}.
 
 @bettergrammar*-ndiff[
 #:labels ("Source/Target Diff (excerpts)" "Full")
-(#:exclude (primop pred v effect aloc fixnum uint8 ascii-char-literal)
+(#:exclude (primop pred effect aloc fixnum uint8 ascii-char-literal)
  lam-free-lang-v9 closure-lang-v9)
 (closure-lang-v9)
 ]
 
-Closure conversion changes @closure-lang-v9[letrec] to bind labels to procedure
+@tech{Closure conversion} changes @closure-lang-v9[letrec] to bind labels to procedure
 code.
 After this pass, the body of @closure-lang-v9[lambda] will not contain any free
 variables, and will not be a procedure data type---it is just like a function
 from @ch6-tech{Values-lang v6}.
 
-To encode closures, we temporarily add a new data type for closures.
+To encode @tech{closures}, we temporarily add a new data type for closures,
+which we compile to a lower-level data structure later.
 We add a new form, @closure-lang-v9[cletrec], which only binds closures.
 Closures can, in general, have recursive self-references, so this is a variant
 of the @closure-lang-v9[letrec] form.
@@ -498,14 +605,16 @@ performing any checks.
 @closure-lang-v9[closure-call] will get translated into the safe, dynamically
 checked call.
 
+@nested[#:style 'inset
 @defproc[(convert-closures [p lam-free-lang-v9?])
          closure-lang-v9?]{
-Converts all procedures into explicit @tech{closures}.
-}
+Performs @tech{closure conversion}, converting all procedures into explicit
+@tech{closures}.
+}]
 
 @margin-note{
-If the operator is already a @closure-lang-v9[aloc], avoid
-avoid introducing an extra @closure-lang-v9[let]:
+If the operator is already a @closure-lang-v9[aloc], avoid introducing an extra
+@closure-lang-v9[let]:
 @racketblock[
 `(call ,aloc ,es ...)
 _=>
@@ -514,10 +623,9 @@ _=>
 This also simplifies the optimization @racket[optimize-known-calls].
 }
 
-@subsection{Challenge: optimize-known-call}
 Closures can cause a lot of indirection, and thus performance penalty, in a
 functional language.
-We essentially transform all call into @emph{indirect calls}.
+We essentially transform all calls into @emph{indirect calls}.
 This causes an extra memory dereference and indirect jump, both of which can
 have performance penalties.
 
@@ -525,54 +633,62 @@ Many calls, particularly to named functions, can be optimized to direct calls.
 We essentially perform the following transformation on all calls where we can
 determine the label of the operator:
 @racketblock[
-`(closure-apply ,e ,es ...)
+`(closure-call ,e ,es ...)
 _=>
-`(unsafe-apply ,l ,es ...)
+`(unsafe-call ,l ,es ...)
 ]
 where @racket[l] is known to be the label of the closure @racket[e].
-Because @racket[e] is already an @object-code{aloc}, we can safely discard it;
-we do not need to force evaluation to preserve any side-effects.
+Because @racket[e] is already an @closure-lang-v9[aloc], we can safely discard it;
+we do not need to force evaluation to preserve any side effects.
 
-Because this transforms into an @object-code{unsafe-apply}, we need to inline
-the arity check that @racket[implement-safe-apply] would insert.
+Because this transforms into an @closure-lang-v9[unsafe-call], we need to inline
+the arity check that @racket[implement-safe-call] would insert.
 Something like:
 @racketblock[
-`(closure-apply ,e ,es ...)
+`(closure-call ,e ,es ...)
 _=>
-`(if (eq? (procedure-arity e) ,(sub1 (length es)))
-     (unsafe-apply ,l ,es)
+`(if (eq? (unsafe-procedure-arity e) ,(sub1 (length es)))
+     (unsafe-call ,l ,es)
      ,bad-arity-error)
 ]
-Remember the the @object-code{procedure-arity} will be one more than the closure
+Remember the @closure-lang-v9[unsafe-procedure-arity] will be one more than the closure
 arguments, since the closure takes itself as a hidden argument.
 @margin-note{We could further optimize this, since we should know the arity
 statically when this optimization would apply.}
 
-We do this by recognizing @object-code{letrec} and @object-code{cletrec} as a
-single composite form:
+We perform this optimization by recognizing @closure-lang-v9[letrec] and
+@closure-lang-v9[cletrec] as a single composite form:
 @racketblock[
 `(letrec ([,label_l ,lam])
    (cletrec ([,aloc_c (make-closure ,label_c ,es ...)])
      ,e))
 ]
-All references uses of @object-code{(closure-apply ,aloc_c ,es ...)} in
-@racket[e] and @racket[lam] can be transformed into @object-code{(unsafe-apply
-,label_c ,es ...)}.
+All uses of @closure-lang-v9[(closure-call aloc_c es ...)] in
+@racket[e] and @racket[lam] can be transformed into @closure-lang-v9[(unsafe-call
+label_c es ...)].
 We have to recognize these as a single composite form to optimize recursive
 calls inside @racket[lam], which will benefit the most from the optimization.
-This relies on the name @racket[aloc_c] being bound in two places: once to
-define the closure, and once when dereferenced in a recursive closure.
+This relies on the name @closure-lang-v9[aloc_c] binding in two places: once to
+define the @tech{closure}, and once when dereferenced in a recursive closure.
 
-@challenge{Design and implement the function @racket[optimize-known-calls].
-The source and target language are @tech{Closure-lang v9}.
+@nested[#:style 'inset
+@defproc[(optimize-known-calls [p closure-lang-v9?])
+         closure-lang-v9?]{
+Optimizes calls to known closures.
 }
+]
 
-@subsection{hoist-lambdas}
-Now that all @object-code{lambda}s are closed and labeled, we can lift them to
-top-level @object-code{define}s.
+Now that all @closure-lang-v9[lambda]s are closed and labelled, we can lift them to
+top-level @hoisted-lang-v9[define]s.
 
 We define @deftech{Hoisted-lang v9} below.
-We typeset differences with respect to @tech{Closure-lang v9}.
+
+@bettergrammar*-ndiff[
+#:labels ("Source/Target Diff (excerpts)" "Full")
+(#:exclude (pred effect primop v aloc label fixnum uint8 ascii-char-literal)
+ closure-lang-v9 hoisted-lang-v9)
+(hoisted-lang-v9)
+]
 
 @racketgrammar*[
 [p     (module (unsyntax @bnf:add{b ...}) e)]
@@ -593,120 +709,54 @@ We typeset differences with respect to @tech{Closure-lang v9}.
 The only difference is the @object-code{letrec} is remove and
 @object-code{define} blocks are re-added.
 
-@exercise{Design and implement the function @racket[hoist-lambdas].
-The source language is @tech{Closure-lang v9} and the target language is
-@tech{Hoisted-lang v9}.}
-
-@subsection{implement-closures}
-Now we implement closures as procedures.
-
-@todo{Need to add proceudres now; removed from prior milestone}
-@;@item{A @deftech{procedure} is a data structure representing a value that can be
-@;called as a function.
-@;Essentially, it is a wrapper around labels so we can check applications.
-@;Starting in this language, application must use a procedure instead of
-@;referencing a label directly.
-@;We construct a procedure using @exprs-unsafe-data-lang-v8[(make-procedure e_1 e_2)], where
-@;@exprs-unsafe-data-lang-v8[e_1] must evaluate to a label and @exprs-unsafe-data-lang-v8[e_2] is the number
-@;of expected arguments.
-@;The predicate @exprs-unsafe-data-lang-v8[procedure?] should return @exprs-unsafe-data-lang-v8[#t] for any
-@;value constructed this way, and #f for any other value---@exprs-unsafee-data-lang-v8[(eq?
-@;(procedure? (make-procedure e_1 e_2)) #t)].
-@;We extract the label of a procedure with @exprs-unsafe-data-lang-v8[(unsafe-procedure-label
-@;e_1)], where @exprs-unsafe-data-lang-v8[e_1] is a procedure.
-@;We get the arity of a procedure with @exprs-unsafe-data-lang-v8[(unsafe-procedure-arity e_1)],
-@;where @exprs-unsafe-data-lang-v8[e_1] is a procedure.
-@;}
-@;We remove @object-code{make-procedure} and @object-code{procedure-label}, which
-@;are used internally.
-@;The surface programmer will only be able to define safe procedures using
-@;@object-code{lambda}.
-@;However, we do allow the user to dynamically test whether a value is a procedure
-@;and how many arguments it takes.
-
-
-Our procedure object is going to be extended compared to last assignment.
-Previously, we only had a label and an arity as part of a procedure.
-All procedures were defined at the top-level and could not have lexical
-variables.
-
-Now, a procedure will look like an extension of a vector.
-It will have at least three fields: the label, the arity, and a size.
-The size indicates how large the environment of the procedure is.
-The environment will be uninitialized after @object-code{make-procedure}, and
-instead the environment will be initialized manually using
-@object-code{unsafe-procedure-set!}, similar to vector initialization.
-As before, @object-code{unsafe-procedure-label} and
-@object-code{unsafe-procedure-arity} dereference the label and arity of a
-procedure.
-However, we now also have @object-code{unsafe-procedure-ref} which dereferences
-a value from the procedure's environment, given an index into the environment,
-similar to @object-code{unsafe-vector-ref}.
-We still have a safe version of apply, @object-code{procedure-apply}.
-
-The language @deftech{Proc-apply-lang v9} is defined below.
-The changes are typeset with respect to @tech{Hoisted-lang v9}.
-
-@racketgrammar*[
-[p     (module b ... e)]
-[b     (define label (lambda (aloc ...) e))]
-[c     (begin c ...) (primop e ...)]
-[e     v
-       (primop e ...)
-       (unsafe-apply e e ...)
-       (let ([aloc e] ...) e)
-       (unsyntax @bnf:sub{(cletrec ([aloc (make-closure label e ...)] ...) e)})
-       (if e e e)
-       (begin c ... e)]
-[v     _...]
-[primop _...
-        (unsyntax @bnf:add{make-procedure})
-        (unsyntax @bnf:add{unsafe-procedure-ref})
-        (unsyntax @bnf:add{unsafe-procedure-set!})
-        (unsyntax @bnf:add{procedure-apply})
-        (unsyntax @bnf:sub{closure-ref})
-        (unsyntax @bnf:sub{closure-apply})]
+@nested[#:style 'inset
+@defproc[(hoist-lambdas [p closure-lang-v9?])
+         hoisted-lang-v9?]{
+Hoists @tech{code} to the top-level definitions.
+}
 ]
 
-For reference, the procedure interface is described below:
-@itemlist[
-@item{@object-code{(make-procedure e_label e_arity e_size)}
+Now we implement @tech{closures} as the procedure data structure.
 
-Creates a procedure whose label is @object-code{e_label}, which expects
-@object-code{e_arity} number of arguments, and has an environment of size
-@object-code{e_size}.
+A @deftech{procedure} is a data structure representing a value that can be
+called.
+Essentially, it is a wrapper around labels so we can check applications.
+We construct a procedure using @hoisted-lang-v9[(make-procedure e_1 e_2)], where
+@hoisted-lang-v9[e_1] must evaluate to a label and @hoisted-lang-v9[e_2] is the number
+of expected arguments.
+The predicate @hoisted-lang-v9[procedure?] should return @hoisted-lang-v9[#t] for any
+value constructed this way, and #f for any other value---@hoisted-lang-v9[(eq?
+(procedure? (make-procedure e_1 e_2)) #t)].
 
-@object-code{make-procedure} does not perform any error checking; it must be
-applied to a label and two fixnum @a7-tech{ptrs}.
-This is safe because no user can access @object-code{make-procedure}
-directly.
-Only the compiler generates uses of this operator, and surely our compiler uses
-it correctly.
-}
-@item{@object-code{(unsafe-procedure-ref e_proc e_index)}
+We extract the label of a procedure with @hoisted-lang-v9[(unsafe-procedure-label
+e_1)], where @hoisted-lang-v9[e_1] is a procedure.
+We get the arity of a procedure with @hoisted-lang-v9[(unsafe-procedure-arity e_1)],
+where @hoisted-lang-v9[e_1] is a procedure.
 
-Return the value at index @object-code{e_index} in the environment of the
-procedure @object-code{e_proc}.
+A procedure looks like an extension of a vector.
+It has at least three fields: the label, the arity, and a size.
+The size indicates how large the environment of the procedure is.
+The environment will be uninitialized after @hoisted-lang-v9[make-procedure], and
+instead the environment will be initialized manually using
+@hoisted-lang-v9[unsafe-procedure-set!], similar to vector initialization.
+As with @tech{closures}, @hoisted-lang-v9[unsafe-procedure-label]
+dereference the label and @hoisted-lang-v9[unsafe-procedure-ref] dereferences a
+value from the procedure's environment, given an index into the environment.
+However, we also have @hoisted-lang-v9[unsafe-procedure-arity] to dereference
+the arity of a procedure.
+@todo{Introduce procedures earlier, in section 1 in a subsection, with tags etc.}
 
-As with all unsafe operators, this does not perform any checking.
-}
-@item{@object-code{(unsafe-procedure-set! e_proc e_index e_val)}
-
-Set the value at index @object-code{e_index} in the environment of the
-procedure @object-code{e_proc} to be @object-code{e_val}.
-}
-@item{@object-code{(procedure-apply e_proc es ...)}
-
-Safely apply the procedure @object-code{e_proc} to its arguments
-@object-code{es}.
-Some later pass will implement this primop to check that @object-code{e_proc} is
-a procedure that expects exactly @racket[(length es)] arguments.
-}
+The language @deftech{Proc-exposed-lang v9} is defined below.
+@bettergrammar*-ndiff[
+#:labels ("Source/Target Diff (excerpts)" "Full")
+(#:exclude (pred effect aloc fixnum uint8 ascii-char-literal)
+ hoisted-lang-v9 proc-exposed-lang-v9)
+(proc-exposed-lang-v9)
 ]
 
 To transform closures into procedures, we do a three simple translations:
 @itemlist[
-@item{Transform @object-code{make-closure}
+@item{Transform @hoisted-lang-v9[make-closure]
 @racketblock[
 `(cletrec ([,aloc (make-closure ,label ,arity ,es ...)] ...)
    ,e)
@@ -721,189 +771,57 @@ _=>
 where @racket[n] is @racket[(length es)], the number of values in the
 environment.
 }
-@item{Transform @object-code{closure-ref}.
+@item{Transform @hoisted-lang-v9[closure-ref].
 @racketblock[
 `(closure-ref ,c ,i)
 _=>
 `(unsafe-procedure-ref ,c ,i)
 ]
-We can use @object-code{unsafe-procedure-ref} since we generate all uses of
-@object-code{closure-ref}.
+We can use @proc-exposed-lang-v9[unsafe-procedure-ref] since we generate all uses of
+@hoisted-lang-v9[closure-ref].
 }
-@item{Transform @object-code{closure-apply}.
+@item{Transform @hoisted-lang-v9[closure-apply].
 @racketblock[
 `(closure-apply ,c ,es ...)
 _=>
-`(procedure-apply ,c ,es ...)
+`(call (unsafe-procedure-label ,c) ,es ...)
 ]
-@object-code{procedure-apply} must still be dynamically checked, since procedure
-applications came from user programs.
+Recall that @hoisted-lang-v9[closure-apply] is generated from an
+@hoisted-lang-v9[unsafe-procedure-call], so it is equally safe to call
+@hoisted-lang-v9[unsafe-procedure-label].
 }
 ]
 
-@exercise{Design and implement the function @racket[implement-closures].
-The source language is @tech{Hoisted-lang v9} and the target language is
-@tech{Proc-apply-lang v9}.
+@nested[#:style 'inset]{
+@defproc[(implement-closures [p hoisted-lang-v9])
+         proc-exposed-lang-v9]{
+Implement @tech{closures} in terms of the @tech{procedure} data structure.
+}
 }
 
-@subsection{sequentialize-let}
-Next we simplify the language once more by sequentializing @object-code{let}, so
-each @object-code{let} binds exactly one abstract location.
-It's not terribly important when we do this, but the rest of our compiler
-assumes unary @object-code{let}, so we might as well do it now.
+Finally, we need to implement procedure data type.
+It is intentionally designed to be similar to the vector data type.
 
-We define @deftech{Unary-let-lang v9}, typesetting the differences with respect
-to @tech{Proc-apply-lang v9}.
+The target language is @tech{Exprs-bits-lang/contexts v8}, which is unchanged
+from the previous chapter.
 
-@racketgrammar*[
-[p     (module b ... e)]
-[b     (define label (lambda (aloc ...) e))]
-[c     (begin c ...) (primop e ...)]
-[e     v
-       (primop e ...)
-       (unsafe-apply e e ...)
-       (let ([aloc e] (unsyntax @bnf:sub{...})) e)
-       (if e e e)
-       (begin c ... e)]
-[v     _...]
-[primop _...
-        make-procedure
-        unsafe-procedure-ref
-        unsafe-procedure-set!
-        procedure-apply]
+@bettergrammar*-ndiff[
+#:labels ("Source/Target Diff (excerpts)" "Full")
+(proc-exposed-lang-v9 exprs-bits-lang-v8/contexts)
+(exprs-bits-lang-v8/contexts)
 ]
 
-The translation is straightforward.
+When implementing @proc-exposed-lang-v9[make-procedure], we assume the size of the
+environment is a fixnum constant, since this is guaranteed by how our compiler
+generates @proc-exposed-lang-v9[make-procedure]
 
-@exercise{Design and implement the function @racket[sequentialize-let].
-The source language is @tech{Proc-apply-lang v9} and the target language is
-@tech{Unary-let-lang v9}.
+@nested[#:style 'inset
+@defproc[(specify-representation [p proc-exposed-lang-v9?])
+         exprs-bits-lang-v8/contexts?]{
+Compiles data types and primitive operations into their implementations as
+@v7-tech{ptrs} and primitive bitwise operations on @v7-tech{ptrs}.
 }
-
-@subsection{implement-safe-apply}
-Now we implement @object-code{procedure-apply} in terms of
-@object-code{unsafe-apply}
-@object-code{unsafe-procedure-label}, and
-@object-code{unsafe-procedure-arity}.
-
-Below we define @deftech{Exprs-data-lang v9}.
-We typeset changes with respect to @tech{Unary-let-lang v9}.
-
-@racketgrammar*[
-[p     (module b ... e)]
-[b     (define label (lambda (aloc ...) e))]
-[c     (begin c ...) (primop e ...)]
-[e     v
-       (primop e ...)
-       (unsyntax @bnf:sub{(unsafe-apply e e ...)})
-       (unsyntax @bnf:add{(apply e e ...)})
-       (let ([aloc e]) e)
-       (if e e e)
-       (begin c ... e)]
-[v     _...]
-[primop unsafe-fx* unsafe-fx+ unsafe-fx- eq? unsafe-fx< unsafe-fx<= unsafe-fx>
-        unsafe-fx>=
-        fixnum? boolean? empty? void? ascii-char? error? not
-        pair?
-        procedure?
-        vector?
-
-        cons
-        unsafe-car
-        unsafe-cdr
-
-        unsafe-make-vector
-        unsafe-vector-length
-        unsafe-vector-set!
-        unsafe-vector-ref
-
-        make-procedure
-        unsafe-procedure-arity
-        unsafe-procedure-label
-        unsafe-procedure-ref
-        unsafe-procedure-set!
-        (unsyntax @bnf:sub{procedure-apply})]
 ]
-
-We implement @object-code{procedure-apply} in terms of @object-code{procedure?},
-@object-code{unsafe-procedure-label}, and @object-code{unsafe-procedure-arity}.
-The essence of the transformation is:
-@racketblock[
-`(procedure-apply ,e ,es ...)
-_=>
-`(if (procedure? ,e)
-     (if (eq? (unsafe-procedure-arity ,e) ,(sub1 (length es)))
-         (apply (unsafe-procedure-label ,e) ,es ...)
-         ,bad-arity-error)
-     ,bad-proc-error)
-]
-We subtract one from the length of the parameter list to account for the closure
-parameter.
-We could equivalently add one to the procedure arity, but since the length of
-the parameter list is known at compile-time, this saves us at least one run-time
-instruction.
-
-@digression{
-This pass assumes the closure argument must always be there.
-This design prevents us from optimizing away the closure parameter easily, a
-slight annoyance that is due to your professor missing this design mistake
-before releasing the assignment.
-A better design would place this pass before closure conversion, exposing
-@object-code{unsafe-apply} earlier.
-Then we would have access to the correct arity count without the closure
-argument, and closure conversion modify the @object-code{unsafe-apply} form
-without disrupting @object-code{procedure-arity}.
-
-We do not want to capture the closure parameter in the
-@object-code{procedure-arity} value, since this value is exposed to a user, and
-we do not want the user to know about the internal closure parameter.
-This internal parameter is not part of their code, so we should not burden them
-with it.
-}
-
-We change the name of @object-code{unsafe-apply} to @object-code{apply}, since
-that's what the rest of the compiler uses.
-
-Note that we cannot simply define @object-code{procedure-apply} as a procedure,
-like we did with other safe wrappers, since it must count its arguments, and we
-must support a variable number of arguments to the procedure.
-
-@exercise{Design and implement the function @racket[implement-safe-apply].
-The source language is @tech{Unary-let-lang v9} and the target language is
-@tech{Exprs-data-lang v9}.
-}
-
-@subsection{specify-representation}
-Finally, we need to modify the procedure data type slightly.
-It was intentionally designed to be similar to the vector data type.
-
-We define @deftech{Impure-Exprs-bits-lang v9} below.
-There are no differences with respect to @a8-tech{Impure-Exprs-bits-lang v8}.
-
-@racketgrammar*[
-[p     (module b ... e)]
-[b     (define label (lambda (aloc ...) e))]
-[c     (begin c ...) (mset! e e e)]
-[e     v
-       (let ([aloc e]) e)
-       (if (cmp e e) e e)
-       (begin c ... e)
-       (binop e e) (apply e e ...)
-       (alloc e)
-       (mref e e)]
-[v     int64 label aloc]
-[binop * + - bitwise-and bitwise-ior bitwise-xor arithmetic-shift-right]
-[cmp   neq? eq? < <= > >=]
-]
-
-When implementing @object-code{make-procedure}, you may assume the size of the
-environment is a fixnum constant.
-
-@exercise{Redesign and extend the implementation of the function
-@racket[specify-representation].
-The source language is @tech{Exprs-data-lang v9} and the target language is
-@tech{Impure-Exprs-bits-lang v9}.
-}
 
 No other passes should need to be updated.
 
