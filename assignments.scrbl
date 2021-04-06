@@ -27,7 +27,7 @@ gradually design and implement new layers of abstraction as languages.
 @include-section{assignment/a7.scrbl}
 @include-section{assignment/a8.scrbl}
 @include-section{assignment/a9.scrbl}
-@margin-note{Assignments ~10--~11 still being re-written}
 @;include-section{assignment/a10.scrbl}
-@;include-section{assignment/a11.scrbl}
+@include-section{assignment/a11.scrbl}
+@margin-note{Milestone 10 canceled this semester}
 
