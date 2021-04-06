@@ -665,7 +665,7 @@ Below, we define @deftech{Closure-lang v9}.
 @tech{Closure conversion} changes @closure-lang-v9[letrec] to bind labels to procedure
 code.
 After this pass, the body of @closure-lang-v9[lambda] will not contain any free
-variables, and will not be a procedure data type---it is just like a function
+variables, and will not be a procedure data type---it is just like a procedure
 from @ch6-tech{Values-lang v6}.
 
 To encode @tech{closures}, we temporarily add a new data type for closures,
@@ -683,12 +683,9 @@ readability.
 This assumption is not necessary for correctness, but simplifies an
 optimization presented later as a challenge exercise.
 
-We add @closure-lang-v9[unsafe-call] to the language to enable optimizing closures,
-an important optimization in functional languages.
-This @closure-lang-v9[unsafe-call] directly applies a label to arguments, without
-performing any checks.
-@closure-lang-v9[closure-call] will get translated into the safe, dynamically
-checked call.
+We add @closure-lang-v9[call], the primtive operation for calling a label
+directly, to enable optimizing closures, an important optimization in functional
+languages.
 
 @nested[#:style 'inset
 @defproc[(convert-closures [p lam-free-lang-v9?])
@@ -701,7 +698,7 @@ Performs @tech{closure conversion}, converting all procedures into explicit
 If the operator is already a @closure-lang-v9[aloc], avoid introducing an extra
 @closure-lang-v9[let]:
 @racketblock[
-`(call ,aloc ,es ...)
+`(unsafe-procedure-call ,aloc ,es ...)
 _=>
 `(closure-call ,aloc ,aloc ,es ...)
 ]
@@ -720,26 +717,11 @@ determine the label of the operator:
 @racketblock[
 `(closure-call ,e ,es ...)
 _=>
-`(unsafe-call ,l ,es ...)
+`(call ,l ,es ...)
 ]
 where @racket[l] is known to be the label of the closure @racket[e].
 Because @racket[e] is already an @closure-lang-v9[aloc], we can safely discard it;
 we do not need to force evaluation to preserve any side effects.
-
-Because this transforms into an @closure-lang-v9[unsafe-call], we need to inline
-the arity check that @racket[implement-safe-call] would insert.
-Something like:
-@racketblock[
-`(closure-call ,e ,es ...)
-_=>
-`(if (eq? (unsafe-procedure-arity e) ,(sub1 (length es)))
-     (unsafe-call ,l ,es)
-     ,bad-arity-error)
-]
-Remember the @closure-lang-v9[unsafe-procedure-arity] will be one more than the closure
-arguments, since the closure takes itself as a hidden argument.
-@margin-note{We could further optimize this, since we should know the arity
-statically when this optimization would apply.}
 
 We perform this optimization by recognizing @closure-lang-v9[letrec] and
 @closure-lang-v9[cletrec] as a single composite form:
@@ -749,7 +731,7 @@ We perform this optimization by recognizing @closure-lang-v9[letrec] and
      ,e))
 ]
 All uses of @closure-lang-v9[(closure-call aloc_c es ...)] in
-@racket[e] and @racket[lam] can be transformed into @closure-lang-v9[(unsafe-call
+@racket[e] and @racket[lam] can be transformed into @closure-lang-v9[(call
 label_c es ...)].
 We have to recognize these as a single composite form to optimize recursive
 calls inside @racket[lam], which will benefit the most from the optimization.
