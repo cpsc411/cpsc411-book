@@ -711,7 +711,7 @@ task:
     (make-vector ,make-init-vector-label (fixnum?))
     (vector-length unsafe-vector-length (vector?))
     (vector-set! ,unsafe-vector-set!-label (vector? fixnum? any?))
-    (vector-ref unsafe-vector-ref (vector? fixnum?))
+    (vector-ref ,unsafe-vector-ref-label (vector? fixnum?))
 
     (car unsafe-car (pair?))
     (cdr unsafe-cdr (pair?))
