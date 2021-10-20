@@ -11,8 +11,8 @@ all: help
 
 .racodeps: info.rkt ../cpsc411-pub/cpsc411-lib/info.rkt ../cpsc411-priv/cpsc411-reference-lib/info.rkt ../cpsc411-interrogator/cpsc411-interrogator-lib/info.rkt
 	(cd ../cpsc411-pub/cpsc411-lib/; raco pkg install --skip-installed --batch --auto)
-	(cd ../cpsc411-priv/cpsc411-reference-lib/; raco pkg install --skip-installed --batch --auto)
 	(cd ../cpsc411-priv/cpsc411-reference-tests/; raco pkg install --skip-installed --batch --auto)
+	(cd ../cpsc411-priv/cpsc411-reference-lib/; raco pkg install --skip-installed --batch --auto)
 	raco pkg install --skip-installed --batch --auto
 	touch $@
 
