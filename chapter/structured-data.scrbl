@@ -515,7 +515,7 @@ Supporting @exprs-bits-lang-v8/contexts[effect] context requires paying
 attention to order when designing @racket[remove-complex-opera*], but does not
 significantly complicate anything.
 
-@defproc[(remove-complex-opera* [p exprs-bigs-lang-v8/contexts?])
+@defproc[(remove-complex-opera* [p exprs-bits-lang-v8/contexts?])
          values-bits-lang-v8?]{
 Performs the monadic form transformation, unnesting all non-trivial operators
 and operands, making data flow explicit and and simple to implement imperatively.
