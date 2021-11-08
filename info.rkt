@@ -2,6 +2,7 @@
 ;(define collection "cpsc411-book")
 (define deps '("at-exp-lib"
                "cpsc411-lib"
+               "https://github.com/97jaz/tzinfo.git#16fa31aa9005de3476885f644cc5930b6a18503f"
                "gregor-lib"
                ;; NOTE: memoize is required by a dependency of gregor lib, so force install my forked version. Otherwise, we get package conflicts.
                "https://github.com/wilbowma/memoize.git?path=memoize-lib"
