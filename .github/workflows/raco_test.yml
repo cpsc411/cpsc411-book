@@ -14,18 +14,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        racket: [7.4,7.5,7.6,7.7,7.8,7.9,current]
+        racket-version: ['7.4', '7.5', '7.6', '7.7', '7.8', '7.9', '8.0', '8.1', '8.2', '8.3', 'current']
+        racket-variant: ['CS', 'BC']
 #        nasm: [2.13,2.14,2.15]
     steps:
     - name: Install system dependencies
       run: |
         sudo apt-get install nasm graphviz
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v0.12
+      uses: Bogdanp/setup-racket@v1.6.1
       with:
         architecture: 'x64'
         distribution: 'minimal'
-        version: ${{ matrix.racket }}
+        variant: ${{ matrix.racket-variant }}
+        version: ${{ matrix.racket-version }}
     - name: Install Racket deps that can't be auto-installed
       run: |
         # required for raco test
