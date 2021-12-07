@@ -143,12 +143,15 @@
 (define (nasm-call-string type name.s name.o)
   @~a{> nasm -f @(bin-format type) -o @|name.o| @|name.s|})
 
+;; This is duplicated in cpsc411-lib/compiler-lib.rkt
 (define (ld-call-string type name.o name.exe)
   (match type
     ['unix
      @~a{> ld -e start -o @|name.exe| @|name.o|}]
     ['macosx
-     @~a{> ld -macosx_version_min 10.6 -e start -o @|name.exe| @|name.o|}]
+     ;; no_pie needed until we switch to position independent code, using lea
+     ;; instead of mov to function/static data pointers
+     @~a{> ld -no_pie -macosx_version_min 10.6 -e start -o @|name.exe| @|name.o|}]
     ['windows
      @~a{> golink /entry Start /fo @|name.exe| @|name.o| kernel32.dll}]))
 
