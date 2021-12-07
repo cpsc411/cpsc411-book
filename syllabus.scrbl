@@ -182,15 +182,15 @@ In no particular order, these are:
 
 @itemlist[
 @item{Office hours}
-@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22020/cpsc411" "Piazza"]
+@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22021/cpsc411" "Piazza"]
 
-    The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about assignments, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza -- pleas of ignorance will not be received.
+    The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about milestones, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza -- pleas of ignorance will not be received.
 
-    Piazza is also a very effective means of communication if used correctly. Questions about the assignments should be posted to the Piazza rather than being emailed to the instructor or a TA, as everyone will see both the question and its answer. All students are encouraged to post answers to questions posed on Piazza as well.
+    Piazza is also a very effective means of communication if used correctly. Questions about the milestones should be posted to the Piazza rather than being emailed to the instructor or a TA, as everyone will see both the question and its answer. All students are encouraged to post answers to questions posed on Piazza as well.
 }
 @item{Email
 
-    Email to the instructor or TAs is effective in limited circumstances. It is the most effective means of scheduling a consulting time when the regular hours are impossible or insufficient. It is an appropriate means of asking questions concerning the grading of assignments and examinations. It is not an appropriate means of asking questions about the assignments - see Piazza.
+    Email to the instructor or TAs is effective in limited circumstances. It is the most effective means of scheduling a consulting time when the regular hours are impossible or insufficient. It is an appropriate means of asking questions concerning the grading of milestones and examinations. It is not an appropriate means of asking questions about the milestones - see Piazza.
 }
 ]
 
@@ -208,11 +208,11 @@ The milestones @emph{a0--a2} will be completed individually, and the rest of
 the project will be in teams of three.
 
 There will be a midterm and final that focus on the concepts covered in lecture
-and in assignments.
-The structure of the exams will be different than the assignments.
-While the assignments focus on implementing a compiler, the exams will test you
+and in milestones.
+The structure of the exams may be different than the milestones.
+While the milestones focus on implementing a compiler, the exams will test you
 on the concepts and design elements that are discussed in lecture and are
-implicit in the assignments.
+implicit in the milestones.
 
 @subsection{Working in Groups}
 How you organize work between yourself is ultimately up to you.
@@ -421,7 +421,7 @@ one solution over another.
 In each exercise, we use the word @emph{design} to remind you that you should
 not merely write code, but @emph{design} it.
 You should @emph{design} your code, a la the design recipe, for every
-assignment in this class.
+assessment in this class.
 It should go without saying, but we have to say it.
 So here, we are saying it very explicitly:
 
@@ -460,7 +460,7 @@ Use @other-doc['(lib "rackunit/scribblings/rackunit.scrbl")] for testing.
 You must write tests.
 @(require scribble/core)
 You must write unit tests for each pass.
-You must write integration tests for the entire compiler for each assignment.
+You must write integration tests for the entire compiler for each milestone.
 Your tests must test each kind of expression in the source language.
 Your tests must test edge cases---what happens with @code{0}, with @code{-2^63}, with
 @code{2^63-1}, etc.
