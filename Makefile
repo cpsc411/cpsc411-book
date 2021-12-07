@@ -103,7 +103,7 @@ clean:
 	rm -rf compiled/
 
 sync: docs-server build/*.html build/*.cgi
-	rsync -avzl --delete --delete-excluded --chmod=Dg+x,g+r build/ cs-411@remote.students.cs.ubc.ca:public_html/2020w2/
+	rsync -avzl --delete --delete-excluded --chmod=Dg+x,g+r build/ cs-411@remote.students.cs.ubc.ca:public_html/2021w2/
 
 serve: build/.done
 	racket -t serve.rkt
