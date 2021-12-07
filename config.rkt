@@ -7,7 +7,7 @@
 (provide (all-defined-out))
 
 (define course-number "CPSC 411")
-(define semester "2020w2")
+(define semester "2021w2")
 (define course-title "Introduction to Compiler Construction")
 
 (define url-root (string-append "https://www.students.cs.ubc.ca/~cs-411/" semester))
@@ -15,7 +15,8 @@
 ;; TODO: Are you serious? Racket can't handle a recursive value?!
 (define deadline-dict
   (let ([x (make-hasheq)])
-    (hash-set! x 'a0 (moment 2021 1 15 23 59 59))
+    ;; First Friday of Term
+    (hash-set! x 'a0 (moment 2022 1 14 23 59 59))
     (hash-set! x 'a1 (+weeks (hash-ref x 'a0) 1))
     (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 2))
     (hash-set! x 'a3 (+weeks (hash-ref x 'a2) 1))
@@ -28,7 +29,7 @@
     (hash-set! x 'a9 (+days (+weeks (hash-ref x 'a8) 1) 4))
     #;(hash-set! x 'a10 (+weeks (hash-ref x 'a9) 1))
     #;(hash-set! x 'a10 (moment 2021 4 16 23 59 59))
-    (hash-set! x 'a11 (moment 2021 4 16 23 59 59)
+    (hash-set! x 'a11 (moment 2022 4 16 23 59 59)
                #;(+weeks (hash-ref x 'a10) 1))
     x)
   #;`((a0 . ,(moment 2019 1 12 23 59 59))
@@ -55,7 +56,9 @@
     #;(,(moment 2021 2 22) . "Weekly Readings: Chp 7 (4.7)")
     (,(moment 2021 2 25) . ,(emph "Midterm!"))
 
-    (,(moment 2021 1 11) . "First Day of Lecture")
+    (,(moment 2022 1 11) . "First Day of Lecture")
+    (,(moment 2022 1 18) . "No lecture; out at POPL")
+    (,(moment 2022 1 20) . "No lecture; out at POPL")
     (,(moment 2021 1 22) . "Last day to withdraw, without W")
     (,(moment 2021 3 12) . "Last day to withdraw, with W")
     (,(moment 2021 2 15) . "Start of Midterm Break")
