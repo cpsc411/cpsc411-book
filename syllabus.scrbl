@@ -365,28 +365,47 @@ subject to change at the instructor's discretion.
 ]
 
 @subsection{Late Policy}
-The most recent commit that is pushed to the GitHub Students instance by the
-deadline is the one that gets graded.
+The entire project must be handed in by the project due date at the end of the
+semester; there will be no extensions.
 If you have a local commit that was before the deadline, but you forgot to push
 it, then it will not be graded.
 
-To prevent TAs from grading the same assignment twice, you must post on Piazza
-before the deadline to request a late day.
-If you need to request a second or third late day, you must post again before
-your extended deadline.
-
-@itemlist[
-@item{1 day -- 10%}
-@item{2 day -- 30%}
-@item{3 day -- 50%}
-@item{More than 3 days late -- don't bother}
-]
+We will provide weekly milestone deadlines, and will provide feedback on the
+last commit made prior to this deadline.
+This feedback is not graded.
+If you miss a milestone deadline, you receive no feedback, and it does not
+directly impact your grade.
 
 @subsection{Project Evaluation}
 The project, the compiler you write through this course, will be divided into
-approximately 13 assignments.
-An assignment will be marked each week to provide on-going feedback on your
+approximately 10 milestone.
+At the end of the semester, your entire compiler will be thoroughly tested and
+hand-graded for design elements.
+This will constitute the entire project grade.
+
+You are required to complete the first 7 milestones to pass the course project,
+but you may choose to stop any time after completing milestone 7.
+Your maximum grade on the project will be 10% for each milestone you choose to
+complete; however, you will receive a bonus 10% on your project grade if your
+milestone is perfect according to our rubric---it passes all of our tests
+(including private tests), and the code is well designed.
+The final 10% is all or nothing.
+This means if you complete milestone 7 perfectly, you will receive an 80% on the
+project; if you complete milestone 7 almost perfectly, you get approximately
+70%.
+If you complete milestone 8 perfectly, you will receive 90% on the project, but
+80% or less for an imperfect milestone 8.
+If you complete milestone 10 pefectly, you will receive 110% on the project, but
+100% or less for an imperfect milestone 10.
+
+By the end of the course, you must declare which milestone you intend to be your
+final milestone.
+You do not have to declare this to the instructors before the end of the
+semester, but you and your group will need to agree before hand.
+This should be clearly communicated in a README in the main branch of your
 project.
+We will grade to rubric and the test suite for the milestone you declare, and
+grade the passes included up to that milestone.
 
 We will evaluate more than merely whether or not your code "works".
 We may review your code and/or ask you as a group to demonstrate your compiler
