@@ -254,7 +254,7 @@ One of the first things a compiler writer will do is abstract away from
 But to abstract away from them, we need to understand how they work in various
 flavours of @tech{x64}.
 
-Our earlier example @tech{x64} program was limited becaues we did not know how
+Our earlier example @tech{x64} program was limited because we did not know how
 to communicate.
 In the rest of this section, we walk through how to use basic @tech{system
 calls} to make a complete program that can exit properly and communicate its
@@ -375,7 +375,7 @@ fact_acc:
 
 fact_done:
   mov r8, msg  ; Move the address of `msg` into `r8`.
-  mov [r8], r9 ; move r9 into the 0th index of the address pointed to by r8.
+  mov [r8], r9 ; Move r9 into the 0th index of the address pointed to by r8.
 
 print_msg:
   mov     rax, 1      ; Say, "I'm about to call the OS sys_write function"
@@ -498,7 +498,7 @@ fact_acc:
 
 fact_done:
   mov r8, msg  ; Move the address of `msg` into `r8`.
-  mov [r8], r9 ; move r9 into the 0th index of the address pointed to by r8.
+  mov [r8], r9 ; Move r9 into the 0th index of the address pointed to by r8.
 
 print_msg:
   mov     rax, 0x2000004    ; Say, "I'm about to call the OS sys_write function"

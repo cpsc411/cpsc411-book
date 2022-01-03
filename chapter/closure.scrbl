@@ -69,7 +69,7 @@ This is a syntactically small change, but it has massive implications.
 
 @section{Procedures, Closures and Closure Conversion}
 So far, procedures in our language have been compiled directly to labeled
-@deftech{code}---a suspended computation that is closed execpt for it's declared
+@deftech{code}---a suspended computation that is closed except for it's declared
 parameters.
 We have not treated procedures as values, nor considered what happens if a
 procedure appears in value context.
@@ -525,7 +525,7 @@ Explicitly binds all procedures to @ch2-tech{abstract locations}.
 Before we start compiling @just-exprs-lang-v9[lambda]s, we should try to get rid of
 them.
 @emph{Direct calls} to @just-exprs-lang-v9[lambda]s, such as @racket[(call (lambda (x)
-x) 1)], are simple to rewrite to a @just-exprs-lang-v9[let] binding, such a
+x) 1)], are simple to rewrite to a @just-exprs-lang-v9[let] binding, such as
 @racket[(let ([x 1]) x)].
 A human programmer may not write this kind of code much, but most programs are
 not written by humans---compilers write far more programs.
@@ -683,7 +683,7 @@ readability.
 This assumption is not necessary for correctness, but simplifies an
 optimization presented later as a challenge exercise.
 
-We add @closure-lang-v9[call], the primtive operation for calling a label
+We add @closure-lang-v9[call], the primitive operation for calling a label
 directly, to enable optimizing closures, an important optimization in functional
 languages.
 

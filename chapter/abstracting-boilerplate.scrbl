@@ -318,7 +318,7 @@ than unit testing alone.
 To ensure no @tech{undefined behaviour}, our validator should check the
 following.
 @itemlist[
-@item{The input conforms to the grammmar of @tech{Paren-x64 v1}, including
+@item{The input conforms to the grammar of @tech{Paren-x64 v1}, including
 restrictions regarding the valid range of integers and when the same register
 must appear in two places.}
 @item{No register is referred to before is it initialized. We assume that no
@@ -332,8 +332,8 @@ We always want our syntax to be valid, but because @tech{Paren-x64 v1} will
 serve as a target language, we may not always want to enforce that registers are
 provabably initialized.
 For example, the language may evolve to the point where checking this will be
-undecidable, and source languages will be responsible to enforcing the guarantee
-isntead.
+undecidable, and source languages will be responsible for enforcing the guarantee
+instead.
 By separating the two checks, we'll be able to reuse code in this eventuality.
 
 First, we check that the syntax is valid.

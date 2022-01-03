@@ -187,7 +187,7 @@ The same @tech{lexical identifier} can be shadowed by nested
 @values-lang-v3[let] expressions, and nested @values-lang-v3[let] expressions
 can refer to the bindings of prior @values-lang-v3[let] expressions.
 However, in the @emph{same} @values-lang-v3[let] expression, the binding are
-considered @emph{paralell}---they do not shadow, and cannot refer to each other.
+considered @emph{parallel}---they do not shadow, and cannot refer to each other.
 This means we can freely reorder the bindings in a single @values-lang-v3[let]
 statement.
 This can be useful for optimization.
@@ -277,7 +277,7 @@ needs only to think about the state of the machine when composing operations.
 @margin-note{@tech{Imp-cmf-lang v3} is in a variant of @deftech{a-normal form}
 (@deftech{ANF}), a syntactic form that restricts all operations to trivial
 values, and forbids nesting.
-It is roughly equivalence to other compiler intermdiate forms, such as
+It is roughly equivalence to other compiler intermediate forms, such as
 static-single assignment.}
 @todo{Add ANF citation}
 @todo{This is no longer ANF}

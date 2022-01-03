@@ -322,7 +322,7 @@ When transforming a procedure @racket[`(lambda (,x_0 ... ,x_n-1 ,x_n ...
 ]
 where:
 @itemlist[
-@item{@racket[fv_0 _... fv_k-1] are the first @racket[k] @ch2-tech{frame variable}.
+@item{@racket[fv_0 _... fv_k-1] are the first @racket[k] @ch2-tech{frame variables}.
 }
 @item{@racket[r_0 _... r_n-1] are the @racket[n] physical locations from
 @racket[current-parameter-registers].}
@@ -516,7 +516,7 @@ locations} uninitialized, resulting in undefined behaviour.
 
 We now have two data types exposed in the source language: integers, and
 procedures.
-This introduces more opporutnities for undefined behaviour.
+This introduces more opportunities for undefined behaviour.
 If we try to compare a procedure to an integer, we will generate code with
 undefined behaviour.
 We therefore must check the source program does not use labels in this way.
@@ -564,7 +564,7 @@ Validates that the @tech{Values-lang v5} is syntactically well-formed, well
 bound and well typed: all procedure calls pass the correct number of arguments,
 and all @values-lang-v5[binop] and @values-lang-v5[relop] are never used with
 labels.
-You may want to separet this into two problems: first checking syntax, then type
+You may want to separate this into two problems: first checking syntax, then type
 checking.
 }
 ]
