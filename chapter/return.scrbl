@@ -125,7 +125,7 @@ abstraction, which allows the language to essentially jump back from a
 @ch5-tech{procedure} call into the middle of a computation.
 Thankfully, we already have the abstractions required to implement this: labels,
 jumps, and a calling convention.
-All we need to do is slightly generalized the calling convention to introduce a
+All we need to do is slightly generalize the calling convention to introduce a
 new label at the return point of a procedure call, store that label
 somewhere, and arrange for the caller to jump back to that label.
 
@@ -1025,7 +1025,7 @@ the non-tail call.}
 @;
 @;... conflict analysis
 
-Unfortunately, we can't implement this transformation as it.
+Unfortunately, we can't implement this transformation as is.
 We want to avoid producing new @asm-pred-lang-v6[set!]s.
 First, they will invalidate the undead analysis we've just performed.
 Second, some or all the moves might be unnecessary.

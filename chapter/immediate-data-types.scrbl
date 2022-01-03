@@ -525,7 +525,7 @@ If you've written any examples or tests in @ch-v6-tech{Values-lang v6}, you've
 probably done this tranformation by hand many times.
 
 @digression{
-We can do a better job if we following the template for the output language
+We can do a better job if we follow the template for the output language
 while processing the input language.
 In this way, we design functions for each non-terminal in the output language.
 These functions describe in what context the current term is being processed.
@@ -713,7 +713,7 @@ To implement this language, we essentially "link" the definitions of each
 procedure wrapper for each primitive operation and replace the
 reserved @exprs-unsafe-data-lang-v7[prim-f] names for the functions with the
 appropriate fresh labels.
-Since our compiler as not provided any means of linking separately compiled
+Since our compiler has not provided any means of linking separately compiled
 modules, we implement this by adding new definitions to the module.
 Each safe function should raise a different error code depending on which
 operation was attempted, and which argument was not well-typed.

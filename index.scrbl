@@ -8,7 +8,7 @@ The goal of this course is to give students experience designing, implementing,
 and extending programming languages. Students will start from a machine
 language, the x86-64 CPU instruction set with Linux system calls (x64), and
 incrementally build a compiler for a subset of Racket to this machine language.
-In the proceess, students will practice building, extending, and maintaining a
+In the process, students will practice building, extending, and maintaining a
 complex piece of software, and practice creating, enforcing, and exploiting
 abstractions formalized in programming languages.
 

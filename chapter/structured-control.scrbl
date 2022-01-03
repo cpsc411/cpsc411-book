@@ -730,7 +730,7 @@ To implement @tech{Nested-asm-lang v4}, we define the procedure
 @racket[expose-basic-blocks].
 The strategy for writing this is slightly complex.
 Each helper for processing a nonterminal may need to introduce new basic blocks,
-and transforming a nested @nested-asm-lang-v4[if] expression requires knowning
+and transforming a nested @nested-asm-lang-v4[if] expression requires knowing
 the target of each branch.
 
 The transformation for predicates should transform predicates and generate an
@@ -745,7 +745,7 @@ When you find an @nested-asm-lang-v4[if] in predicate position, you'll need to
 generate two new basic blocks, and rearrange the current true and false labels.
 
 The transformer for effects should take care to unnest @nested-asm-lang-v4[begin]
-statments.
+statements.
 This is not really related to exposing basic blocks, but it is trivial to deal
 with using the right abstraction, and so does not warrant a separate compiler
 pass.
