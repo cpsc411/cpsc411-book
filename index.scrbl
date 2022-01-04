@@ -30,6 +30,7 @@ Please report bugs, typos, etc at in the relevant repository:
 @(local-table-of-contents #:style 'immediate-only)
 
 @include-section{syllabus.scrbl}
+@include-section{covid-syllabus.scrbl}
 @include-section{calendar.scrbl}
 @include-section{project-logistics.scrbl}
 @include-section{readings.scrbl}
