@@ -171,7 +171,6 @@ available electronic textbook may be suggested.
 (list @bold{TA} @bold{Contact Details} @bold{Office} @bold{Office Hours})
 (list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "" "TBD")
 (list "Paulette Koronkevich" @mailto["pletrec@cs.ubc.ca"] "" "TBD")
-(list "Justin Hu" @mailto["justin.hu@alumni.ubc.ca"] "" "TBD")
 )
 ]
 
@@ -364,6 +363,8 @@ subject to change at the instructor's discretion.
 @item{Final -- 30%}
 ]
 
+You must pass both the project and the final to pass the course.
+
 @subsection{Late Policy}
 The entire project must be handed in by the project due date at the end of the
 semester; there will be no extensions.
@@ -371,8 +372,13 @@ If you have a local commit that was before the deadline, but you forgot to push
 it, then it will not be graded.
 
 We will provide weekly milestone deadlines, and will provide feedback on the
-last commit made prior to this deadline.
-This feedback is not graded.
+last commit on the milestone branch made prior to this deadline.
+This feedback is not graded, but you will be given comments on the design and
+implementation of your project, as well as summary feedback of "NS" (not
+satisfactory), "S" (satsifactory), or "S+" (above satsifactory) on your progress
+so far.
+If you receive an "NS", you should meet with a TA or instructor to get ensure
+you have a plan to get your project back on track.
 If you miss a milestone deadline, you receive no feedback, and it does not
 directly impact your grade.
 
@@ -402,10 +408,10 @@ By the end of the course, you must declare which milestone you intend to be your
 final milestone.
 You do not have to declare this to the instructors before the end of the
 semester, but you and your group will need to agree before hand.
-This should be clearly communicated in a README in the main branch of your
+This should be clearly communicated in the README in the main branch of your
 project.
 We will grade to rubric and the test suite for the milestone you declare, and
-grade the passes included up to that milestone.
+grade the compiler passes included up to that milestone.
 
 We will evaluate more than merely whether or not your code "works".
 We may review your code and/or ask you as a group to demonstrate your compiler
@@ -415,7 +421,7 @@ You should be prepared to:
 @itemlist[
 @item{Demonstrate that your solution works in a live demo.}
 @item{Answer questions about all the code you submitted as a team.}
-@item{Defend various implementation choices you have made during the course of the project.}
+@item{Defend various implementation and design choices you have made during the course of the project.}
 @item{Show that you can "think outside the box" about alternative implementation strategies or extensions to the project which may not have been part of the original project specification.}
 ]
 
@@ -437,7 +443,7 @@ as justify the often subjective value judgements that are inherent in choosing
 one solution over another.
 
 @subsection[#:tag "grading-design"]{@elem[#:style (style "red" (list (color-property "red")))]{Important}: We will grade you on design}
-In each exercise, we use the word @emph{design} to remind you that you should
+In each milestone description, we use the word @emph{design} to remind you that you should
 not merely write code, but @emph{design} it.
 You should @emph{design} your code, a la the design recipe, for every
 assessment in this class.
@@ -468,11 +474,11 @@ You will lose marks if you do not write them.
 You should follow the template for your input language.
 The template will help ensure you cover all the cases, get you started writing
 your code, and avoid unnecessarily complicated code.
-You're not writing simple functions in 110 now, so this is not a hard and fast
+You're not writing simple functions like in CPSC 110 now, so this is not a hard and fast
 rule.
 Sometimes, not very often, it will make sense to compose functions or write
 higher-order functions, or use mutable variables.
-But when in doubt, you should follow the design template.
+But when in doubt, you should follow the template.
 
 Write your tests before you write your code.
 Use @other-doc['(lib "rackunit/scribblings/rackunit.scrbl")] for testing.
