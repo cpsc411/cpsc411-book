@@ -24,7 +24,7 @@ You should have a git repository created for you at @url{https://github.students
   @item{Setup a 64-bit Linux (virtual) machine for local development}
   ]
 }
-@item{Ensure @code{racket} >= 7.3 is installed.}
+@item{Ensure @code{racket} >= 8.3 is installed.}
 @item{Ensure @code{nasm} >= 2.13 is installed.}
 @item{Ensure @code{nasm} is callable from Racket.}
 @item{Compile and execute fact.s from the command line.}
@@ -92,15 +92,17 @@ git repostory with the @tt{Dockerfile}.
 Assuming your compilers assignments are in stored in the path
 @tt{~/workspace/}, you can launch a new container with access to your
 assignments via @tt{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
+You can use docker compose via @tt{docker-compose run cpsc411}, which should
+automate all of the above.
 
 Whichever you choose, the following exercises will make sure your machine is
 setup and working properly.
 
 First, let's ensure Racket is installed properly and the right version.
-You will need @code{racket} version 7.3 or higher.
+You will need @code{racket} version 8.3 or higher.
 
 @exercise{Run @code{racket --version}, and check that a message like "Welcome to
-Racket v7.4.0.1" is printed, and that the version is at least "v7.3".
+Racket v8.3.0.1" is printed, and that the version is at least "v8.3".
 }
 
 Next, we'll test @code{nasm}. We need @code{nasm} version 2.13 or higher.
