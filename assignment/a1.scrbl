@@ -42,12 +42,22 @@ Before you start, you should read:
 ]
 These lay out important expectations regarding grading and sharing of code.
 
-@emph{Completely new passes}
+@emph{Optional passes}
+You will not be required to maintain these passes in the rest of the compiler,
+and so they're optional.
+However, I strongly recommend implementing them as they will provide valuable practice,
+insight into the semantics of our intermediate semantics, and can be used in
+testing and debugging your compiler.
+
 @typeset-passlist[
 check-paren-x64
 check-paren-x64-syntax
 check-paren-x64-init
 interp-paren-x64
+]
+
+@emph{New passes}
+@typeset-passlist[
 generate-x64
 wrap-x64-run-time
 wrap-x64-boilerplate
