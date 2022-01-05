@@ -1,9 +1,9 @@
 #lang racket/base
 
 (require
-  (except-in scribble/manual/lang tech deftech compile racketgrammar* date? date)
+  (except-in scribble/manual/lang tech deftech compile racketgrammar* date? date
+             url)
   (for-label racket)
-  scribble/base
   scribble/example
   "lib.rkt"
   cpsc411/compiler-lib)

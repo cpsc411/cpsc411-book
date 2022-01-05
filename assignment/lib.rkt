@@ -8,7 +8,8 @@
  racket/dict
  racket/runtime-path
  with-cache
- (except-in scribble/manual racketgrammar*)
+ (except-in scribble/manual racketgrammar* url)
+ (rename-in scribble/base [url base:url])
  scribble/example
  scribble/core
  scribble/html-properties
@@ -58,6 +59,8 @@
 
 (define ie @emph{i.e.,})
 (define eg @emph{e.g.,})
+(define (url . rest)
+  (base:url (apply string-append rest)))
 
 (define a0-tech (curry tech #:tag-prefixes '("milestone:" "a0:")))
 (define a1-tech (curry tech #:tag-prefixes '("milestone:" "a1:")))
