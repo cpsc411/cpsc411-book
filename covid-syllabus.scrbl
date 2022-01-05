@@ -23,7 +23,7 @@ You should feel free to contact me if you have concerns about COVID and course
 policy.
 
 @section{Changes to Lecture Delivery}
-Lectures will be delievery online via Zoom until at least Jan. 24th, per UBC policy.
+Lectures will be delivered online via Zoom until at least Jan. 24th, per UBC policy.
 
 Our scheduled lecture hall, DMP 110, has an occupancy limit of 120.
 At the current enrolment (67 students), 50% occupancy of DMP 110 is @emph{almost} possible.
