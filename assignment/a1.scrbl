@@ -71,6 +71,8 @@ This milestone description links to the documentation for each exercise in the
 chapter for convenience, but you are responsible for the reading the entire
 chapter.
 
+You should read first and work the relevant exercises as you read.
+
 @section{Exercises}
 @exercise[#:optional #t]{@emph{Design} and implement the function
 @racket[check-paren-x64-syntax].

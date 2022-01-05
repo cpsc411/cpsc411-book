@@ -130,6 +130,8 @@ As usual, this milestone description links to the documentation for each
 exercise in the chapter for convenience, but you are responsible for the
 reading the entire chapter.
 
+You should read first and work the relevant exercises as you read.
+
 @section{Exercises}
 
 @exercise{Remove your definitions of @racket[wrap-x64-boilerplate] and
