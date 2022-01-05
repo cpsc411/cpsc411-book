@@ -14,7 +14,7 @@ This assignment will instruct you to install and test the required tools.
 
 This assignment is due @(due 'a0).
 
-You should have a git repository created for you at @url{https://github.students.cs.ubc.ca/orgs/cpsc411-2021w-t2/}
+You should have a git repository created for you at @url{https://github.students.cs.ubc.ca/orgs/@|gh-org|}
 
 @subsubsub*section{Assignment Checklist}
 @itemlist[
