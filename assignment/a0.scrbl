@@ -14,10 +14,11 @@ This assignment will instruct you to install and test the required tools.
 
 This assignment is due @(due 'a0).
 
-You should have a git repository created for you at @url{https://github.students.cs.ubc.ca/orgs/cpsc411-2020w-t2/}
+You should have a git repository created for you at @url{https://github.students.cs.ubc.ca/orgs/cpsc411-2021w-t2/}
 
 @subsubsub*section{Assignment Checklist}
 @itemlist[
+@item{Ensure you have a CSID: @url{https://www.cs.ubc.ca/getacct/}.}
 @item{Either:
   @itemlist[
   @item{Connect to @tt{ssh://remote.students.cs.ubc.ca}, or}
@@ -73,16 +74,23 @@ Thankfully, someone has already written a compiler, called @tt{nasm}, from
 You can read more about these languages in in @Secref[#:tag-prefixes
 '("book:" "chp1:")]{top}.
 
+@section{Setup a CSID}
+You almost certainly already have one, but if you don't, make sure you
+sign up for an account at @url{https://www.cs.ubc.ca/getacct/}.
+
+This account will be your GradeScope account and your account on
+@url{https://github.students.cs.ubc.ca/orgs/cpsc411-2021w-t2/}.
+
 @section{Testing Your Development Machine}
 If you're running your own Linux machine, I trust you can figure out how to
 install @code{racket} and @code{nasm}.
 
 If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca},
 which has the correct version of @code{nasm} and @code{racket}.
-You can sign up for an account at @url{https://www.cs.ubc.ca/getacct/}.
+You can connect via SSH using your CSID.
 
 If you want a local development environment, you can use the @tt{Dockerfile}
-found in your git repository. to setup a development container that mirrors
+found in your git repository to setup a development container that mirrors
 @url{remote.students.cs.ubc.ca}.
 This will install a container with all the appropriate build tools and version.
 We recommend editing the compiler assignment files in the host machine,
@@ -163,6 +171,24 @@ executable, and how you will test your compiler from Racket.
 Run the file to ensure the test passes, using @tt{raco test fact.rkt}.
 Make sure to push to @tt{assignment-0} branch of the git repository we created
 for you.
+
+It is your responsibility to make sure the final commit to that branch is the
+right one; use good software development practices and avoid merging to that
+branch until you've tested.
+Other commits will not be graded.
+}
+
+@exercise{
+We will be attempting to grade using GradeScope, and milestones may include an
+autograder.
+You can manually submit by logging in to GradeScope using the email
+@tt{CSID@"@"students.cs.ubc.ca}, and uploading a ZIP archive created from your
+git repo using @tt{git archive -o submission.zip assignment-0}.
+You will be able to see some information from the autograder after submitting.
+
+If you do not submit, we'll automatically submit your final commit prior to the
+deadline from the @tt{assignment-0} branch.
+
 }
 
 @section{x64 References}
