@@ -72,7 +72,7 @@ chapter for convenience, but you are responsible for the reading the entire
 chapter.
 
 @section{Exercises}
-@exercise{@emph{Design} and implement the function
+@exercise[#:optional #t]{@emph{Design} and implement the function
 @racket[check-paren-x64-syntax].
 
 It might help to start by writing the template, following the instructions from
@@ -87,12 +87,12 @@ See @secref["main-and-test" #:doc '(lib "scribblings/guide/guide.scrbl")] for
 more details.
 }
 
-@exercise{@emph{Design} and implement the function
+@exercise[#:optional #t]{@emph{Design} and implement the function
 @racket[check-paren-x64-init].}
 
 @exercise{Implement the function @racket[check-paren-x64].}
 
-@exercise{
+@exercise[#:optional #t]{
 @emph{Design} and implement the function @racket[interp-paren-x64], an
 interpreter for @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
 v1}.
@@ -135,9 +135,9 @@ Note that a similarly named function exists in the support library, but will not
 correctly implement the boilerplate this milestone.
 }
 
-@exercise{Test your compiler compiler correctness statement by running the same
-programs through your interpreter and through your compiler and comparing the
-results.
+@exercise[#:optional #t]{Test your compiler compiler correctness statement by
+running the same programs through your interpreter and through your compiler and
+comparing the results.
 
 While testing, you may want to avoid hard-coding values modulo 256, as the
 run-time system may change in later iterations to return values directly.

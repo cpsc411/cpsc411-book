@@ -122,9 +122,10 @@
                      (let ([x (unbox ecounter)])
                        (set-box! ecounter (add1 x))
                        x))]
+           #:optional [opt? #f]
            . rest)
     (nested #:style "boxed"
-            @bold{Exercise @~a[number]: }
+            @bold{Exercise @~a[number]@(if opt? " (optional)" ""): }
             rest)))
 
 (define ccounter (box 1))
