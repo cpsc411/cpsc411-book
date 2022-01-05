@@ -90,7 +90,12 @@ more details.
 @exercise[#:optional #t]{@emph{Design} and implement the function
 @racket[check-paren-x64-init].}
 
-@exercise{Implement the function @racket[check-paren-x64].}
+@exercise[#:optional #t]{Design and implement the function
+@racket[check-paren-x64], a validator for @tech[#:tag-prefixes '("book:"
+"chp-boilerplate:")]{Paren-x64 v1}.
+It should just compose @racket[check-paren-x64-init] and
+@racket[check-paren-x64-syntax], if you've implemented both, but could also just
+be an alias for @racket[check-paren-x64-syntax].}
 
 @exercise[#:optional #t]{
 @emph{Design} and implement the function @racket[interp-paren-x64], an
