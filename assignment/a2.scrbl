@@ -35,7 +35,7 @@ abstract names.
 This assignment is due @(due 'a2).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a2}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a2}.
 
 @subsection{Learning Objectives}
 @todo{Redo above summary to split out summary from learning objectives.}
@@ -196,9 +196,15 @@ You may find the functions @racket[name?] and @racket[fresh] helpful.
 Which passes were simplified by the abiltiy to nest @asm-lang-v2[tail]s?
 }
 
-@todo{Last semester, a2 was a bit intense. Maybe cut some of this.}
+@subsection{Optional Exercises}
+
+These exercises are optional, but if you complete them, you'll be able to use
+them when debugging your compiler, by comparing the results of a compiled
+program to the result of interpreting it.
+
 @todo{Add a separate chapter on validator, interpreters, etc, their use in
 intermediate languages, and source langauges.}
+
 @exercise{Redesign and extend the implementation of @racket[check-paren-x64].
 You should be able to modify your type checker for the previous
 @tech[#:tag-prefixes '("a1:")]{Paren-x64} to include cases for displacement mode
