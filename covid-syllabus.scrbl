@@ -51,6 +51,7 @@ strongly recommend all students upgrade to respirator-type fitted masks.
 N95s are orders of magntitude (~1000x) more effective than cloth masks at
 filtration, and can be safely reused for approximately 200 days according to the
 N95 rating.
+You can find details here: @url{https://www.acgih.org/covid-19-fact-sheet-worker-resp/}.
 They are composed of both fibers and fiber glass that has been electrically
 charged to attract and trap tiny particles.
 They should not be washed or exposed to high heat, as this can destroy the
