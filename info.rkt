@@ -1,13 +1,10 @@
 #lang info
 ;(define collection "cpsc411-book")
 (define deps '("at-exp-lib"
-               "cpsc411-lib"
+               ;"cpsc411-lib"
+               "https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2021w2"
                "gregor-lib"
-               ;; NOTE: memoize is required by a dependency of gregor lib, so force install my forked version. Otherwise, we get package conflicts.
-               "https://github.com/wilbowma/memoize.git?path=memoize-lib"
-               "https://github.com/wilbowma/memoize.git?path=memoize-doc"
-               "https://github.com/wilbowma/memoize.git?path=memoize-test"
-               "https://github.com/wilbowma/memoize.git?path=memoize"
+               "memoize-lib"
                "racket-graphviz"
                ("scribble-bettergrammar-lib" #:version "1.4.2")
                "scribble-lib"
