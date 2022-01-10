@@ -87,7 +87,9 @@ install @code{racket} and @code{nasm}.
 
 If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca},
 which has the correct version of @code{nasm} and @code{racket}.
-You can connect via SSH using your CSID.
+To access the v8.3 Racket, add @tt{/cs/local/lib/pkg/racket-8.3/bin/} to your path.
+You can connect via SSH using the username setup at
+@url{https://www.cs.ubc.ca/getacct/}.
 
 If you want a local development environment, you can use the @tt{Dockerfile}
 found in your git repository to setup a development container that mirrors
