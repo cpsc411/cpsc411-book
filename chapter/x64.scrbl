@@ -610,7 +610,7 @@ exit-fact-x64-windows.exe exit-fact-x64-windows.o kernel32.dll}.
 You should now have an understanding of the first @tech{target language} we will
 use, @tech{x64}.
 We looked at its syntax, its behaviour, and the existing toolchain to compile
-and execute it (an operating system, @tt{nasm} and a linker like @{ld}, and an
+and execute it (an operating system, @tt{nasm} and a linker like @tt{ld}, and an
 x86-64 CPU).
 We by no means saw a complete description of everything that language offers
 us, but it is enough that we can start designing a @tech{source language} that
