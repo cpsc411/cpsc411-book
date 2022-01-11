@@ -19,10 +19,16 @@
       cpsc411/reference/a1-solution
       (except-in cpsc411/compiler-lib compile))))
 
-@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{The First Compiler: Abstracting Boilerplate}
-Once we have picked a @ch1-tech{target language}, a language from which to start
-building, we have fixed some set of abstractions.
-From this starting point, we ask a question:
+@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{The First Compiler, and Abstracting Boilerplate}
+In this chapter, we walk through the design of an entire @ch1-tech{compiler}.
+It's a small one that merely abstracts some boilerplate, but it serves as a
+concrete example of the entire design process.
+
+We will design our compilers by starting from a fixed abstraction boundary, an
+existing @ch1-tech{target language}, and building a new layer of abstraction
+atop it.
+We have fixed some set of abstractions, and from this starting point, we ask a
+question:
 @todo{Also talk about validators and undefined behaviour in this chapter. Should
 that be separate from abstracting boilerplate?}
 
@@ -30,32 +36,58 @@ that be separate from abstracting boilerplate?}
   What's wrong with this language?
 }
 
-Our goal in designing and implementing a language is to systematically design
-and build new layers of abstractions.
+Our goal is to systematically design and build new layers of abstractions,
+formalized as a new programming language, a @deftech{source language}, that can
+be implemented by translation into a corresponding @ch1-tech{target language}.
 These abstractions are meant to solve some problem, such as software development
 being error-prone, software design being complex, or software produced in the
 language being unsafe, unportable, or verbose.
 Ideally, we solve these problems without introducing some cost, such as a high
-learning curve, or introducing some performance cost.
-To solve these problems, we must first concretely identify one, and then design a
-layer of abstraction to address it.
+learning curve, or some performance penalty.
+To solve these problems, we must first concretely identify one, and then design
+a layer of abstraction to address it.
+
+Once we identify a concrete problem, we design a new @tech{source language} that
+solves the problem, and design a @ch1-tech{compiler} to transform the
+@tech{source language} into the @ch1-tech{target language}.
+We aim to derive the transformation from the language definitions; this is
+easiest when we focus on a single problem at a time, so we will introduce
+many @deftech{intermediate languages} in the process---languages that are both
+@tech[#:key "source language"]{source} and @ch1-tech{target languages}, serving
+some larger overall compiler.
+The transformations may be as simple as inserting some code, or as complex as
+analyzing and rewriting the structure of many pieces of interacting code.
+Some transformations we present have been designed after years of iteration to
+effectively implement some well-known abstraction, but some are easily derived
+from our language definitions.
+@todo{
+Abstraction vs convention?
+
+The abstract we introduce to remove boilerplate is not a new syntactic form, but
+a @deftech{convention}: a pattern programs in the language must follow to be
+implemented correctly.
+
+}
+@section{Designing an Abstraction}
+As always, we start by asking: what's wrong with our current language, namely,
+@ch1-tech{x64}?
 
 The first limitation in @ch1-tech{x64} we identify is boilerplate.
 Writing programs in @ch1-tech{x64} requires the programmer to insert repetitive
 boilerplate, such as the declaration of the initial label, and some code to exit
 the program and report the result to the user.
 This boilerplate prevents the user from focusing on the program and requires
-them to copy and paste the same snippets of code into their programs, an error-prone
-process if that snippet ever needs to change.
+them to copy and paste the same snippets of code into their programs, an
+error-prone process if that snippet ever needs to change.
 
-To address this, we design a new @ch1-tech{source language} that is free of this
-boilerplate, and design a compiler to transform the @ch1-tech{source language}
-into the @ch1-tech{target language} by introducing the boilerplate.
+We could solve this problem by allowing the programmer to focus on writing and
+composing sequences of instructions, giving those sequences meaning independent
+of the boilerplate and the run-time system.
 
-@section{Designing an abstraction}
 Our goal is to introduce the abstraction of @deftech{instruction sequences}:
 lists of instructions that represent the code of an @ch1-tech{x64} program.
 @tech{Instruction sequences} separate the code from the boilerplate.
+@todo{Also, convention: rax contains the answer}
 As a result, we get a notion of program composition, allowing us to focus on the
 program, and decompose a program into separate pieces that we can easily stitch
 together.
@@ -67,13 +99,14 @@ executes the instructions in @metavar{p_2}.
 Since these are not valid @ch1-tech{x64} programs on their own, we need to define
 the meaning of @tech{instruction sequences} to make clear whether we are compiling
 them correctly.
-We define their meaning by describing an interpreter for @tech{instruction
+We define their meaning by designing an interpreter for @tech{instruction
 sequences}: executing the @tech{instruction sequence} begins at the first
 instruction in the sequence, and ends with the last instruction.
-We describe how to execute each instruction once we fix a specific set of
-instructions.
-The final result of the @tech{instruction sequence} is the value of some
-designated register after the last instruction is executed.
+We design this interpreter after we pick a specific set of instructions.
+@;The final result of the @tech{instruction sequence} is the value of some
+@;designated register after the last instruction is executed.
+@;Note that this language definition combines a new abstraction, the
+@;@tech{instruction sequence}, with a @tech{convention} for using the abstraction.
 
 Below, we select the subset of @ch1-tech{x64} instructions we plan to suppport.
 
@@ -126,7 +159,7 @@ a register @tt{imul @metavar{reg_1}, @metavar{reg_2}}.
 ]
 
 
-Below is an example of a valid sequence of instructions in our subset of
+Below is an example of a valid @tech{instruction sequence} in our subset of
 @ch1-tech{x64}.
 @nested[#:style 'inset
 @verbatim{
@@ -142,9 +175,10 @@ Below is an example of a valid sequence of instructions in our subset of
 Note that this does not correspond to a @ch1-tech{x64} @emph{program}, as it is
 missing much of the structure: the starting label, the section declarations,
 etc.
-The goal of our first compiler is to capture this notion of instruction
-sequences, and insert the necessary boilerplate to generate a valid
-@ch1-tech{x64} program.
+It has no meaning on its own, and part of the job of our compiler is to give it
+a meaning.
+You probably have some idea of how to fix this program meaning, but we will be
+systematic, but we will be systematic in our approach in defining its meaning.
 
 We represent @ch1-tech{x64} @tech{instruction sequences} as Racket strings, with
 each instruction separated by newline characters.
@@ -164,19 +198,31 @@ For example, the following program corresponds to the Racket string
 ]
 
 @section{Defining a Source Language}
-Above we defined @tech{instruction sequences} in terms of the concrete syntax of
-@ch1-tech{x64} and strings, but this syntax is not convenient for a compiler to
-manipulate.
+Our next step is to capture this abstraction in its own language.
+
+When defining languages, we start by defining their abstract syntax via an
+eBNF grammar, such as the one below.
+When we described @tech{instruction sequences}, we described them in terms of
+the concrete syntax of @ch1-tech{x64} and strings, but this syntax is not
+convenient for a compiler to manipulate.
 Concrete syntax often contains irrelevant details that are useful for human
 programmers, but irrelevant to a machine.
-For example, strings are also difficult to work with, as they lack structure for
-conveniently accessing substructures, and whitespace-sensitivity makes means
-there is multiple ways to represent identical programs.
+For example, strings are difficult to work with as they lack structure for
+conveniently accessing substructures, and whitespace sensitivity means two
+identical programs have multiple representations.
 
-Therefore, we define an abstract syntax our new language, @deftech{Paren-x64
-v1}, with its new @tech{instruction sequence} abstraction.
-We first present a simple definition, then gradually refine the definition to
-encode more constraints.
+From now on, we'll work almost entirely in abstract syntax.
+Our abstract syntax is meant to be represented as quasiquoted data, so the
+expression @paren-x64-v1[(begin (set! rax 42))] is represented in Racket as
+@racket[`(begin (set! rax 42))], or (equivalently) @racket[(list 'begin (list
+'set! 'rax 42))].
+See @secref["qq" #:doc '(lib "scribblings/guide/guide.scrbl")] for
+more.
+
+Below, we define a new language, @deftech{Paren-x64 v1}, with our new
+@tech{instruction sequence} abstraction.
+We first present a simple definition of the abstract syntax, then gradually
+refine the definition to encode more constraints.
 
 @bettergrammar*[
   #:literals (integer?)
@@ -211,13 +257,13 @@ Our abstract syntax makes more clear that the arithmetic operations are actually
 a combination of an arithmetic operation and an operation that changes state.
 The instruction @tt{add @metavar{reg}, @metavar{integer}} is represented
 @paren-x64-v1[(set! reg (+ reg integer))].
-Note that this duplicates the register, and the two occurences must be the same
-in order to be translated to a valid @ch1-tech{x64}.
+Note that this duplicates the register in the syntax, and the two occurences
+must be the same in order to correspond to a valid @ch1-tech{x64} instruction.
 
-Some of the restrictions from @ch1-tech{x64} are not apparent in the definition
-of the grammar.
+Some restrictions from @ch1-tech{x64} are not apparent in the definition of the
+grammar.
 To simplify precisely defining languages as grammars without too much additional
-English specification, we create two conventions.
+English specification, we create two extensions in our eBNF language.
 @itemlist[
 
 @item{Any time we suffix a non-terminal by an underscore and a number, such as
@@ -229,7 +275,12 @@ So @paren-x64-v1[(set! reg_1 (+ reg_1 integer))] represents an
 @paren-x64-v1[reg_1] must be the same register.
 However, two instances of non-terminals with different suffixes, like
 @paren-x64-v1[reg_1] and @paren-x64-v1[reg_2], are not necessarily
-different---they are only not guaranteed to be the same.}
+different---they are only not guaranteed to be the same.
+As usual in eBNF, any reference to a non-terminal without an underscore is also
+unrestricted.
+For example, in @paren-x64-v1[(set! reg reg)], neither occurrence of
+@paren-x64-v1[reg] is guaranteed to be the same nor different.
+}
 
 @item{Any non-terminal that is not defined as syntax, such as
 @paren-x64-v1[int64], may be defined by a Racket predicate, such as
@@ -237,8 +288,8 @@ different---they are only not guaranteed to be the same.}
 Such definitions will link to the documentation defining the predicate.}
 ]
 
-Using these two conventions, we define the final grammar of @tech{Paren-x64 v1}
-with all the above restrictions below.
+Using these two features, we define the final grammar of @tech{Paren-x64 v1}
+with all @ch1-tech{x64} restrictions as follows.
 
 @bettergrammar*[paren-x64-v1]
 
@@ -247,38 +298,134 @@ library @racketmodname[cpsc411/compiler-lib], and return @racket[#t] if and only
 if given an integer in the range for a 64-bit or 32-bit, respectively, signed
 two's complement integer.
 
-Since @tech{Paren-x64 v1} is an imperative language and does not return values
-like Racket does, we must decide how to interpret a @tech{Paren-x64 v1} program
-as a value.
-As discussed above, we can do this by imposing some convention on what the
-value of the program is.
-We choose to interpret the value of an @tech{Paren-x64 v1} program as the value in
-@paren-x64-v1[rax] when the program is finished executing (has no instructions
-in the @tech{instruction sequence} left to execute).
+@;subsection{Understanding Meaning}
+A grammar is not enough to define our language.
+When we create a new language, we want to ensure we understand the meaning of
+that grammar separate from how it is compiled.
+This is for two reasons.
+First, optimizations depend on when various programs in a language are
+equivalent.
+We need to understand the language in order to understand when programs are
+equivalent.
+Second, we cannot know whether the compiler is correct if we do not know
+the meaning of programs before they are compiled.
+Unit tests will help us debug, but when we know the meaning of @emph{all}
+programs in the language, we can say whether that meaning is preserved through
+compilation.
+
+We can define the meaning of a language by writing an interpreter.
+For most of our languages, we assume the grammar has an interpreter that roughly
+corresponds to embedding the program in Racket, although we describe in detail
+any features that don't correspond closely to existing Racket features.
+@racketmodname[cpsc411] contains embedding for each language used by our
+compiler, although they may allow some syntactically invalid programs to run.
+For some languages, including this first @tech{source language}, we walk through
+the design of an interpreter explicitly.
+
+Since @tech{Paren-x64 v1} is an imperative language and does not return values,
+we must decide how to interpret a @tech{Paren-x64 v1} program as a value.
+Unlike @ch1-tech{x64}, there is no preexisting @tech{convention} for how to produce a
+value, so we must create our own.
+We create a @deftech{convention}, or pattern that every program must follow to
+be well-defined, for producing a final value in @tech{Paren-x64 v1} by
+deciding that the final value is the value of @paren-x64-v1[rax] when the
+program is finished executing (has no instructions in the @tech{instruction
+sequence} left to execute), modulo 256.
 This choice is completely up to us, but this choice is designed to continue to
 work well as we build up our compiler.
+We explain the modulo 256 later.
+@todo{remove this}
 
-We also require that any register is initialized before it is accessed.
+Design an interpreter that produces the value of a @tech{Paren-x64 v1} is
+straightforward.
+We implement a register machine: a recursive function over @tech{instruction
+sequences} that interprets each instruction using an accumulator mapping
+registers to values.
+When there are no instructions left, the interpreter returns the value of
+@paren-x64-v1[rax], the register designated by our convention.
+
+When we begin writing our interpreter, we will immediately notice an edge case.
+What is a register has no value before it is used?
+For example, what is the value of a program when @paren-x64-v1[rax] is never
+initialized?
+
+There are several ways to deal with this, but we take the simplest that will
+enable us to efficiently compile @tech{Paren-x64 v1}:
+we also require that any register is initialized before it is accessed.
 We inherit this restriction from @ch1-tech{x64}.
 In @ch1-tech{x64}, the value of an uninitialized register is undefined, that is,
 accessing an uninitialized register results in @deftech{undefined behaviour},
-behavior that has no specified behavior defined by the language specification.
+behavior that has no specified definition in the language specification.
+Since we don't want to insert code to check every register is initialized (if
+that's even possible, it would be expensive), or insert extra code to initialize
+registers to arbitrary values (how would we distinguish them from real values?),
+we simplfy restrict the language.
 
 @tech{Undefined behaviour} is common in low-level languages that lack a strong
 enough enforcement mechanism for checking assumptions.
-Eliminating undefined behavior by adding static or dynamic checks in the source
-language improves the ability of programmers to predict behaviour of all
+Eliminating @tech{undefined behavior} by adding static or dynamic checks in the
+source language improves the ability of programmers to predict behaviour of all
 programs in your language.
 However, it is not always practical to achieve.
 It may be too difficult to statically check an assumption and still allow all
 the programs you want to allow, or too expensive to check a property
 dynamically.
 In these cases, we are forced to make assumptions that we cannot enforce,
-injecting @tech{undefined behaviour} into our compiler.
+injecting @tech{undefined behaviour} into our language.
 
 In this book, we make it a non-negotiable goal: @tech{source languages} must
 never have @tech{undefined behaviour}.
-If they might, we hobble them until we can eliminate the @tech{undefined behaviour}.
+If they might, we (temporarily) sacrifice expressivity until we have enough
+expressivity to remove the @tech{undefined behaviour}.
+So in @tech{Paren-x64 v1}, there are no uninitialized registers.
+
+In the interpreter, we @emph{assume} the input is a valid @tech{Paren-x64 v1} program.
+Not only syntactically, but also obeying any restrictions or conventions
+required by the language.
+In a user interface, we would validate all input, but in the implementation of
+the interpreter, we keep the two concerns separate.
+Instead, the interpreter is free to assume all integers are in the right range,
+arithmetic instructions correctly refer to the same register in both operand
+positions, and all registers are initialized before use.
+For example, in the instruction @paren-x64-v1[(set! reg_1 (+ reg_2 integer))],
+we assume @paren-x64-v1[reg_1] and @paren-x64-v1[reg_2] are identical, and
+@paren-x64-v1[integer] is a 32-bit integer, since otherwise the input would not
+have been a valid @tech{Paren-x64 v1} program.
+In fact, it would be bad style to check these again in the interpreter, since
+this mixes concerns and duplicates code.
+
+
+@nested[#:style 'inset
+@defproc[(interp-paren-x64 [x paren-x64-v1?]) int64?]{
+Interprets the @tech{Paren-x64 v1} program, returning the final value as an exit code
+in the range 0--255.
+@;, returning the final value as a 64-bit signed integer.
+
+@examples[#:eval eg
+(interp-paren-x64
+ '(begin
+    (set! rax 0)
+    (set! rax (+ rax 42))))
+
+(interp-paren-x64
+ '(begin
+    (set! rax 170679)
+    (set! rdi rax)
+    (set! rdi (+ rdi rdi))
+    (set! rsp rdi)
+    (set! rsp (* rsp rsp))
+    (set! rbx 8991)))
+]
+}
+]
+
+To properly implement arithmetic operations, you need to handle two's complement
+arithmetic, which overflows on large positive numbers and underflows on small
+negative numbers.
+You may want to use @racket[x64-add] and @racket[x64-mul] from
+@racketmodname[cpsc411/compiler-lib].
+
+Now we can begin designing a compiler.
 
 @section{Enforcing Assumptions}
 One of the jobs of the front-end of a compiler is to enforce assumptions the
@@ -288,18 +435,19 @@ type checkers, linters, and static analyses.
 
 We're going to design a function @racket[check-paren-x64] to validate
 @tech{Paren-x64 v1} programs.
-It is, in essence, a parser.
+It is similar to a parser.
 It reads an arbitrary value, expected to represent a @tech{Paren-x64 v1}
 program, and returns a valid program in the language @tech{Paren-x64 v1}, or
 raises an error.
 However, it is a trivial parser.
 Usually we think of parsers as transforming from one representation to another,
-but this parser does not transform the input if it is valid.
-It does not deal with transforming strings into abstract syntax.
-Instead, it expects its input to be abstract syntax already, and either returns
-it if the abstract syntax is already valid, or raises an error.
-This means our parsers, like the rest of our compiler, are simple tree automata,
-rather than complex string automata.
+but this parser does not transform the representation of input if it is
+valid---it only transforms the @emph{type}, or interpretation, of the data.
+@;It does not deal with transforming strings into abstract syntax.
+@;Instead, it expects its input to be abstract syntax already, and either returns
+@;it if the abstract syntax is already valid, or raises an error.
+@;This means our parsers, like the rest of our compiler, are simple tree automata,
+@;rather than complex string automata.
 
 You could view @racket[check-paren-x64] as a type checker.
 In this view, it checks for a single type: @emph{The-Paren-x64-Type}, which
@@ -307,15 +455,19 @@ every valid instruction has, and which has quite simple typing rules.
 @racket[check-paren-x64] checks that the input program is following the typing
 disciplines of the language (which aren't very restrictive).
 
-Writing validators, such as parsers or type checkers, for intermediate language
-programs produced by your compiler is a powerful debugging technique.
+I'll call passes of this kind @deftech{validator}, a generic name for a compiler
+passes that does not transform the representation of data, but does transform
+the type or interpretation of that data.
+
+Writing validators for intermediate language programs, including those produced
+by your compiler, is a powerful debugging technique.
 By designing them in the same way as @racket[check-paren-x64], so that they
 return the input if it's valid, you can easily add them as passes in your
-compiler and detect when an early pass produces an ill-typed program.
+compiler and detect when an early pass produces an invalid program.
 This is a form of @emph{property-based testing}, and will catch many more bugs
 than unit testing alone.
 
-To ensure no @tech{undefined behaviour}, our validator should check the
+To ensure no @tech{undefined behaviour}, our @tech{validator} should check the
 following.
 @itemlist[
 @item{The input conforms to the grammar of @tech{Paren-x64 v1}, including
@@ -408,6 +560,12 @@ program or raises an error with a descriptive error message.
 ]
 }
 
+In these examples, the reference implementation raises contract errors when the
+input is invalid.
+The reference implementation uses contracts on each and every pass to detect
+invalid input and output.
+These errors are separate from the errors raised by the validator.
+
 For convenience, we define a single validator that validates all properties of
 the language as @racket[check-paren-x64].
 
@@ -417,97 +575,13 @@ Takes an arbitrary value and either returns it, if it is valid @tech{Paren-x64
 v1} program, or raises an error with a descriptive error message. }
 }
 
-@section{Understanding Meaning}
-When we create a new language, we want to ensure we understand its meaning
-separate from how it is compiled.
-This is for two reasons.
-First, optimizations depend on when various programs in a language are
-equivalent.
-We need to understand the language in order to understand when programs are
-equivalent.
-Second, we cannot know whether or not the compiler is correct if we do not know
-the meaning of programs before they are compiled.
-Unit tests will help us debug, but when we know the meaning of @emph{all}
-programs in the language, we can say whether that meaning is preserved through
-compilation.
-
-We can define the meaning of a language by writing an interpreter.
-To design an interpreter for @tech{Paren-x64 v1} is straightforward.
-We implement a register machine: a recursive function over @tech{instruction
-sequences} that interprets each instructions by modifying a dictionary mapping
-registers mapped to values.
-When there are no instructions left, the interpreter returns the value of
-the designated register @paren-x64-v1[rax].
-
-In the interpreter, we assume the input is a valid @tech{Paren-x64 v1} program.
-In a user interface, we would validate all input, for example by using
-@racket[check-paren-x64], but in the implementation of the interpreter, we keep
-the two concerns separate.
-Instead, the interpreter is free to assume all integers are in the right range,
-and arithmetic instructions correctly refer to the same register in both operand
-positions.
-For example, in the instruction @paren-x64-v1[(set! reg_1 (+ reg_2 integer))],
-we assume @paren-x64-v1[reg_1] and @paren-x64-v1[reg_2] are identical, and
-@paren-x64-v1[integer] is a 32-bit integer, since otherwise the input would not
-have been a valid @tech{Paren-x64 v1} program.
-In fact, it would be bad style to check these again, since this mixes concerns
-and duplicates code.
-
-@nested[#:style 'inset
-@defproc[(interp-paren-x64 [x paren-x64-v1?]) int64?]{
-Interprets the @tech{Paren-x64 v1} program, returning the final value as an exit code
-in the range 0--255.
-@;, returning the final value as a 64-bit signed integer.
-
-@examples[#:eval eg
-(interp-paren-x64
- '(begin
-    (set! rax 0)
-    (set! rax (+ rax 42))))
-
-(interp-paren-x64
- '(begin
-    (set! rax 170679)
-    (set! rdi rax)
-    (set! rdi (+ rdi rdi))
-    (set! rsp rdi)
-    (set! rsp (* rsp rsp))
-    (set! rbx 8991)))
-]
-}
-]
-
-To properly implement arithmetic operations, you need to handle two's complement
-arithmetic, which overflows on large positive numbers and underflows on small
-negative numbers.
-You may want to use @racket[x64-add] and @racket[x64-mul] from
-@racketmodname[cpsc411/compiler-lib].
-
-Once we have the meaning of programs defined, we can define what it means for a
-compiler to be correct.
-
-A compiler for @tech{Paren-x64 v1} is correct if:
-@itemlist[
-@item{the meaning (as defined by the interpreter) of a program @paren-x64-v1[p] is
-the value @paren-x64-v1[integer_1]}
-@item{we compile @paren-x64-v1[p] and execute it as a @ch1-tech{x64} program and
-get the value @paren-x64-v1[integer_2]}
-@item{the values @paren-x64-v1[integer_1] and @paren-x64-v1[integer_2] are
-@emph{equivalent}. In general, we have to define equivalence for each pair of
-source and target languages. In this case, the interpreter and the compiler
-should return @emph{the same} value.
-@;We'll define equivalence between @tech{Paren-x64 v1} and @ch1-tech{x64} values shortly.
-}
-]
-
 @section{Compiling}
 Finally, we get to compiling.
 We have designed our new abstraction, made it precise in the form of a language,
-enforced our assumptions, and understood its meaning
-@todo{Should probably do interpreter first then checker? Don't know, this flow seems to work.}
+and enforced our assumptions.
 
 The job of our compiler is to translate one level of abstraction into another.
-We currently have a three levels of abstraction: (1) @tech{Paren-x64 v1}, the
+We currently have three levels of abstraction: (1) @tech{Paren-x64 v1}, the
 abstract syntax representation of @ch1-tech{x64} @tech{instruction sequences},
 (2) the string representation of @ch1-tech{x64} @tech{instruction sequences},
 and (3), @ch1-tech{x64} programs.
@@ -572,7 +646,17 @@ To implement this convention, we need to write some @ch1-tech{x64} code
 (ideally, an @tech{instruction sequence}) that will take any @tech{instruction
 sequence} implementing the @tech{Paren-x64 v1} convention and communicate the
 result to the operating system.
-This code is a very simple run-time system.
+This code is a very simple @tech{run-time system}.
+
+The @deftech{run-time system} provides all run-time support required by the
+language but that that is not provided by the underlying machine.
+Exactly what this run-time support is depends on the language.
+Typically, the language run-time provides memory allocation and deallocation,
+initialization of the process environment such as the stack, handles returning
+values to the user, and provides any built-in procedures that all programs in
+the language can expect to use.
+For @tech{Paren-x64 v1}, the only run-time support we require is returning the
+final value to the operating system and exiting.
 
 Our choice of run-time system depends on the abstractions provided by the
 language, the machine, the operating system, and the user interface we desire.
@@ -601,21 +685,6 @@ In Racket, we can access the exit code of a subprocess using
 This limits how much our programs can communicate; we will lift that restriction
 in later versions of our compiler.
 
-@todo{Cross-language equivalence}
-@;Because we've chosen to return the result as an exit code, our definition for
-@;compiler correctness is non-trivial.
-@;The meaning of a @tech{Paren-x64 v1} program is a 64-bit integer, but we've
-@;designed the compiler to only ever return a value between 0 and 255.
-@;This doesn't mean our compiler is incorrect, but instead, our definition of
-@;correctness uses a custom notion of equivalence.
-@;For this compiler, the result of a @tech{Paren-x64 v1} is considered
-@;@emph{equivalent} to the exit code returned by a @ch1-tech{x64} program when the
-@;two are @emph{equal} up to modulo 256:
-@;@racketblock[
-@;(define (v1-results-equivalent? s t)
-@;  (= (modulo s 256) t))
-@;]
-
 Our run-time system is an @ch1-tech{x64} @tech{instruction sequence} which
 expects to be composed after another @tech{instruction sequence}.
 The run-time system assumes that the first @tech{instruction sequence} must
@@ -632,17 +701,19 @@ For formatting strings in Racket, you may want to investigate @racket[format],
 @defproc[(wrap-x64-run-time [x string?]) string?]{
 Installs the @tech{Paren-x64 v1} run-time system.
 The input is the same as the output for @racket[generate-x64]: a
-string representing an @tech{x64} @tech{instruction sequence}.
+string representing an @ch1-tech{x64} @tech{instruction sequence}.
 The run-time system is composed with the input as a second @tech{instruction
 sequence}.
+
+Note that in the string representation, string concatination implement
+@tech{instruction sequence} comosition.
 }]
-@todo{should say above that instruction sequence composition is string
-concatination in the string representation.}
 
-@subsection{Wrapping it all up}
+@subsection{Implementing Instruction Sequences}
 
-Finally, we implement a simple pass to wrap the @tech{instruction sequence} with
-the @ch1-tech{x64} boilerplate described in @Secref[#:tag-prefixes '("chp1:")]{top}.
+Finally, we implement a simple pass to turn the @tech{instruction sequence} into
+a program, by introducing the @ch1-tech{x64} boilerplate described in
+@Secref[#:tag-prefixes '("chp1:")]{top}.
 
 @nested[#:style 'inset
 @defproc[(wrap-x64-boilerplate [x string?]) string?]{
@@ -684,12 +755,61 @@ The compiler is easily defined by composing all the individual passes.
     (set! rdi (+ rdi rdi))
     (set! rsp rdi)
     (set! rsp (* rsp rsp))
-    (set! rbx 8991)))
+    (set! rbx 8991))
+  nasm-run/exit-code)
 ]
 
 The support library @racketmodname[cpsc411/compiler-lib] provides a few
 abstractions for deriving the compiler from a list of passes.
 See @racket[current-pass-list], @racket[compile], and @racket[execute].
+
+@section{Is the Compiler Correct?}
+Now that we have a compiler the meaning of all our languages is fully defined.
+We have an interpreter for the source language to define its mean.
+We have an "interpreter" for the target language (the CPU).
+So we can define what it means for a compiler to be correct.
+
+A compiler for @tech{Paren-x64 v1} is correct if:
+@itemlist[
+@item{the meaning (as defined by the interpreter) of a program @paren-x64-v1[p] is
+the value @paren-x64-v1[integer_1]}
+@item{we compile @paren-x64-v1[p] and execute it as a @ch1-tech{x64} program and
+get the value @paren-x64-v1[integer_2]}
+@item{the values @paren-x64-v1[integer_1] and @paren-x64-v1[integer_2] are
+@emph{equivalent}. In general, we have to define equivalence for each pair of
+source and target languages. In this case, the interpreter and the compiler
+should return @emph{the same} value.
+}
+]
+
+Instead of defining @tech{Paren-x64 v1} to produce a value modulo 256, we could
+have instead defined its meaning as the final value of @paren-x64-v1[rax], and
+then defined @emph{equivalence} between @tech{Paren-x64 v1} and @tech{x64}
+differently.
+In that case, the interpreter and compiled programs would produce different
+results for some programs, but they would always be equivalence modulo 256.
+
+This gives us yet another design choice in our compiler: do we restrict the
+definition of our source language to ensure the compiler is correct, or design a
+more complex equivalence relation that can decide whether the compiler is correct?
+We won't spend much more time on this, and in general, choose to ensure the
+interpreter and compiler produce "the same" value.
+
+@todo{Cross-language equivalence}
+@;Because we've chosen to return the result as an exit code, our definition for
+@;compiler correctness is non-trivial.
+@;The meaning of a @tech{Paren-x64 v1} program is a 64-bit integer, but we've
+@;designed the compiler to only ever return a value between 0 and 255.
+@;This doesn't mean our compiler is incorrect, but instead, our definition of
+@;correctness uses a custom notion of equivalence.
+@;For this compiler, the result of a @tech{Paren-x64 v1} is considered
+@;@emph{equivalent} to the exit code returned by a @ch1-tech{x64} program when the
+@;two are @emph{equal} up to modulo 256:
+@;@racketblock[
+@;(define (v1-results-equivalent? s t)
+@;  (= (modulo s 256) t))
+@;]
+
 
 @section{Appendix: Compiler Overview}
 
