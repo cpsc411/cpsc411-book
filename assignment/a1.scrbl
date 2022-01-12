@@ -5,6 +5,7 @@
   racket/runtime-path
   (for-label rackunit)
   (for-label cpsc411/compiler-lib)
+  (for-label cpsc411/langs/m1)
   (for-label cpsc411/reference/a1-solution))
 
 @;todo{Reset automatically on new assignment.}
@@ -112,6 +113,9 @@ You may want to use @racket[x64-add] and @racket[x64-mul] from
 
 While testing, you may want to avoid hard-coding values modulo 256, as the
 interpreter may change in later iterations to return values directly.
+
+You can test your implementation against the reference implementation:
+@racket[interp-paren-x64-v1].
 }
 
 @exercise{
@@ -148,4 +152,7 @@ comparing the results.
 
 While testing, you may want to avoid hard-coding values modulo 256, as the
 run-time system may change in later iterations to return values directly.
+
+You can test your implementation against the reference interpreter,
+@racket[interp-paren-x64-v1].
 }
