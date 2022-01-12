@@ -1,6 +1,6 @@
 #lang info
-(define compile-omit-paths '("attempt-at-cached-eval.rkt"))
-(define test-omit-paths '("attempt-at-cached-eval.rkt"))
+(define compile-omit-paths '("attempt-at-cached-eval.rkt" "a11.scrbl"))
+(define test-omit-paths '("attempt-at-cached-eval.rkt" "a11.scrbl"))
 (define scribblings '())
 ;; TODO: Scribble isn't really meant to build modules, but documents.
 ;; I don't think I can do this and then later "include" the pre-built (partial)
