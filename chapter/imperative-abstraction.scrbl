@@ -68,7 +68,7 @@ L6 -> L62 [label=" replace-locations"];
 
 L0 -> L1 [label=" uniquify"];
 L1 -> L2 [label=" sequentialize-let"];
-L2 -> L3 [label=" canonicalize-bind"];
+L2 -> L3 [label=" normalize-bind"];
 L3 -> L4 [label=" select-instructions"];
 L4 -> L62 [label=" assign-homes"];
 L62 -> L7 [label=" flatten-begins"];
@@ -390,12 +390,12 @@ beneficial, some design decisions may not be obvious until the software evolves.
 @todo{Add citations for the ANF and MF papers}
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v3?))
+@defproc[(normalize-bind (p imp-mf-lang-v3?))
           imp-cmf-lang-v3?]{
 Compiles @tech{Imp-mf-lang v3} to @tech{Imp-cmf-lang v3}, pushing
 @imp-mf-lang-v3[set!] under @imp-mf-lang-v3[begin] so that the right-hand-side of each
 @imp-mf-lang-v3[set!] is simple value-producing operation.
-This canonicalizes @tech{Imp-mf-lang v3} with respect to the equations
+This normalizes @tech{Imp-mf-lang v3} with respect to the equations
 @tabular[
 (list
 (list

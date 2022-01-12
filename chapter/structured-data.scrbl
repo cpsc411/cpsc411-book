@@ -72,7 +72,7 @@ Lz -> L0 [label=" specify-representation"];
 L0 -> L1 [label=" remove-complex-opera*"];
 L1 -> L2 [label=" sequentialize-let"];
 L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" canonicalize-bind"];
+L3 -> L4 [label=" normalize-bind"];
 L4 -> L5_1 [label=" select-instructions"];
 L5_1 -> L5 [label= " expose-allocation-pointer"];
 
@@ -411,13 +411,13 @@ position for an @imp-mf-lang-v8[mset!] instruction is still restricted.
 @question{Why can't (or shouldn't) we allow the index position to also be a
 @imp-mf-lang-v8[value]?}
 
-@defproc[(canonicalize-bind [p imp-mf-lang-v8?])
+@defproc[(normalize-bind [p imp-mf-lang-v8?])
          imp-cmf-lang-v8?]{
 Pushes @imp-mf-lang-v8[set!] and @imp-mf-lang-v8[mset!] under @imp-mf-lang-v8[begin] and
 @imp-mf-lang-v8[if] so that the right-hand-side of each is simple
 value-producing operand.
 
-This canonicalizes @tech{Imp-mf-lang v8} with respect to the equations
+This normalizes @tech{Imp-mf-lang v8} with respect to the equations
 @tabular[
 (list
  (list

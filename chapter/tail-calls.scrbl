@@ -80,7 +80,7 @@ L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
 L1 -> L2 [label=" sequentialize-let"];
 L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" canonicalize-bind"];
+L3 -> L4 [label=" normalize-bind"];
 L4 -> L5 [label=" select-instructions"];
 
 L10 -> L11 [label=" expose-basic-blocks"];
@@ -410,15 +410,15 @@ This last feature tells us we should place the new pass before
 
 Second: which translations might be disrupted by introducing new features in
 their source language?
-If we add the new translation before @racket[canonicalize-bind], then we won't
-need to extend @racket[canonicalize-bind] to support the @values-lang-v5[call]
-construct, but we will need to make sure @racket[canonicalize-bind] handles the
+If we add the new translation before @racket[normalize-bind], then we won't
+need to extend @racket[normalize-bind] to support the @values-lang-v5[call]
+construct, but we will need to make sure @racket[normalize-bind] handles the
 @block-pred-lang-v5[jump] construct.
 This might be a problem, if @block-pred-lang-v5[jump] appears in effect
 context, but note that since @values-lang-v5[call] appears in tail context, so
 must the @block-pred-lang-v5[jump] that @values-lang-v5[call] compiles to.
 This suggests we could place the new pass either right before or right
-after @racket[canonicalize-bind].
+after @racket[normalize-bind].
 
 Third, we try to future proof our design decisions: will the answer to any of
 the above questions change if we add new features in the future?
@@ -431,20 +431,20 @@ If we allowed calls in effect context, @eg then our translation would need to
 generate a @imp-mf-lang-v5[begin] in effect context, and not just tail context.
 This tells us we want to support nested @imp-mf-lang-v5[begin] in the target
 language of our new pass.
-Since we changed the target of @racket[canonicalize-bind] to allow nested
+Since we changed the target of @racket[normalize-bind] to allow nested
 @imp-cmf-lang-v5[begin], we can still place our new pass before or after
-@racket[canonicalize-bind].
+@racket[normalize-bind].
 
 Finally (and it's important to consider last), we consider minor matters of
 performance.
 Since the new pass will introduce many new instructions, it will increase the
 size of code each pass must transform, and thus slow down the compiler.
-If we place the new pass after @racket[canonicalize-bind], then 1 fewer pass has
+If we place the new pass after @racket[normalize-bind], then 1 fewer pass has
 to run on the larger code.
 
-We conclude the new pass should go just after @racket[canonicalize-bind].
+We conclude the new pass should go just after @racket[normalize-bind].
 Since we're proceeding top-down, we start by extending the first few passes down
-to @racket[canonicalize-bind].
+to @racket[normalize-bind].
 
 @section{Extending front-end with support for call}
 
@@ -656,13 +656,13 @@ Finally, we design @deftech{Imp-cmf-lang v5}.
 There are no interesting changes.
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v5.p))
+@defproc[(normalize-bind (p imp-mf-lang-v5.p))
           imp-cmf-lang-v5.p]{
 Compiles @tech{Imp-mf-lang v5} to @tech{Imp-cmf-lang v5}, pushing
 @imp-mf-lang-v5[set!] under @imp-mf-lang-v5[begin] so that the right-hand-side
 of each @imp-mf-lang-v5[set!] is simple value-producing operation.
 
-This canonicalizes @tech{Imp-mf-lang v5} with respect to the equations:
+This normalizes @tech{Imp-mf-lang v5} with respect to the equations:
 @tabular[
 (list
 (list

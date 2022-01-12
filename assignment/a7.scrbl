@@ -97,7 +97,7 @@ Redesign and extend the implementations of all the following passes:
 @item{@racket[undead-analysis]}
 @item{@racket[uncover-locals]}
 @item{@racket[select-instructions]}
-@item{@racket[canonicalize-bind]}
+@item{@racket[normalize-bind]}
 @item{@racket[impose-calling-conventions]}
 @item{@racket[sequentialize-let]}
 ]

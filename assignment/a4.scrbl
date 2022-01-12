@@ -63,7 +63,7 @@ replace-locations
 conflict-analysis
 uncover-locals
 select-instructions
-canonicalize-bind
+normalize-bind
 sequentialize-let
 uniquify
 ]
@@ -254,7 +254,7 @@ Redesign and extend the implementation of @racket[sequentialize-let].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[canonicalize-bind].
+Redesign and extend the implementation of @racket[normalize-bind].
 }
 
 @exercise{

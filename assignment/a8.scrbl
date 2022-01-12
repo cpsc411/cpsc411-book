@@ -61,7 +61,7 @@ You can use the interrogator to get limited access to the reference solution:
 @item{@racket[uniquify]}
 @item{@racket[remove-complex-opera*]}
 @item{@racket[impose-calling-conventions]}
-@item{@racket[canonicalize-bind]}
+@item{@racket[normalize-bind]}
 @item{@racket[select-instructions]}
 @item{@racket[uncover-locals]}
 @item{@racket[conflict-analysis]}
@@ -131,7 +131,7 @@ Note that @ch8-tech{mops} do not @emph{assign} any registers or frame variables.
 
 @exercise{Redesign and extend the implementation of @racket[select-instructions].}
 
-@exercise{Redesign and extend the implementation @racket[canonicalize-bind].
+@exercise{Redesign and extend the implementation @racket[normalize-bind].
 
 You may want to use a continuation in the helper for transforming values, if
 you're not already.

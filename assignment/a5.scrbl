@@ -51,7 +51,7 @@ impose-calling-conventions
 @typeset-passlist[
 uniquify
 sequentialize-let
-canonicalize-bind
+normalize-bind
 select-instructions
 uncover-locals
 undead-analysis
@@ -102,7 +102,7 @@ You should use @racket[current-parameter-registers] rather than hard-coding the
 calling convention registers.
 }
 
-@exercise{Extend @racket[canonicalize-bind] with support for blocks and the jump
+@exercise{Extend @racket[normalize-bind] with support for blocks and the jump
 instruction.}
 
 @exercise{Extend @racket[select-instructions] with support for blocks and the

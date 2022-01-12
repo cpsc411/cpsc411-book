@@ -74,7 +74,7 @@ assign-registers
 check-values-lang
 uniquify
 sequentialize-let
-canonicalize-bind
+normalize-bind
 select-instructions
 uncover-locals
 conflict-analysis
@@ -124,7 +124,7 @@ You should use @racket[current-return-address-register] and
 convention registers.
 }
 
-@exercise{Extend @racket[canonicalize-bind] with support for return points.}
+@exercise{Extend @racket[normalize-bind] with support for return points.}
 
 @exercise{Extend @racket[select-instructions] with support for return points.}
 

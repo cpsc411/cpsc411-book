@@ -946,7 +946,7 @@ Lz7 -> L0 [label=" specify-representation"];
 L0 -> L1 [label=" remove-complex-opera*"];
 L1 -> L2 [label=" sequentialize-let"];
 L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" canonicalize-bind"];
+L3 -> L4 [label=" normalize-bind"];
 L4 -> L5_1 [label=" select-instructions"];
 L5_1 -> L5 [label= " expose-allocation-pointer"];
 

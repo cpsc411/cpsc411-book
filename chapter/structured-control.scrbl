@@ -78,7 +78,7 @@ L2 -> L7 [label=" assign-homes-opt"];
 
 L0 -> L1 [label=" uniquify"];
 L1 -> L15 [label=" sequentialize-let"];
-L15 -> L16 [label=" canonicalize-bind"];
+L15 -> L16 [label=" normalize-bind"];
 L16 -> L2 [label=" select-instructions"];
 
 L7 -> L7 [label=" optimize-predicates"];
@@ -1049,14 +1049,14 @@ defined below.
 @bettergrammar*-diff[imp-cmf-lang-v4 imp-mf-lang-v4]
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v4?))
+@defproc[(normalize-bind (p imp-mf-lang-v4?))
          imp-cmf-lang-v4?]{
 Compiles @tech{Imp-mf-lang v4} to @tech{Imp-cmf-lang v4}, pushing
 @imp-mf-lang-v3[set!] under @imp-mf-lang-v4[begin] and @imp-mf-lang-v4[if] so
 that the right-hand-side of each @imp-mf-lang-v3[set!] is a simple value-producing
 operation.
 
-This canonicalizes @tech{Imp-mf-lang v4} with respect to the equations
+This normalizes @tech{Imp-mf-lang v4} with respect to the equations
 @tabular[
 (list
  (list

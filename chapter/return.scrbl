@@ -69,7 +69,7 @@ L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
 L1 -> L2 [label=" sequentialize-let"];
 L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" canonicalize-bind"];
+L3 -> L4 [label=" normalize-bind"];
 L4 -> L5 [label=" select-instructions"];
 
 L10 -> L10 [label=" optimize-predicates"]
@@ -383,7 +383,7 @@ right-hand side of a @imp-mf-lang-v6[(set! aloc value)] instruction.
 Recall that after the non-tail call, the return value of the procedure
 will be stored in @racket[(current-return-value-register)].
 When normalizing the @imp-mf-lang-v6[set!] instructions
-@racket[canonicalize-bind], we can translate this instruction as:
+@racket[normalize-bind], we can translate this instruction as:
 @racketblock[
 `(begin
    ,translation-of-non-tail-call
@@ -661,7 +661,7 @@ variables to the same frame location.
 Before allocating frames, there are a few passes we must update to pass through
 our new abstractions.
 
-First, we extend @racket[canonicalize-bind].
+First, we extend @racket[normalize-bind].
 We define @deftech{Imp-cmf-lang v6} below.
 We typeset the differences compared to @ch5-tech{Imp-cmf-lang v5}.
 
@@ -672,13 +672,13 @@ We simply extend @ch5-tech{Imp-cmf-lang v5} with our new abstractions, including
 We also require the @imp-cmf-lang-v6[new-frames] declaration in the @imp-cmf-lang-v6[info] field.
 
 @nested[#:style 'inset
-@defproc[(canonicalize-bind (p imp-mf-lang-v6?))
+@defproc[(normalize-bind (p imp-mf-lang-v6?))
 imp-cmf-lang-v6?]{
 Compiles @tech{Imp-mf-lang v6} to @tech{Imp-cmf-lang v6}, pushing
 @imp-mf-lang-v6[set!] under @imp-mf-lang-v6[begin] so that the right-hand-side
 of each @imp-mf-lang-v6[set!] is base value-producing operation.
 
-This canonicalizes @tech{Imp-mf-lang v6} with respect to the equations:
+This normalizes @tech{Imp-mf-lang v6} with respect to the equations:
 @tabular[
 (list
 (list
@@ -842,7 +842,7 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
    undead-analysis
    uncover-locals
    select-instructions
-   canonicalize-bind
+   normalize-bind
    impose-calling-conventions
    sequentialize-let)
   '(module
@@ -860,7 +860,7 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module
@@ -1115,7 +1115,7 @@ to frame locations.
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module
@@ -1194,7 +1194,7 @@ to frame variables in the new frame.
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module
@@ -1215,7 +1215,7 @@ to frame variables in the new frame.
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module
@@ -1348,7 +1348,7 @@ field.
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module
@@ -1508,7 +1508,7 @@ all nested expressions by generate fresh basic blocks and jumps.
      undead-analysis
      uncover-locals
      select-instructions
-     canonicalize-bind
+     normalize-bind
      impose-calling-conventions
      sequentialize-let)
     '(module

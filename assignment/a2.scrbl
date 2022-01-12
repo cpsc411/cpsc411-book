@@ -52,7 +52,7 @@ You can use the interrogator to get limited access to the reference solution:
 @typeset-passlist[
 uniquify
 sequentialize-let
-canonicalize-bind
+normalize-bind
 select-instructions
 assign-homes
 uncover-locals
@@ -147,7 +147,7 @@ You may find the functions @racket[name?] and @racket[fresh] helpful.
 
 @exercise{Design and implement @racket[sequentialize-let].}
 
-@exercise{Design and implement @racket[canonicalize-bind].}
+@exercise{Design and implement @racket[normalize-bind].}
 
 @exercise{Design and implement @racket[select-instructions] to compile
 imperative operations to abstract assembly instructions.
@@ -318,7 +318,7 @@ to support @ch2-tech{Paren-x64 v2}.
   check-values-lang
   uniquify
   sequentialize-let
-  canonicalize-bind
+  normalize-bind
   select-instructions
   assign-homes
   flatten-begins
@@ -358,7 +358,7 @@ to support @ch2-tech{Paren-x64 v2}.
                    check-values-lang
                    uniquify
                    sequentialize-let
-                   canonicalize-bind
+                   normalize-bind
                    select-instructions
                    assign-homes
                    flatten-begins
