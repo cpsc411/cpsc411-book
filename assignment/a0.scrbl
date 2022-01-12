@@ -193,9 +193,10 @@ You can manually submit by logging in to GradeScope using the email
 git repo using @tt{git archive -o submission.zip assignment-0}.
 You will be able to see some information from the autograder after submitting.
 
-If you do not submit, we'll automatically submit your final commit prior to the
-deadline from the @tt{assignment-0} branch.
-
+Regardless of whether you submit or not, we'll automatically submit your final
+commit prior to the deadline from the @tt{assignment-0} branch.
+You are not required to submit manually, and submitting manually does not affect
+which commit we grade.
 }
 
 @section{x64 References}
