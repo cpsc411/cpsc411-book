@@ -104,7 +104,7 @@ We recommend editing the compiler assignment files in the host machine,
 mounting them in the Docker container, and running tests in the container.
 You can create a new image using @tt{docker image build -t cpsc411 .} from your
 git repostory with the @tt{Dockerfile}.
-Assuming your compilers assignments are in stored in the path
+Assuming your compilers assignments are stored in the path
 @tt{~/workspace/}, you can launch a new container with access to your
 assignments via @tt{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
 You can use docker compose via @tt{docker-compose run cpsc411}, which should
