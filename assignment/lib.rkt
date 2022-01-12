@@ -73,6 +73,7 @@
 (define a9-tech (curry tech #:tag-prefixes '("milestone:" "a9:")))
 
 (define ch1-tech (curry tech #:tag-prefixes '("book:" "chp1:")))
+(define ch-bp-tech (curry tech #:tag-prefixes '("book:" "chp-boilerplate:")))
 (define ch2-tech (curry tech #:tag-prefixes '("book:" "chp2:")))
 (define ch3-tech (curry tech #:tag-prefixes '("book:" "chp3:")))
 (define ch4-tech (curry tech #:tag-prefixes '("book:" "chp4:")))

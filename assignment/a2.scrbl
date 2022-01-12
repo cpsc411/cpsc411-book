@@ -3,7 +3,12 @@
 @(require
   (for-label cpsc411/compiler-lib)
   (for-label cpsc411/2c-run-time)
-  (for-label cpsc411/reference/a2-solution)
+  (for-label (except-in cpsc411/reference/a2-solution
+                        check-paren-x64
+                        interp-paren-x64))
+  (for-label (only-in cpsc411/reference/a1-solution
+                      check-paren-x64
+                      interp-paren-x64))
   (for-label cpsc411/langs/v2)
   @;(for-label (except-in "../chapter/intro-abstraction.scrbl" doc))
   @;(for-label (except-in "../chapter/imperative-abstraction.scrbl" doc))
@@ -45,17 +50,17 @@ You can use the interrogator to get limited access to the reference solution:
 @emph{Completely new passes}
 
 @typeset-passlist[
-implement-fvars
-patch-instructions
-flatten-begins
-replace-locations
-assign-fvars
-uncover-locals
-assign-homes
-select-instructions
-canonicalize-bind
-sequentialize-let
 uniquify
+sequentialize-let
+canonicalize-bind
+select-instructions
+assign-homes
+uncover-locals
+assign-fvars
+replace-locations
+flatten-begins
+patch-instructions
+implement-fvars
 ]
 
 @emph{Minor modifications}
@@ -134,39 +139,23 @@ You should read first and work the relevant exercises as you read.
 
 @section{Exercises}
 
-@exercise{Remove your definitions of @racket[wrap-x64-boilerplate] and
-@racket[wrap-x64-run-time].
-These are now provided by @racketmodname[cpsc411/2c-run-time], since your
-run-time system is getting more complicated.
+@exercise{Design and implement @racket[uniquify] to resolve all @ch3-tech{names} to
+@ch2-tech{abstract locations}.
+
+You may find the functions @racket[name?] and @racket[fresh] helpful.
 }
 
-@exercise{Extend @racket[generate-x64] to emit @ch2-tech{displacement mode operands}.
-@todo{Add hint for nasm syntax?}
+@exercise{Design and implement @racket[sequentialize-let].}
+
+@exercise{Design and implement @racket[canonicalize-bind].}
+
+@exercise{Design and implement @racket[select-instructions] to compile
+imperative operations to abstract assembly instructions.
+
+You may find the functions @racket[aloc?] helpful and @racket[fresh] helpful.
 }
 
-@exercise{Design and implement @racket[implement-fvars] to support the
-@ch2-tech{frame variables} abstraction.
-
-You may find the function @racket[fvar->index] helpful.
-}
-
-@exercise{Design and implement @racket[patch-instructions] to abstract away from
-@ch1-tech{x64} restrictions.
-}
-
-@exercise{Design and implement @racket[flatten-begins] to flatten nested
-instructions.
-
-You may find the function @racket[make-begin] helpful.
-}
-
-@exercise{Design and implement @racket[replace-locations] to replace
-@ch2-tech{abstract locations} with their assigned @tech{physical location}.
-}
-
-@exercise{Design and implement @racket[assign-fvars] assign @ch2-tech{abstract
-locations} to @tech{physical location}.
-}
+@exercise{Implement @racket[assign-homes].}
 
 @exercise{Design and implement @racket[uncover-locals] to analyze which
 @ch2-tech{abstract locations} need to be assigned @tech{physical locations}.
@@ -176,22 +165,38 @@ For working with sets, you may want to use @secref["sets" #:doc '(lib
 "scribblings/reference/reference.scrbl")].
 }
 
-@exercise{Implement @racket[assign-homes].}
-
-@exercise{Design and implement @racket[select-instructions] to compile
-imperative operations to abstract assembly instructions.
-
-You may find the functions @racket[aloc?] helpful and @racket[fresh] helpful.
+@exercise{Design and implement @racket[assign-fvars] assign @ch2-tech{abstract
+locations} to @tech{physical location}.
 }
 
-@exercise{Design and implement @racket[canonicalize-bind].}
+@exercise{Design and implement @racket[replace-locations] to replace
+@ch2-tech{abstract locations} with their assigned @tech{physical location}.
+}
 
-@exercise{Design and implement @racket[sequentialize-let].}
+@exercise{Design and implement @racket[flatten-begins] to flatten nested
+instructions.
 
-@exercise{Design and implement @racket[uniquify] to resolve all @ch3-tech{names} to
-@ch2-tech{abstract locations}.
+You may find the function @racket[make-begin] helpful.
+}
 
-You may find the functions @racket[name?] and @racket[fresh] helpful.
+@exercise{Design and implement @racket[patch-instructions] to abstract away from
+@ch1-tech{x64} restrictions.
+}
+
+@exercise{Design and implement @racket[implement-fvars] to support the
+@ch2-tech{frame variables} abstraction.
+
+You may find the function @racket[fvar->index] helpful.
+}
+
+@exercise{Extend @racket[generate-x64] to emit @ch2-tech{displacement mode operands}.
+@todo{Add hint for nasm syntax?}
+}
+
+@exercise{Remove your definitions of @racket[wrap-x64-boilerplate] and
+@racket[wrap-x64-run-time].
+These are now provided by @racketmodname[cpsc411/2c-run-time], since your
+run-time system is getting more complicated.
 }
 
 @exercise{
@@ -208,16 +213,12 @@ program to the result of interpreting it.
 intermediate languages, and source langauges.}
 
 @exercise{Redesign and extend the implementation of @racket[check-paren-x64].
-You should be able to modify your type checker for the previous
-@tech[#:tag-prefixes '("a1:")]{Paren-x64} to include cases for displacement mode
+You should be able to modify your validator for the previous
+@ch-bp-tech{Paren-x64 v1} to include cases for displacement mode
 operands and accept programs for @ch2-tech{Paren-x64 v2}.
 
 You should start by writing new examples and tests for the new specification,
 and adding new @racket[match] clauses following the template.
-You'll need at least 6 new tests, checking for success and failure of the new
-features.
-These examples in this assignment description don't count; you'll need 6 new
-tests.
 }
 
 @exercise{Redesign and extend your implementation of @racket[interp-paren-x64]
