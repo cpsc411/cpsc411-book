@@ -355,7 +355,7 @@ we also require that any register is initialized before it is accessed.
 We inherit this restriction from @ch1-tech{x64}.
 In @ch1-tech{x64}, the value of an uninitialized register is undefined, that is,
 accessing an uninitialized register results in @deftech{undefined behaviour},
-behavior that has no specified definition in the language specification.
+behaviour that has no specified definition in the language specification.
 Since we don't want to insert code to check every register is initialized (if
 that's even possible, it would be expensive), or insert extra code to initialize
 registers to arbitrary values (how would we distinguish them from real values?),
@@ -363,7 +363,7 @@ we simplfy restrict the language.
 
 @tech{Undefined behaviour} is common in low-level languages that lack a strong
 enough enforcement mechanism for checking assumptions.
-Eliminating @tech{undefined behavior} by adding static or dynamic checks in the
+Eliminating @tech{undefined behaviour} by adding static or dynamic checks in the
 source language improves the ability of programmers to predict behaviour of all
 programs in your language.
 However, it is not always practical to achieve.
