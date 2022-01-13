@@ -166,7 +166,7 @@ exit:
   syscall
 }
 
-@exercise{Compile and execute @tt{fact.}  from the command line. You should observe
+@exercise{Compile and execute @tt{fact.s} from the command line. You should observe
 @code{120} as the exit code.}
 
 
@@ -175,6 +175,8 @@ file from Racket using @racket[system] or @racket[system/exit-code] to make
 calls to command line programs from Racket.
 This is how the last pass of the compiler will translate your code into an
 executable, and how you will test your compiler from Racket.
+The file @tt{fact.rkt} demonstrates how to do this with the above assembly
+program.
 
 @exercise{
 Modify and run the @tt{fact.rkt} file to ensure the test passes, using @tt{raco
