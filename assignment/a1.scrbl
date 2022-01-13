@@ -5,7 +5,7 @@
   racket/runtime-path
   (for-label rackunit)
   (for-label cpsc411/compiler-lib)
-  (for-label cpsc411/langs/m1)
+  (for-label cpsc411/langs/v1)
   (for-label cpsc411/reference/a1-solution))
 
 @;todo{Reset automatically on new assignment.}
