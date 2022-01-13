@@ -134,7 +134,7 @@ and check that a message like "NASM version 2.14.02" is printed and that the
 version is at least "2.13".
 }
 
-Now you should be able to compile the following file "fact.s"
+Now you should be able to create and compile the following file @tt{fact.s}.
 
 @nasm-example[
 #:file-name "fact.s"
@@ -166,18 +166,21 @@ exit:
   syscall
 }
 
-@exercise{Compile and execute "fact.s" from the command line. You should observe
+@exercise{Compile and execute @tt{fact.}  from the command line. You should observe
 @code{120} as the exit code.}
 
-We can compile and execute a file from Racket using @racket[system] or
-@racket[system/exit-code] to make calls to command line programs.
+
+Instead of compiling manully using shell commands, we can compile and execute a
+file from Racket using @racket[system] or @racket[system/exit-code] to make
+calls to command line programs from Racket.
 This is how the last pass of the compiler will translate your code into an
 executable, and how you will test your compiler from Racket.
 
 @exercise{
-Run the file to ensure the test passes, using @tt{raco test fact.rkt}.
-Make sure to push to @tt{assignment-0} branch of the git repository we created
-for you.
+Modify and run the @tt{fact.rkt} file to ensure the test passes, using @tt{raco
+test fact.rkt}.
+When you're done, commit the changes to @tt{fact.rkt}, and make sure to push to
+@tt{assignment-0} branch of the git repository we created for you.
 
 It is your responsibility to make sure the final commit to that branch is the
 right one; use good software development practices and avoid merging to that
