@@ -536,25 +536,3 @@ Compiles @tech{Values-lang v3} to @tech{Values-unique-lang v3} by resolving all
 @section{Appendix: Overview}
 
 @figure["fig:v3-graph" "Overview of Compiler Version 3" v3-graph]
-
-@section{Appendix: Language Definitions}
-
-@(require (for-label cpsc411/langs/v3))
-@declare-exporting[cpsc411/langs/v3]
-
-@todo{Should probably just provide these bindings from the solution, or actually
-define the languages in that file?.}
-
-@deflangs[
-values-lang-v3
-values-unique-lang-v3
-imp-mf-lang-v3
-imp-cmf-lang-v3
-asm-lang-v2
-asm-lang-v2/locals
-asm-lang-v2/assignments
-nested-asm-lang-v2
-para-asm-lang-v2
-paren-x64-fvars-v2
-paren-x64-v2
-]

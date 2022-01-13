@@ -88,6 +88,9 @@ look into the @other-doc['(lib "rackunit/scribblings/rackunit.scrbl")] package.
 All tests should be inside the special test submodule.
 See @secref["main-and-test" #:doc '(lib "scribblings/guide/guide.scrbl")] for
 more details.
+
+You can check your implementation against the reference implementation
+@racket[paren-x64-v1?].
 }
 
 @exercise[#:optional #t]{@emph{Design} and implement the function

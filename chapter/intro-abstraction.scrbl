@@ -694,17 +694,3 @@ Compiles @tech{Asm-lang v2} to @tech{Nested-asm-lang v2}, replacing each
 @section{Appendix: Overview}
 
 @figure["fig:v2-graph" "Overview of Compiler Version 2" v2-graph]
-
-@section{Appendix: Language Definitions}
-
-@declare-exporting[cpsc411/langs/v2]
-
-@deflangs[
-asm-lang-v2
-asm-lang-v2/locals
-asm-lang-v2/assignments
-nested-asm-lang-v2
-para-asm-lang-v2
-paren-x64-fvars-v2
-paren-x64-v2
-]

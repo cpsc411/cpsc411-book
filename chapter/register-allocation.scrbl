@@ -691,16 +691,3 @@ the locals set into a register, and if one cannot be found, assigns it a
 @section{Appendix: Compiler Overview}
 
 @figure["fig:reg-alloc-graph" "Overview of Register Allocation Optimization" reg-alloc-graph]
-
-@section{Appendix: Language Definitions}
-
-@declare-exporting[cpsc411/langs/v2-reg-alloc]
-
-@deflangs[
-asm-lang-v2
-asm-lang-v2/locals
-asm-lang-v2/undead
-asm-lang-v2/conflicts
-asm-lang-v2/assignments
-nested-asm-lang-v2
-]

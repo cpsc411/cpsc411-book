@@ -836,10 +836,12 @@ L0 -> "integer" [label="interp-paren-x64"];
 }
 }
 
-@section{Appendix: Language Definitions}
-
-@declare-exporting[cpsc411/langs/v1]
-
-@deflangs[
-paren-x64-v1
-]
+@;racketmodpath[cpsc411/langs/v1]
+@;include-section[(lib "cpsc411/scribblings/langs/v1.scrbl")]
+@;@section{Appendix: Language Definitions}
+@;
+@;@declare-exporting[cpsc411/langs/v1]
+@;
+@;@deflangs[
+@;paren-x64-v1
+@;]
