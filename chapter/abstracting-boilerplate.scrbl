@@ -317,10 +317,12 @@ We can define the meaning of a language by writing an interpreter.
 For most of our languages, we assume the grammar has an interpreter that roughly
 corresponds to embedding the program in Racket, although we describe in detail
 any features that don't correspond closely to existing Racket features.
-@racketmodname[cpsc411] contains embedding for each language used by our
-compiler, although they may allow some syntactically invalid programs to run.
 For some languages, including this first @tech{source language}, we walk through
 the design of an interpreter explicitly.
+@margin-note{
+Reference implementations of all our languages are availble the @other-doc['(lib
+"cpsc411/cpsc411.scrbl")].
+}
 
 Since @tech{Paren-x64 v1} is an imperative language and does not return values,
 we must decide how to interpret a @tech{Paren-x64 v1} program as a value.
