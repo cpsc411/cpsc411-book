@@ -29,7 +29,7 @@ jobs:
     - name: Checkout private dependencies
       uses: actions/checkout@v2
       with:
-        repository: cpsc411/compilers2.0
+        repository: cpsc411/cpsc411-priv
         ref: 2021w2
         ssh-key: ${{ secrets.PRIV_SSH_KEY }}
         path: compilers2.0
@@ -42,8 +42,8 @@ jobs:
         raco pkg install --batch --auto \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2021w2 \
           https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc#2021w2 \
-          ./compilers2.0/cpsc411-priv/cpsc411-reference-tests \
-          ./compilers2.0/cpsc411-priv/cpsc411-reference-lib \
+          ./cpsc411-priv/cpsc411-reference-tests \
+          ./cpsc411-priv/cpsc411-reference-lib \
     - name: Build lib
       run: |
         raco pkg install --batch --auto ./cpsc411-book/
