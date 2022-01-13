@@ -32,7 +32,7 @@ jobs:
         repository: cpsc411/cpsc411-priv
         ref: 2021w2
         ssh-key: ${{ secrets.PRIV_SSH_KEY }}
-        path: compilers2.0
+        path: cpsc411-priv
     - name: Checkout
       uses: actions/checkout@v2
       with:
