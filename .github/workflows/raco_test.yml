@@ -21,19 +21,11 @@ jobs:
       run: |
         sudo apt-get install nasm graphviz
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v0.12
+      uses: Bogdanp/setup-racket@v1.7
       with:
         architecture: 'x64'
-        distribution: 'minimal'
+        distribution: 'full'
         version: ${{ matrix.racket }}
-    - name: Install Racket deps that can't be auto-installed
-      run: |
-        # required for raco test
-        # NOTE: at-exp-lib a built-time dependency; build first to prevent race conditions
-        # redex-lib and deps seems to need to be built first, or redex-gen causes problems
-        raco pkg install --batch --auto compiler-lib \
-        at-exp-lib \
-        redex-lib
     - name: Checkout private dependencies
       uses: actions/checkout@v2
       with:
