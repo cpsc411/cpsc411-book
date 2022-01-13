@@ -786,7 +786,7 @@ should return @emph{the same} value.
 
 Instead of defining @tech{Paren-x64 v1} to produce a value modulo 256, we could
 have instead defined its meaning as the final value of @paren-x64-v1[rax], and
-then defined @emph{equivalence} between @tech{Paren-x64 v1} and @tech{x64}
+then defined @emph{equivalence} between @tech{Paren-x64 v1} and @ch1-tech{x64}
 differently.
 In that case, the interpreter and compiled programs would produce different
 results for some programs, but they would always be equivalence modulo 256.
