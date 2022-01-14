@@ -210,7 +210,7 @@ following the @ch1-tech{x64} "stack grows down" convention.
 
 All languages in our compiler assume that the uses of
 @racket[current-frame-base-pointer-register] obey the @deftech{stack discipline}, defined
-below; all other uses are @tech{undefined behavior}.
+below; all other uses are @tech{undefined behvaiour}.
 Setting its value directly is forbidden.
 Pointer arithmetic, such as @paren-x64-v2[(set! rbp (+ rbp opand))], is allowed
 only when the @paren-x64-v2[opand] is a @racket[dispoffset?].
@@ -218,7 +218,7 @@ Incrementing the pointer beyond its initial value given by the run-time system
 is forbidden.
 We do not try to enforce these statically, since it may be impossible to do so
 in general.
-Instead, they must be @tech{undefined behavior}.
+Instead, they must be @tech{undefined behvaiour}.
 
 @digression{
 The language is parameterized by the @racket[current-frame-base-pointer-register].
@@ -362,7 +362,7 @@ language.
 We can think of this language as parameterized by the set of locations, hence the name.
 
 @todo{If I enable para-asm to be parameterized by the set of registers, could enable Kent's "unspillable" optimization.
-To do that, para-asm lang needs to change to have undefined behavior.
+To do that, para-asm lang needs to change to have undefined behvaiour.
 Don't think I want to do that yet.}
 
 @bettergrammar*-diff[paren-x64-v2 para-asm-lang-v2]

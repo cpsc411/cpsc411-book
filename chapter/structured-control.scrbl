@@ -160,7 +160,7 @@ giving an arbitrary interpretation to any values in the predicate position.
 For example, we could interpret @racket[0] as true and @racket[1] as false, or
 vice versa.
 Unfortunately, this would expose our source language to undefined
-behavior---what happens when an @values-lang-v4[if] expression branches on any
+behvaiour---what happens when an @values-lang-v4[if] expression branches on any
 other value?
 We could remedy this slightly by making any non-zero integer true, for example.
 However, it also means we become unable to distinguish booleans from integers,
@@ -227,7 +227,7 @@ In @tech{Paren-x64 v4}, we model labels with the @paren-x64-v4[(with-label label
 instruction, which defines a label @paren-x64-v4[label] at the instruction
 @paren-x64-v4[s] in the instruction sequence.
 This corresponds to the @ch1-tech{x64} string @tt{label:\n s}.
-Note that they can be nested, allowing the same behavior as chaining labels in
+Note that they can be nested, allowing the same behvaiour as chaining labels in
 @ch1-tech{x64}.
 For convenience, we assume all labels are symbols of the form
 @paren-x64-v4[L.<name>.<number>], and are globally unique.

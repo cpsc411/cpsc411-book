@@ -230,7 +230,7 @@ through every layer of abstraction up to the point where we implement the
 calling convention.
 @;That's every language from @a4-tech{Para-asm v2} to @a4-tech{Block-lang}.
 This makes all our abstractions only partial abstractions, and injects undefined
-behavior back into our intermediate languages.
+behvaiour back into our intermediate languages.
 
 We could also use the stack to implement the calling convention.
 This is simpler, as we can keep registers abstract and need to expose

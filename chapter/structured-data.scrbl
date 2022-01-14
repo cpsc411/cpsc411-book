@@ -194,7 +194,7 @@ The run-time system initializes this register to point to the base of the heap.
 Allocation is implemented by copying the current value of this pointer, and
 incrementing it by the number of bytes we wish to allocate.
 The pointer must only be incremented by word-size multiples of bytes.
-Any other access to this register is now undefined behavior, similar to accesses
+Any other access to this register is now undefined behvaiour, similar to accesses
 to @object-code{fbp} that do not obey the stack of frames discipline.
 
 @digression{
@@ -643,13 +643,13 @@ Compiles data types and primitive operations into their implementations as
 
 @subsection{New Safe Primops}
 @; Don't know how to do this without closures.
-@;Last week, the last piece of undefined behavior in our language was in procedure
+@;Last week, the last piece of undefined behvaiour in our language was in procedure
 @;calls.
 @;We were not checking that procedures were correctly applied to the number of
 @;expected arguments.
 @;Lower down, when procedure calls are implemented in terms of register and frame
 @;variables, this could result in dereferencing uninitialized locations.
-@;We can use the procedure data type to eliminate this undefined behavior.
+@;We can use the procedure data type to eliminate this undefined behvaiour.
 @;
 @;This week, this pass is optional, as current events mean I haven't been able to
 @;write up the design in time.
