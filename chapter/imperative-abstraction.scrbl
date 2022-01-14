@@ -8,8 +8,8 @@
   cpsc411/langs/v2
   (for-label cpsc411/langs/v2)
   cpsc411/langs/v3
-  (except-in "../assignment/a1.scrbl" doc)
-  (except-in "intro-abstraction.scrbl" doc))
+  #;(except-in "../assignment/a1.scrbl" doc)
+  #;(except-in "abstract-locations.scrbl" doc))
 
 @(provide
   (except-out (all-defined-out) sb))

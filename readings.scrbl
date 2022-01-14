@@ -6,7 +6,7 @@
 
 @include-section{chapter/x64.scrbl}
 @include-section{chapter/abstracting-boilerplate.scrbl}
-@include-section{chapter/intro-abstraction.scrbl}
+@include-section{chapter/abstract-locations.scrbl}
 @include-section{chapter/imperative-abstraction.scrbl}
 @include-section{chapter/register-allocation.scrbl}
 @include-section{chapter/structured-control.scrbl}

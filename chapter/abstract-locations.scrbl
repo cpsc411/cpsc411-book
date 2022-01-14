@@ -8,7 +8,7 @@
   (for-label cpsc411/langs/v2)
   (for-label cpsc411/reference/a2-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
-  (except-in "abstracting-boilerplate.scrbl" doc))
+  #;(except-in "abstracting-boilerplate.scrbl" doc))
 
 @(provide
   (except-out (all-defined-out) sb))
@@ -77,33 +77,44 @@ L9 -> L11 [label = "interp-paren-x64"];
 }
 ]
 
-@title[#:tag "top" #:tag-prefix "chp2:"]{Abstracting Machine Details}
+@title[#:tag "top" #:tag-prefix "chp2:"]{Abstract Locations}
 
 @section{Preface: What's wrong with our language?}
-In the last chapter, we designed our first language, @a1-tech{Paren-x64 v1}, and
+In the last chapter, we designed our first language, @ch-bp-tech{Paren-x64 v1}, and
 wrote our first compiler to implement it.
 This language introduces the barest, although still very useful,
 abstraction---freedom from boilerplate.
-@a1-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
+@ch-bp-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
 details of exactly how to pass a value to the operating system.
 
-While @a1-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
+While @ch-bp-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
 significant limitation for writing programs that we will address this week.
-The language requires the programmer to remember many machine details---in
-particular, which of the small number of registers are in use---while
-programming.
+The language requires the programmer to manually manage a small number of
+variables, namely the registers, while programming.
 Human memory is much less reliable than computer memory, so we should
 design languages that make the computer remember more and free the human to
 remember less.
 This will prevent the human from causing run-time errors when they inevitable
 make a mistake and overwrite a register that was still in use.
 
+To address this, we will introduce @tech{abstract locations}, of which there are
+an arbitrary number of and that the programmer does not need to know where the
+exist physically.
+
+In general, these cannot all be mapped to registers, since there are a fixed
+number of registers.
+So to implement these, we'll need to expose a little more from our target
+language.
+We expose some limited access to memory in @ch1-tech{x64}, and introduce the
+abstraction of a @tech{frame variable} to help use compile @tech{abstract
+locations} to @tech{physical locations}.
+
 @section{Introduction to Designing a Source language}
 When designing a new language, I often start by writing some programs until I
 spot a pattern I dislike.
 @todo{Do some example Paren-x64 v1 programming}
 
-The pattern in @a1-tech{Paren-x64 v1} is that all computations act on a small
+The pattern in @ch-bp-tech{Paren-x64 v1} is that all computations act on a small
 set of 16 @tech{physical locations}.
 
 This limits the way we can write computations.
@@ -124,7 +135,8 @@ Instead, we should free the programmers (ourselves), eliminating cumbersomeness
 and removing error-prone programming patterns.
 
 We should free the programmer to invent new locations at will if it helps their
-programming, and not worry about irrelevant machine-specific restrictions on instructions.
+programming, and not worry about irrelevant machine-specific restrictions on
+these locations.
 
 We design a new language, @tech{Asm-lang v2}, to abstract away from these two
 machine-specific concerns.
