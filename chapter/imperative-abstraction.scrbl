@@ -494,7 +494,7 @@ binary expressions and lexical binding.
 
 @bettergrammar*-diff[values-unique-lang-v3 values-lang-v3]
 
-@values-lang-v3[x] is a short-hand nonterminal for names, which are arbitrary
+@values-lang-v3[x] is a short-hand non-terminal for names, which are arbitrary
 symbols.
 To ensure transform names into abstract location, it suffices to append a unique
 number to each.

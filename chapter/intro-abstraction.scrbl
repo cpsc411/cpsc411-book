@@ -191,9 +191,9 @@ The new version of @deftech{Paren-x64 v2} is below.
 
 @bettergrammar*-diff[paren-x64-v1 paren-x64-v2]
 
-We add the new nonterminal @paren-x64-v2[addr] to the language, and add
+We add the new non-terminal @paren-x64-v2[addr] to the language, and add
 @paren-x64-v2[addr] as a production to @paren-x64-v2[loc].
-The @paren-x64-v2[addr] nonterminal represents a displacement mode operand to an
+The @paren-x64-v2[addr] non-terminal represents a displacement mode operand to an
 instruction.
 We abstract the language over the @deftech{base frame pointer}, the pointer to
 the start of the current stack frame, which is stored in the parameter

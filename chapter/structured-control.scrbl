@@ -745,7 +745,7 @@ code;for efficiency and simplicity, it is beneficial to maintain
 To implement @tech{Nested-asm-lang v4}, we define the procedure
 @racket[expose-basic-blocks].
 The strategy for writing this is slightly complex.
-Each helper for processing a nonterminal may need to introduce new basic blocks,
+Each helper for processing a non-terminal may need to introduce new basic blocks,
 and transforming a nested @nested-asm-lang-v4[if] expression requires knowing
 the target of each branch.
 

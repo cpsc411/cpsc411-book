@@ -466,7 +466,7 @@ It not safe to reorder expressions after an @values-bits-lang-v8[mset!].
 Furthermore, @values-bits-lang-v8[mset!] does not return a useful value.
 
 To deal with this, we introduce a contextual distinction in the language.
-We add the nonterminal @values-bits-lang-v8[effect] to represent an impure computation.
+We add the non-terminal @values-bits-lang-v8[effect] to represent an impure computation.
 A @values-bits-lang-v8[effect] represents an expression that does not have a value, and is
 executed only for its effect.
 We can use @values-bits-lang-v8[effect] in certain expression contexts using

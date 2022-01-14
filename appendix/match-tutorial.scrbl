@@ -23,7 +23,7 @@ over lists as functions on programs.
 
 It has a few disadvantages though.
 The primary disadvantage is that @racket[match] cannot check that we've covered
-all cases of a nonterminal.
+all cases of a non-terminal.
 This means we must be extra careful to follow the design recipe and
 disambiguate every match case, or we'll get annoying run-time errors or
 mysterious failures for ambiguous cases in the language.
