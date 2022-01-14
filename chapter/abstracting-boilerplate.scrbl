@@ -219,12 +219,12 @@ expression @paren-x64-v1[(begin (set! rax 42))] is represented in Racket as
 See @secref["qq" #:doc '(lib "scribblings/guide/guide.scrbl")] for
 more.
 
-Below, we define a new language, @deftech{Paren-x64 v1}, with our new
+Below, we define a new language, @tech{Paren-x64 v1}, with our new
 @tech{instruction sequence} abstraction.
 We first present a simple definition of the abstract syntax, then gradually
 refine the definition to encode more constraints.
 
-@bettergrammar*[
+@define-grammar[paren-x64-v1-simpl
   #:literals (integer?)
   #:datum-literals (begin set! + * rsp rbp rax rbx rcx rdx rsi rdi r8 r9 r10 r11
    r12 r13 r14 r15)
@@ -285,13 +285,28 @@ For example, in @paren-x64-v1[(set! reg reg)], neither occurrence of
 @item{Any non-terminal that is not defined as syntax, such as
 @paren-x64-v1[int64], may be defined by a Racket predicate, such as
 @racket[int64?].
-Such definitions will link to the documentation defining the predicate.}
+Such definitions link to the documentation defining the predicate.}
 ]
 
-Using these two features, we define the final grammar of @tech{Paren-x64 v1}
+Using these two features, we define the final grammar of @deftech{Paren-x64 v1} (@racket[paren-x64-v1])
 with all @ch1-tech{x64} restrictions as follows.
 
-@bettergrammar*[paren-x64-v1]
+@margin-note{Since we are frequently extending and comparing languages, we
+typeset them in a tabbed interface with a one or more diffs comparing two
+languages, and usually a tab containing the language definition on its own.
+The diff emphasize what has been @bnf:add{added} to the language, and what has been
+@bnf:sub{removed} from the language.
+Anything that is unchanged between the two is left without additional
+formatting.
+}
+
+@bettergrammar*-ndiff[
+#:labels ("Paren-x64 v1" "Diff" "Paren-x64 v1 Simplified")
+(paren-x64-v1)
+(paren-x64-v1-simpl paren-x64-v1)
+(paren-x64-v1-simpl)
+]
+
 
 The predicates @racket[int64?] and @racket[int32?] are defined by the support
 library @racketmodname[cpsc411/compiler-lib], and return @racket[#t] if and only
