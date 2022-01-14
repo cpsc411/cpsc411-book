@@ -207,6 +207,22 @@ labels, and conditional and unconditional jump operations.
 Labels are too complex to define by grammar; instead, they're defined by the
 @racket[label?] predicate in @racketmodname[cpsc411/compiler-lib].
 
+NASM and @a0-tech{x64} impose some additional restriction on labels, some of
+which we've discussed already.
+@itemlist[
+@item{A @tt{mov} instruction to an @object-code{addr} can only move 32-bit
+integers. @object-code{(set! (rbp + 0) 9223372036854775807)} is invalid.}
+@item{The only valid characters in labels are letters, numbers, _, $, #, @"@",
+~, ., and ?. The only characters which may be used as the first character of an
+identifier are letters, . (with has a special meaning and shouldn't be used), _
+and ?.
+}
+@item{Labels cannot be longer than 4095 characters.}
+]
+
+The library function @racket[sanitize-label] turning a @racket[label?] into a
+string that NASM will accept, as long as it is not too long.
+
 In @tech{Paren-x64 v4}, we model labels with the @paren-x64-v4[(with-label label s)]
 instruction, which defines a label @paren-x64-v4[label] at the instruction
 @paren-x64-v4[s] in the instruction sequence.
