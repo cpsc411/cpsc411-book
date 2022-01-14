@@ -8,7 +8,7 @@
   (for-label cpsc411/langs/v2)
   (for-label cpsc411/reference/a2-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
-  (except-in "abstracting-boilerplate.scrbl" doc))
+  #;(except-in "abstracting-boilerplate.scrbl" doc))
 
 @(provide
   (except-out (all-defined-out) sb))
@@ -77,40 +77,54 @@ L9 -> L11 [label = "interp-paren-x64"];
 }
 ]
 
-@title[#:tag "top" #:tag-prefix "chp2:"]{Abstracting Machine Details}
+@title[#:tag "top" #:tag-prefix "chp2:"]{Abstract Locations}
 
 @section{Preface: What's wrong with our language?}
-In the last chapter, we designed our first language, @a1-tech{Paren-x64 v1}, and
+In the last chapter, we designed our first language, @ch-bp-tech{Paren-x64 v1}, and
 wrote our first compiler to implement it.
 This language introduces the barest, although still very useful,
 abstraction---freedom from boilerplate.
-@a1-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
+@ch-bp-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
 details of exactly how to pass a value to the operating system.
 
-While @a1-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
-significant limitation for writing programs that we will address this week.
-The language requires the programmer to remember many machine details---in
-particular, which of the small number of registers are in use---while
-programming.
+While @ch-bp-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
+significant limitation for writing programs that we address in this chapter.
+The language requires the programmer to manually manage a small number of
+variables, namely the registers, while programming.
 Human memory is much less reliable than computer memory, so we should
 design languages that make the computer remember more and free the human to
 remember less.
-This will prevent the human from causing run-time errors when they inevitable
+This will prevent the human from causing run-time errors when they inevitably
 make a mistake and overwrite a register that was still in use.
 
-@section{Introduction to Designing a Source language}
-When designing a new language, I often start by writing some programs until I
-spot a pattern I dislike.
+To address this, we will introduce @tech{abstract locations}, of which there are
+an arbitrary number and that the programmer does not need to know what
+@tech{physical location} they end up using.
+
+In general, these cannot all be mapped to registers, since there are a fixed
+number of registers.
+So to implement @tech{abstract locations}, we'll need to expose a little more
+from our @tech{target language}.
+We expose some limited access to memory in @ch1-tech{x64}, and introduce the
+abstraction of a @tech{frame variable} to help use compile @tech{abstract
+locations} to @tech{physical locations}.
+
+We also need to design a new language, and some translations, that enable
+instructions to work over @tech{abstract locations}, even though @ch1-tech{x64}
+restricts which kinds of @tech{physical locations} instructions can use.
+
+@section{Designing a Source language}
+When designing a new abstraction, I often start by reading and writing some
+programs using an existing abstraction until I spot a pattern I dislike.
 @todo{Do some example Paren-x64 v1 programming}
 
-The pattern in @a1-tech{Paren-x64 v1} is that all computations act on a small
-set of 16 @tech{physical locations}.
-
+We've seen a few @ch-bp-tech{Paren-x64 v1} programs by now, and they all have a
+pattern: all computations act on a small set of 16 registers.
 This limits the way we can write computations.
 We must, manually, order and collapse sub-computations to keep the number of
-locations that are in use small.
-We must keep track of which locations are still in use before we move a value
-into a location, or we will overwrite part of our computation.
+registers that are in use small.
+We must keep track of which registers are still in use before we move a value,
+or we will overwrite part of our computation.
 
 Furthermore, the instructions we're given are idiosyncratic---they only work
 with certain operands, such as requiring some integer literals to be 32-bit or
@@ -124,7 +138,8 @@ Instead, we should free the programmers (ourselves), eliminating cumbersomeness
 and removing error-prone programming patterns.
 
 We should free the programmer to invent new locations at will if it helps their
-programming, and not worry about irrelevant machine-specific restrictions on instructions.
+programming, and not worry about irrelevant machine-specific restrictions on
+these locations.
 
 We design a new language, @tech{Asm-lang v2}, to abstract away from these two
 machine-specific concerns.
@@ -139,13 +154,21 @@ These now act uniformly on their arguments.
 The left-hand-side is always the destination location, and the right-hand-side
 is an arbitrary trivial value.
 
+Our convention requires that we pass the result to the @ch1-tech{OS} in
+@paren-x64-v1[rax], but we've removed registers from the language.
+This requires us to design some new feature that we can use to indicate the
+result without exposing registers, and that the compiler can identify in order
+to compile to an instruction that sets @paren-x64-v1[rax].
+We add the @asm-lang-v2[halt] instruction, which indicates the end of the
+computation with a particular value as the result.
+
 @section{Exposing Memory in Paren-x64}
 @todo{Transition}
 
 We first need to expose @ch1-tech{x64} features to access memory locations.
 In particular, we expose @tech{displacement mode operands} for memory locations.
 The @deftech{displacement mode operand} is a new operand that can appear in some location
-positions as the argument or an instruction.
+positions as the operand of an instruction.
 This allows accessing memory locations using pointer arithmetic.
 It is written as @tt{QWORD [reg - int32]} or
 @tt{QWORD [reg + int32]} in @ch1-tech{x64}, where @tt{reg} is a register
@@ -155,11 +178,11 @@ The keyword @tt{QWORD}, which is an unintuitive spelling of "8 bytes",
 indicates that this operand is accessing 64 bits at a time.
 
 @margin-note{
-"Word" normally means the unit of addressing memory---64bits in our case.
+"Word" normally means the unit of addressing memory---64 bits in our case.
 Unfortunately, in the past, the word size was different.
 In order to avoid backwards incompatibilty changes, tools that use @tt{WORD} as
 a keyword, like @tt{nasm}, didn't want to change it's meaning.
-Instead, the keyword @tt{WORD} means 16-bits, not the word size, and prefixes
+Instead, the keyword @tt{WORD} means 16 bits, not the word size, and prefixes
 give us multiple of that notion of @tt{WORD}.
 So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on x64.
 }
@@ -170,9 +193,9 @@ For example, if @tt{rbp} holds a memory address, we can move the value
 We can move the value from memory into the register @tt{rax} using the
 instruction @tt{mov rax, QWORD [rbp - 0]}.
 
-Our offsets will be multiples of 8.
+Our offsets are multiples of 8.
 The offset is a number of bytes, and since we are dealing primarily with 64-bit
-values, we will increment pointers in values of 8.
+values, we increment pointers in multiples of 8.
 For example, the following snippet of code moves two values into memory, then
 pulls them out and adds them.
 @verbatim{
@@ -187,9 +210,14 @@ These accesses grow @emph{downwards}, subtracting from the base pointer rather
 than adding, following common conventions about how stack memory is used.
 This is an arbitrary choice, but we choose to follow the convention.
 
-The new version of @deftech{Paren-x64 v2} is below.
+The new version of @deftech{Paren-x64 v2} (@racket[paren-x6-v2]) is below.
 
-@bettergrammar*-diff[paren-x64-v1 paren-x64-v2]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Paren-x64 v2" "Paren-x64 v1")
+(paren-x64-v1 paren-x64-v2)
+(paren-x64-v2)
+(paren-x64-v1)
+]
 
 We add the new non-terminal @paren-x64-v2[addr] to the language, and add
 @paren-x64-v2[addr] as a production to @paren-x64-v2[loc].
@@ -197,7 +225,8 @@ The @paren-x64-v2[addr] non-terminal represents a displacement mode operand to a
 instruction.
 We abstract the language over the @deftech{base frame pointer}, the pointer to
 the start of the current stack frame, which is stored in the parameter
-@racket[current-frame-base-pointer-register] and is @paren-x64-v2[rbp] by default.
+@racket[current-frame-base-pointer-register] and is
+@paren-x64-v2[#,(current-frame-base-pointer-register)] by default.
 An @paren-x64-v2[addr] may only be used with the
 @racket[current-frame-base-pointer-register] as its first operand.
 The offset of each @paren-x64-v2[addr] is restricted to be an integer that is
@@ -210,7 +239,7 @@ following the @ch1-tech{x64} "stack grows down" convention.
 
 All languages in our compiler assume that the uses of
 @racket[current-frame-base-pointer-register] obey the @deftech{stack discipline}, defined
-below; all other uses are @tech{undefined behvaiour}.
+below; all other uses are @ch-bp-tech{undefined behaviour}.
 Setting its value directly is forbidden.
 Pointer arithmetic, such as @paren-x64-v2[(set! rbp (+ rbp opand))], is allowed
 only when the @paren-x64-v2[opand] is a @racket[dispoffset?].
@@ -218,39 +247,49 @@ Incrementing the pointer beyond its initial value given by the run-time system
 is forbidden.
 We do not try to enforce these statically, since it may be impossible to do so
 in general.
-Instead, they must be @tech{undefined behvaiour}.
 
 @digression{
 The language is parameterized by the @racket[current-frame-base-pointer-register].
 Parameterizing the language this way lets us avoid committing to particular
-register choices, making the language inherently more machine agnostic.
+register choices, making the language inherently more machine and convention
+agnostic.
 This is helpful in designing a compiler with multiple machine backends.
 A real compiler would want to support many machines, not just @ch1-tech{x64},
 and parameterizing the language makes this simpler.
-We could imagine retargeting a new machine by changing the value of
-@racket[current-frame-base-pointer-register], among other parameters.
+We could imagine retargeting a new operating system that uses a different stack
+register, by changing the value of @racket[current-frame-base-pointer-register],
+among other parameters.
 If our language definitions were sufficiently parameterized, few if any compiler
 passes would need to differ between target machines.
 This language is not suffiently abstract yet, but using parameterized languages
 in this way is a common tool we will use.
 }
 
-The @racket[current-frame-base-pointer-register] is initialized by the run-time system.
-Implementing this will require a new run-time system to initialize the stack.
-From now on, the run-time system is provided by the @racketmodname[cpsc411/compiler-lib]
-library.
-@todo{Adjust run-time to work with either bytes or ptrs. Not sure how yet...}
+To use the stack, the run-time system must initialize
+@racket[current-frame-base-pointer-register].
+On systems following the SYS V ABI, @paren-x64-v2[rsp] is initialized the @emph{end} of
+the virtual memory space, so we can create a simple run-time system by
+copying @paren-x64-v2[rsp] into
+@paren-x64-v2[#,(current-frame-base-pointer-register)], and growing down from
+there will access unused memory.
+
+@margin-note*{
+We provide such a run-time system in @racketmodname[cpsc411/2c-run-time].
 The run-time system provides a default stack of size 8 megabytes.
 This should be enough for now, but if it's not, you can use the
 @racket[parameter?] @racket[current-stack-size] to increase it.
 
-The new run-time system also prints the value of @paren-x64-v2[rax] to the
+Our run-time system also prints the value of @paren-x64-v2[rax] to the
 screen, instead of returning it via an exit code, and does the work of
 converting numbers to ASCII strings.
-Now when you run your binary, you'll get a more familiar output.
-The @racket[execute] function will parse this output into a Racket number.
+The @racket[execute] function uses @racket[nasm-run/read] to parse printed
+output into a Racket datum.
 If you're interested in how this is done, you can read the definition of
-@racket[x86-64-runtime].
+@racket[wrap-x86-64-run-time].
+
+We assume that this run-time system is used until we introduce data types, which
+require additional run-time support.
+}
 
 @nested[#:style 'inset
 @defproc[(generate-x64 (p paren-x64-v2?))
@@ -305,19 +344,27 @@ instructions, represented as a string.
 ]
 
 @section{Abstracting the Machine}
-Now that we have effectively unlimited @tech{physical locations} on the machine, we
+Now that we have effectively unlimited @deftech{physical locations}---registers and
+memory locations that can store values---on the machine, we
 want to begin abstracting away from machine details.
 
-The first thing we do is to abstract away from the displacement mode operand,
+The first thing we do is to abstract away from the @tech{displacement mode operand},
 introducing an abstract notion of @deftech{frame variable}, a variable that is
 located in a particular slot on the frame.
-This lets the programmer stop worrying about exactly what the displacement mode
-offset contraints are.
+This lets the programmer stop worrying about details like which register
+contains the frame base, and what the constraints on displacement mode
+offset are.
 
-We define @deftech{Paren-x64-fvars v2} below.
-@bettergrammar*-diff[paren-x64-v2 paren-x64-fvars-v2]
+We define @deftech{Paren-x64-fvars v2} (@racket[paren-x64-fvars-v2]) below.
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Paren-x64-fvars-v2" "Paren-x64-v2")
+(paren-x64-v2 paren-x64-fvars-v2)
+(paren-x64-fvars-v2)
+(paren-x64-v2)
+]
 
-We replace the notation of an address with that of an @paren-x64-fvars-v2[fvar],
+We replace the @paren-x64-v2[addr], the @tech{displacement mode operand}, with
+the abstraction of an @paren-x64-fvars-v2[fvar],
 which represents a unique location on the frame, relative to the current value
 of @racket[current-frame-base-pointer-register].
 These are written as the symbol @racket[fv] followed by a
@@ -333,14 +380,15 @@ variables: @racket[fvar?], @racket[make-fvar], @racket[fvar->index], and
 @racket[fvar->addr].
 }
 
-In @tech{Paren-x64-fvars v2}, it is still undefined behaviour to violate stack
-discipline when using @racket[current-frame-base-pointer-register].
+In @tech{Paren-x64-fvars v2}, it is still @ch-bp-tech{undefined behaviour} to
+violate stack discipline when using
+@racket[current-frame-base-pointer-register].
 
 @nested[#:style 'inset
-@defproc[(implement-fvars (p Paren-x64-fvars-v2.p))
-         Paren-x64-v2.p]{
-Compile the @tech{Paren-x64-fvars v2} to @tech{Paren-x64 v2} by reifying
-@paren-x64-fvars-v2[fvar]s into displacement mode operands.
+@defproc[(implement-fvars (p paren-x64-fvars-v2?))
+         paren-x64-v2?]{
+Compiles the @tech{Paren-x64-fvars v2} to @tech{Paren-x64 v2} by reifying
+@paren-x64-fvars-v2[fvar]s into @tech{displacement mode operands.}
 The pass should use @racket[current-frame-base-pointer-register].
 }
 ]
@@ -357,17 +405,20 @@ any kind of @tech{physical locations}.
 This way, the language is responsible for managing these annoying details
 instead of the programmer.
 
-We do this by defining @deftech{Para-asm v2}, a kind of less finiky assembly
-language.
-We can think of this language as parameterized by the set of locations, hence the name.
+We do this by defining @deftech{Para-asm v2} (@racket[para-asm-v2]), a kind of
+less finiky assembly language.
+We can think of this language as @emph{para}meterized by the set of locations,
+hence the name.
 
-@todo{If I enable para-asm to be parameterized by the set of registers, could enable Kent's "unspillable" optimization.
-To do that, para-asm lang needs to change to have undefined behvaiour.
-Don't think I want to do that yet.}
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Para-asm-lang-v2" "Paren-x64-fvars-v2")
+(paren-x64-fvars-v2 para-asm-lang-v2)
+(para-asm-lang-v2)
+(paren-x64-fvars-v2 )
+]
 
-@bettergrammar*-diff[paren-x64-v2 para-asm-lang-v2]
-
-The main difference is in the @para-asm-lang-v2[s] non-terminal.
+The main difference is in the @para-asm-lang-v2[effect] non-terminal, which has
+been renamed and simplified from the @paren-x64-fvars-v2[s] non-terminal.
 Now, instructions can use an arbitrary kind of @para-asm-lang-v2[loc] as their
 operands.
 The semantics are otherwise unchanged.
@@ -377,14 +428,11 @@ values of @para-asm-lang-v2[loc_1] and @para-asm-lang-v2[triv], storing the resu
 @para-asm-lang-v2[loc_1].
 Note that the two occurrences of @para-asm-lang-v2[loc_1] in a binary operations are
 still required to be identical.
-We're not trying to lift all of the restrictions from @ch1-tech{x64} yet; we're
-doing @emph{one thing well}.
-@todo{This is actually a change in semantics from last semester.}
-@todo{I've forgotten what that one thing is...}
+We're not trying to lift all restrictions from @ch1-tech{x64} yet.
 
-We also add the @nested-asm-lang-v2[halt] instruction, which moves the the value of
-its operand into the @racket[current-return-value-register] (@para-asm-lang-v2[rax]
-by default).
+We also add the @nested-asm-lang-v2[halt] instruction, which moves the value of
+its operand into the @racket[current-return-value-register]
+(@para-asm-lang-v2[#,(current-return-value-register)] by default).
 Adding this abstraction frees the user from remembering which register is used for
 this purpose.
 This instruction is valid only as the final instruction executed in a program,
@@ -413,11 +461,10 @@ the @tech{stack discipline} invariant for the
 @racket[current-frame-base-pointer-register].
 }
 
-@todo{Patch-instructions is an uninformative name. concretize-machine?}
 @nested[#:style 'inset
 @defproc[(patch-instructions (p para-asm-lang-v2?))
           paren-x64-fvars-v2?]{
-Compiles the @tech{Para-asm v2} to @tech{Paren-x64-fvars v2} by patching
+Compiles @tech{Para-asm v2} to @tech{Paren-x64-fvars v2} by patching
 instructions that have no @ch1-tech{x64} analogue into a sequence of
 instructions.
 The implementation should use auxiliary registers from
@@ -447,17 +494,16 @@ sequences, and @racket[current-return-value-register] for compiling
 }
 ]
 
-@;@todo{Maybe this comes too early; in Jeremy's assignment, I had an easier time
-@;doing select instructions from ANF. OTOH, taking that route, it's hard to insert
-@;register allocation after the fact. In Kent's, it comes several assignments
-@;later.}
-
 @section{Nesting Instruction Sequences}
 @todo{This is sort of crowbarred in. Really belongs in "imperative abstractions", which is all about composition. But that requires a lot of motivation in that chapter, and a lot of new typesetting.}
 One of the most restrictive limitations in our language is that expressions
 cannot be nested.
 Each program must be a linear sequence of instructions.
 @todo{motivation is weak here}
+@todo{This is must easier to motivate, I think, when going top-down ala the
+removing-patch-instructions branch.
+select-instructions needs to transform one effect into multiple instruction in
+effect context.}
 
 We can easily lift this restriction by designing a language that supports
 nesting, and compiling it using our well-known operations for composing
@@ -477,8 +523,8 @@ The @nested-asm-lang-v2[tail] production represents the "tail", or last, computa
 in the program.
 
 We also enable nesting in effect position.
-This essentially allows to copy and paste some @tech{instruction sequence} into
-the middle of a program.
+This essentially allows us to copy and paste some @ch-bp-tech{instruction
+sequence} into the middle of a program.
 
 @nested[#:style 'inset
 @defproc[(flatten-begins [p nested-asm-lang-v2]) para-asm-lang-v2]{
@@ -487,33 +533,41 @@ Flatten all nested @nested-asm-lang-v2[begin] expressions.
 ]
 
 @section{Abstracting Physical Locations}
-We are still required to think about @deftech{physical locations}---the registers
-and frame variables of @ch1-tech{x64}.
+We are still required to think about @tech{physical locations}.
 We don't usually care which location a value is stored in, so long as it is
 stored @emph{somewhere}.
 
 We can introduce an abstraction to capture this idea.
-We define an @deftech{abstract location} to be a globally unique name for some
-@tech{physical location}.
-@todo{I think they aren't globally unique, but unique within a block.}
+We define an @deftech{abstract location} to be a unique name for some
+@tech{physical location}, that is unique for some unit of allocation (for
+the moment, this means they're globally unique).
+Each @tech{abstract location} must be allocated a @tech{physical location}
+somewhere on the machine, and we want to ensure the allocater can replace any
+two instances of an @tech{abstract location} with the same @tech{physical
+location}.
 
-We define @deftech{Asm-lang v2} below.
+We define @deftech{Asm-lang v2} (@racket[asm-lang-v2]) below.
 @tech{Asm-lang v2} is an imperative, assembly-like language.
 
-@bettergrammar*-diff[nested-asm-lang-v2 asm-lang-v2]
+@bettergrammar*-ndiff[
+#:labels ("Asm-lang-v2" "Diff" "Nested-asm-lang-v2")
+(asm-lang-v2)
+(nested-asm-lang-v2 asm-lang-v2)
+(nested-asm-lang-v2)
+]
 
-In @tech{Asm-lang v2}, we generalize instructions to work over abstract
-location, @asm-lang-v2[aloc].
-An @asm-lang-v2[aloc] is a symbol that is of the form @code{<name>.<number>};
-this is captured by the @racket[aloc?] predicate.
-Note that this overlaps with the definition of @racket[fvar?], but we will never
-be able to compare the two, so we don't feel a need to distinguish them.
-We assume all @asm-lang-v2[aloc]s are globally unique, and any reference to
-the same @asm-lang-v2[aloc] is to the same location---these are not the
+In @tech{Asm-lang v2}, we generalize instructions to work over @tech{abstract
+location}, @asm-lang-v2[aloc].
+An @asm-lang-v2[aloc] is a symbol that is of the form @code{<name>.<number>},
+such as @asm-lang-v2[x.2]; this is captured by the @racket[aloc?] predicate.
+We assume all @asm-lang-v2[aloc]s are unique up to some scope, and any reference
+to the same @asm-lang-v2[aloc] is to the same location---these are not the
 @ch3-tech{names} yet.
+So far, the only scope we have is the global program scope, so all
+@tech{abstract locations} are globally unique.
 
 Implementing @tech{Asm-lang v2} is a multi-step process.
-We gather up all the @tech{abstract locations}, then assign them to
+We gather all the @tech{abstract locations}, then assign them to
 @tech{physical locations}.
 @todo{'Implementing' concretely means compiling to nested-asm v2 right?
 This should probably be moved to the beginning of this section and
@@ -532,18 +586,22 @@ is unrestricted---it could contain anything at all.
 In fact, we can view the parent language as a family of languages, each
 differing in its @tech{info field}.
 
-We represent the @tech{info field} as an association list of keys to proper list
-whose first element is the value of the key, such as @racket[((key value))].
+@margin-note*{
 The module @racketmodname[cpsc411/info-lib] provides utilities for working with
-this representation.
-In general, we will only give a partial specification---it may contain arbitrary
-other key-value pairs, indicated by the @racket[any/c] pattern in the
-definition.
+the @tech{info field} representation.
+It also provides the contract @racket[info/c], which formalizes the
+specification language for @tech{info fields}.
+}
+
+We represent the @tech{info field} as an association list of keys to a proper
+list whose first element is the value of the key, such as @racket[((key
+value))].
+In general, we only give a partial specification---it may contain arbitrary
+other key-value pairs.
 This lax specification is useful for debugging: you may leave residual
 @asm-lang-v2[info] from earlier languages, or include your own debugging
 @asm-lang-v2[info].
-The @asm-lang-v2[info] field is also unordered, so it should be accessed
-through the @racketmodname[cpsc411/info-lib] interface.
+The @asm-lang-v2[info] field is also unordered.
 
 @digression{
 In a production compiler, we would probably not represent these
@@ -573,7 +631,7 @@ First, we analyze the @tech{Asm-lang v2} to discover which
 This is a straight-forward analysis, traversing the program and collecting any
 @tech{abstract location} we see into a set.
 
-We define the @tech{administrative language} @deftech{Asm-lang v2/locals}
+We define the @tech{administrative language} @deftech{Asm-lang v2/locals} (@racket[asm-lang-v2/locals])
 (pronounced "Asm lang v2 with locals") to capture this information.
 
 @bettergrammar*-diff[asm-lang-v2 asm-lang-v2/locals]
@@ -581,8 +639,17 @@ We define the @tech{administrative language} @deftech{Asm-lang v2/locals}
 The only difference is in the @tech{info field}, which now contains a
 @deftech{locals set}, a @racket[set?] of all @tech{abstract locations} used in
 the associated @asm-lang-v2[tail].
+A grammar production beginning with @racket[#:from-contract] is not specified
+using BNF, but instead is specified by the @racket[contract] expression
+following it.
+In this case, the @tech{info field} is required to contain at least one entry
+mapping the key @racket['locals] to a list of @racket[aloc?].
+@margin-note*{
+Contract expressions can be evaluated like predicates; see the documentation for
+@racket[info/c] for examples.
+}
 In this language, there is an invariant that any @tech{abstract location} that
-is used must appear in the locals set.
+is used must appear in the @asm-lang-v2[locals] set in the @tech{info field}.
 
 @nested[#:style 'inset
 @defproc[(uncover-locals (p asm-lang-v2?))
@@ -631,20 +698,23 @@ Compiles @tech{Asm-lang v2/locals} to @tech{Asm-lang v2/assignments},
 by assigning each @tech{abstract location} from the @asm-lang-v2/locals[locals]
 @tech{info field} to a fresh @tech{frame variable}.
 
-@todo{Add examples back in}
-@;@examples[#:eval sb
-@;(assign-fvars
-@;  '(begin ((locals (x.1)))
-@;     (set! x.1 0)
-@;     (halt x.1)))
-@;
-@;(assign-fvars
-@; '(begin ((locals (x.1 y.1 w.1)))
-@;    (set! x.1 0)
-@;    (set! y.1 x.1)
-@;    (set! w.1 (+ x.1 y.1))
-@;    (halt w.1)))
-@;]
+@examples[#:eval sb
+(assign-fvars
+ '(module
+    ((locals (x.1)))
+    (begin
+      (set! x.1 0)
+      (halt x.1))))
+
+(assign-fvars
+ '(module
+    ((locals (x.1 y.1 w.1)))
+    (begin
+      (set! x.1 0)
+      (set! y.1 x.1)
+      (set! w.1 (+ w.1 y.1))
+      (halt w.1))))
+]
 }
 ]
 
@@ -687,9 +757,6 @@ Compiles @tech{Asm-lang v2} to @tech{Nested-asm-lang v2}, replacing each
 @tech{abstract location} with a @tech{physical location}.
 }
 ]
-
-@;section{Source Language Polishing}
-@todo{Add validator to remove undefined behaviour}
 
 @section{Appendix: Overview}
 

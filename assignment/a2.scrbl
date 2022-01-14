@@ -10,8 +10,6 @@
                       check-paren-x64
                       interp-paren-x64))
   (for-label cpsc411/langs/v2)
-  @;(for-label (except-in "../chapter/intro-abstraction.scrbl" doc))
-  @;(for-label (except-in "../chapter/imperative-abstraction.scrbl" doc))
   cpsc411/langs/v2)
 
 @(provide
