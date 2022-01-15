@@ -160,7 +160,8 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
   (list @bold{Instructor} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "TBD"))
+  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389"
+  "ONLINE Tue/Thu 16:00--17:00"))
 ]
 
 @tabular[
@@ -169,8 +170,9 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
 (list @bold{TA} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-(list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "" "TBD")
-(list "Paulette Koronkevich" @mailto["pletrec@cs.ubc.ca"] "" "TBD")
+(list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "ONLINE" "Mon 13:00--14:00;
+Wed 15:00--16:00")
+(list "Paulette Koronkevich" @mailto["pletrec@cs.ubc.ca"] "ONLINE" "Thu/Fri 11:00--12:00")
 )
 ]
 
