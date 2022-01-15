@@ -104,7 +104,7 @@ an arbitrary number and that the programmer does not need to know what
 In general, these cannot all be mapped to registers, since there are a fixed
 number of registers.
 So to implement @tech{abstract locations}, we'll need to expose a little more
-from our @tech{target language}.
+from our @ch1-tech{target language}.
 We expose some limited access to memory in @ch1-tech{x64}, and introduce the
 abstraction of a @tech{frame variable} to help use compile @tech{abstract
 locations} to @tech{physical locations}.
