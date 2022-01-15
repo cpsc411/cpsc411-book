@@ -7,12 +7,12 @@ To me, the study of compilers is the study of languages.
 As a mathematical object, a @deftech{compiler} is a transformation between
 languages, transforming a source language into a target language---but that is
 for another time.
-As a program, a compiler is a function that takes any program in a @tech{source
+As a program, a compiler is a function that takes any program in a @ch-bp-tech{source
 language} and produces some program that "behaves the same" in a @tech{target
 language}.
 
 This definition tells us we need three things before we can start designing our compiler:
-We need a @tech{source language}, @tech{target language}, and some definition of
+We need a @ch-bp-tech{source language}, @tech{target language}, and some definition of
 "behaviour" for programs in each.
 Each of these is a design choice.
 Often, we choose a pre-existing @tech{target language}.
@@ -21,10 +21,10 @@ By contrast, the source language is often designed to achieve a balance between
 aesthetic and pragmatic goals.
 
 In this course, we will pick a starting @tech{target language} (@tech{x64}), and
-systematically design @emph{many} @tech{source languages}.
-Each of our @tech{source languages} will be designed to remove a restriction from a
+systematically design @emph{many} @ch-bp-tech{source languages}.
+Each of our @ch-bp-tech{source languages} will be designed to remove a restriction from a
 @tech{target language}, or add high-level features to improve usability.
-We also take care to ensure the @tech{source languages} can be compiled
+We also take care to ensure the @ch-bp-tech{source languages} can be compiled
 efficiently.
 For each of these languages, their behaviour is defiend by an interpreter.
 For @tech{x64}, the behaviour is defined by whatever happens when we turn it
@@ -59,10 +59,10 @@ generating programs simpler.
 The language may already have an efficient implementation, making writing
 optimizations less important.
 This frees the compiler writer to focus on other design goals of the new
-@tech{source language}.
+@ch-bp-tech{source language}.
 Perhaps they want to focus on ruling out more errors statically, or providing
 convenient syntax for certain programming patterns they find common.
-These are common goals in @tech{source language} and domain-specific language
+These are common goals in @ch-bp-tech{source language} and domain-specific language
 design.
 
 However, choosing such languages as a target has a cost.
@@ -102,7 +102,7 @@ And, because we want to talk to the CPU, we must deal with it.
 
 While we have choosen @tech{x64} as our @tech{target language}, @tech{x64}
 itself does not run on most hardware.
-Instead, it is the @tech{source language} yet another compiler, which transforms
+Instead, it is the @ch-bp-tech{source language} yet another compiler, which transforms
 @tech{x64} to a binary machine code that I call @tech{bin64} for now.
 In this course, we use the @tt{nasm} assembler to compile @tech{x64} into
 @tech{bin64}.
@@ -613,6 +613,6 @@ We looked at its syntax, its behaviour, and the existing toolchain to compile
 and execute it (an operating system, @tt{nasm} and a linker such as @tt{ld}, and
 an x86-64 CPU).
 We by no means saw a complete description of everything that language offers
-us, but it is enough that we can start designing a @tech{source language} that
+us, but it is enough that we can start designing a @ch-bp-tech{source language} that
 abstracts aways some of the annoying aspects of the language, and a
 @tech{compiler} to write programs in @tech{x64} for us.
