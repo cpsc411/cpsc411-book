@@ -13,87 +13,14 @@ all: help
 	raco pkg install --skip-installed --batch --auto
 	touch $@
 
-build: build/.done
+build: build/index.html
 
-build/.done: .racodeps assignment/* appendix/*.scrbl chapter/*.scrbl *.scrbl Makefile config.rkt
-	scribble --dest-name build --htmls --redirect-main "https://www.students.cs.ubc.ca/~cs-411/docs/" ++xref-in setup/xref load-collections-xref ++style assignment/custom.css index.scrbl
-	touch $@
+build/cpsc411.sxref:
+	mkdir -p build
+	scribble --dest ./build --dest-name cpsc411 --htmls --info-out build/cpsc411.sxref +m --redirect-main "https://docs.racket-lang.com" `racket -e "(require setup/collection-search)" -e "(display (path->string (collection-search '(lib \"cpsc411/cpsc411.scrbl\"))))"`
 
-docs-server:
-	rsync --inplace -avz --delete-excluded --delete\
-    --exclude srfi/\
-    --exclude gui/\
-    --exclude teachpack/\
-    --exclude plot/\
-    --exclude redex/\
-    --exclude r6rs/\
-    --exclude pict/\
-    --exclude raco/\
-    --exclude mzlib/\
-    --exclude draw/\
-    --exclude scheme/\
-    --exclude foreign/\
-    --exclude syntax/\
-    --exclude tools/\
-    --exclude r5rs/\
-    --exclude mrlib/\
-    --exclude net/\
-    --exclude inside/\
-    --exclude ts-reference/\
-    --exclude htdp-langs/\
-    --exclude web-server-internal/\
-    --exclude drracket/\
-    --exclude web-server/\
-    --exclude data/\
-    --exclude cur/\
-    --exclude data/\
-    --exclude gregor/\
-    --exclude pkg/\
-    --exclude lazy/\
-    --exclude file/\
-    --exclude 'cldr*/'\
-    --exclude htdp/\
-    --exclude htdp-ptr/\
-    --exclude license/\
-    --exclude bitsyntax/\
-    --exclude browser/\
-    --exclude compatibility/\
-    --exclude cookies/\
-    --exclude frog/\
-    --exclude future-visualizer/\
-    --exclude markdown/\
-    --exclude json/\
-    --exclude graphviz/\
-    --exclude macro-debugger/\
-    --exclude match-plus/\
-    --exclude memoize/\
-    --exclude metapict/\
-    --exclude mzscheme/\
-    --exclude openssl/\
-    --exclude osx-ssl/\
-    --exclude parsack/\
-    --exclude parser-tools/\
-    --exclude plai/\
-    --exclude planet/\
-    --exclude profile/\
-    --exclude quick/\
-    --exclude quickscript/\
-    --exclude readline/\
-    --exclude rosette-guide/\
-    --exclude sexp-diff/\
-    --exclude win32-ssl/\
-    --exclude stepper/\
-    --exclude slideshow/\
-    --exclude ts-guide/\
-    --exclude turtles/\
-    --exclude tzinfo/\
-    --exclude xrepl/\
-    --exclude xml/\
-    --exclude with-cache/\
-    --exclude docindex.sqlite\
-    --exclude '*.rktd'\
-    --exclude '*.sxref'\
-    ${PLTHOME}/racket/doc/ cs-411@remote.students.cs.ubc.ca:public_html/docs/
+build/index.html: build/cpsc411.sxref .racodeps assignment/* appendix/*.scrbl chapter/*.scrbl *.scrbl Makefile config.rkt
+	scribble --dest-name build --htmls ++info-in build/cpsc411.sxref --redirect-main https://docs.racket-lang.org/ +m ++style assignment/custom.css index.scrbl
 
 #%.html: %.scrbl .racodeps
 #	scribble --html --redirect-main "https://docs.racket-lang.org" ++xref-in setup/xref load-collections-xref ++style assignment/custom.css $<
@@ -102,7 +29,7 @@ clean:
 	echo "You should manually run `git clean -ixd` in build."
 	rm -rf compiled/
 
-sync: docs-server build/*.html build/*.cgi
+sync: build/*.html build/*.cgi
 	rsync -avzl --delete --delete-excluded --chmod=Dg+x,g+r build/ cs-411@remote.students.cs.ubc.ca:public_html/2021w2/
 
 serve: build/.done
