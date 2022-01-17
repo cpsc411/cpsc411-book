@@ -334,9 +334,11 @@ corresponds to embedding the program in Racket, although we describe in detail
 any features that don't correspond closely to existing Racket features.
 For some languages, including this first @tech{source language}, we walk through
 the design of an interpreter explicitly.
+@;other-doc['(lib "cpsc411/cpsc411.scrbl")]
+@;FRAGILE LINK
 @margin-note{
-Reference implementations of all our languages are availble the @other-doc['(lib
-"cpsc411/cpsc411.scrbl")].
+Reference implementations of all our languages are availble the
+@hyperlink["cpsc411/ref-langs.html"]{Language Reference Implementations}
 }
 
 Since @tech{Paren-x64 v1} is an imperative language and does not return values,
