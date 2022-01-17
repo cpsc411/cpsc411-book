@@ -42,10 +42,11 @@ some simple imperative programming in assembly.
 A passing grade in CPSC 311.
 
 @subsection{What if I want to take it but can't fulfill the prerequisites?}
-I'm willing to be flexible with students for whom taking CPSC 311 is not
-practical or possible.
-You should reach out to me well in advance, ideally a semester before hand, if
-you think you will not be able to take CPSC 311 before CPSC 411.
+Subject to available space in the course for all interested students meeting the prerequisites, I’m
+willing to consider flexibility for students for whom taking CPSC 311 is not practical or possible.
+You should reach out to me well in advance, ideally a semester before hand, if you think you will not
+be able to take CPSC 311 before CPSC 411. If I support your case, we will work with the CPSC advising
+team to ensure they have no objections.
 
 @subsection{Judging your own background}
 This course demands programming in a functional programming languages, learning
