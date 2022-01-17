@@ -17,7 +17,7 @@ build: build/index.html
 
 build/cpsc411.sxref:
 	mkdir -p build
-	scribble --dest ./build --dest-name cpsc411 --htmls --info-out build/cpsc411.sxref +m --redirect-main "https://docs.racket-lang.com" `racket -e "(require setup/collection-search)" -e "(display (path->string (collection-search '(lib \"cpsc411/cpsc411.scrbl\"))))"`
+	scribble --dest ./build --dest-name cpsc411 --htmls --info-out build/cpsc411.sxref +m --redirect-main "https://docs.racket-lang.com" `racket -e "(display (path->string (collection-file-path \"cpsc411.scrbl\" \"cpsc411\")))"`
 
 build/index.html: build/cpsc411.sxref .racodeps assignment/* appendix/*.scrbl chapter/*.scrbl *.scrbl Makefile config.rkt
 	scribble --dest-name build --htmls ++info-in build/cpsc411.sxref --redirect-main https://docs.racket-lang.org/ +m ++style assignment/custom.css index.scrbl
