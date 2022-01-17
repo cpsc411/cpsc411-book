@@ -240,15 +240,26 @@
     (ev r))
   ev)
 
-(define (run-dot str format)
-  (define cmd (string-append "dot -y -T" format))
-  (match (process cmd)
-    [(list stdout stdin pid stderr ctl)
-     (write-string str stdin)
-     (newline stdin)
-     (close-output-port stdin)
-     (cond [(eq? (ctl 'status) 'done-error) (error (port->string stderr))]
-           [else stdout])]))
+(define cached-dot-counter (box 0))
+(define (dot-counter!)
+  (let ([x (unbox cached-dot-counter)])
+    (set-box! cached-dot-counter (add1 x))
+    x))
+
+(define (run-dot str fmt)
+  (with-cache (cachefile (format "dot-~a" (dot-counter!)))
+    (thunk
+     (define cmd (string-append "dot -y -T" fmt))
+     (match (process cmd)
+       [(list stdout stdin pid stderr ctl)
+        (write-string str stdin)
+        (newline stdin)
+        (close-output-port stdin)
+        (cond [(eq? (ctl 'status) 'done-error) (error (port->string stderr))]
+              [else (define r (port->lines stdout))
+                    (close-input-port stdout)
+                    (close-input-port stderr)
+                    r])]))))
 
 (require (only-in pict bitmap) racket/draw)
 #;(define (dot->pict . rest)
@@ -261,7 +272,7 @@
         (style #f
                (list
                 (xexpr-property
-                 (cdata #f #f (apply string-append (drop (port->lines (run-dot (apply string-append rest) "svg")) 3)))
+                 (cdata #f #f (apply string-append (drop (run-dot (apply string-append rest) "svg") 3)))
                  (cdata #f #f ""))))))
 
 
