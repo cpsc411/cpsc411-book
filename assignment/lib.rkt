@@ -230,8 +230,8 @@
 (define (make-cached-eval name . rest)
   (define cache (cachefile name))
   (define ev
-    (make-base-eval)
-    #;(make-log-based-eval
+    #;(make-base-eval)
+    (make-log-based-eval
      cache
      (if (file-exists? cache)
          'replay
