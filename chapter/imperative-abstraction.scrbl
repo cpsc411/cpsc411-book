@@ -7,6 +7,7 @@
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v2
   (for-label cpsc411/langs/v2)
+  (for-label cpsc411/langs/v3)
   cpsc411/langs/v3
   #;(except-in "../assignment/a1.scrbl" doc)
   #;(except-in "abstract-locations.scrbl" doc))
@@ -84,7 +85,7 @@ L9 -> L11 [label = "interp-paren-x64"];
 @; ----- end of Language Defs ------
 
 
-@title[#:tag "top" #:tag-prefix "chp3:"]{Imperative Abstractions}
+@title[#:tag "top" #:tag-prefix "chp3:"]{Monadic Expressions}
 @todo{Feel like I can make a joke or point about imperative and sequentiality.
 I don't care when things happen, so long as they happen, in a value-oriented
 language.}
@@ -93,16 +94,15 @@ language.}
 abstractions?"}
 
 @section{Preface: What's wrong with our language?}
-In @ch2-tech{Asm-lang v2}, which abstracted away from machine-specific details
-such as what @tech{physical locations} exist and machine-specific restrictions
-on instructions.
-This is often a goal of compiler implementation---we want a more portable
-language to easily retarget to different machines.
+In @ch2-tech{Asm-lang v2}, which abstracted away from machine-specific
+@ch2-tech{physical locations} exist and, therefore, instructions that operate on
+@ch2-tech{physical locations}.
 
 However, the source language is still not something we want to program.
-In order to program, we, as @ch2-tech{Asm-lang v2} programmers, must manually
-keep track of where a value is located in order to perform computation on it.
-We must move values into particular locations before computing.
+In order to program, we, as @ch2-tech{Asm-lang v2} programmers, can only compose
+operations by moving values in and out of locations.
+We cannot focus on their values, but instead must focus on their locations.
+This makes composing operations harder.
 For example, when doing arithmetic, we cannot simply write @racket[(+ 2 2)],
 @ie "Add the values 2 and 2".
 Instead, we must write "first move 2 into a location, then move 2 into a
@@ -112,10 +112,11 @@ different location, now add the contents of the two locations".
 
 We want to move towards a @deftech{value-oriented} language, @ie a language
 where operations consume and produce values directly, and away from
-@deftech{imperative language} that manipulates some underlying machine state
-that the programmer must always keep in mind and manually manipulate.
+@deftech{imperative language} that manipulates some underlying machine state.
 This would free the programmer from keeping the state of the machine in mind at
-all times and manually manipulating it to perform computation.
+all times.
+The structure of the computation could instead be reflected in the syntax of the
+program.
 
 To this end we design a new source language, @tech{Values-lang v3}.
 Implementing this language is the goal for this chapter.
@@ -131,12 +132,16 @@ stored.
 Intermediate operations can be named using @values-lang-v3[let], which
 binds an arbitrary number of independent computations to @tech{names}.
 
+This language introduces two new abstractions: @tech{names}, and @tech{monadic
+expressions}.
+
 A @deftech{name}, or @deftech{lexical identifier}, is a placeholder that is
 indistinguishable from the value of the expression it names.
-Like @tech{abstract locations}, @tech{names} can be created at will.
-Unlike @tech{abstract locations}, @tech{names} obey lexical binding, shadowing
-the same name if an existing name is reused but without overwriting the old
-value.
+Like @ch2-tech{abstract locations}, @tech{names} can be created at will.
+Unlike @ch2-tech{abstract locations}, @tech{names} do not unique identify a
+@ch2-tech{physical location}.
+@tech{Names} obey lexical binding, shadowing the same name if an existing name
+is reused but without overwriting the old value.
 For example, the following example uses the same @tech{names} multiple times,
 but this doesn't overwrite any other use of the @tech{name}.
 
@@ -159,7 +164,11 @@ to @racket[(execute p)].
         (+ x y)))))
 ]
 
-This gives the programmer the ability to name sub-computations in a non-imperative way.
+@deftech{Monadic expressions} enable composing expressions that compute to
+values from other values (but not other expressions).
+
+This gives the programmer the ability to compose computations locally, without
+know anything about the state of the machine.
 When we need some sub-computation, we are able to make up a brand new @tech{name}
 without fear that we will erroneously overwrite some existing value; at worst,
 we locally shadow it.
@@ -183,23 +192,25 @@ Only a @values-lang-v3[value] or a @values-lang-v3[let] whose body is a
 
 In @tech{Values-lang v3}, the @values-lang-v3[let] expression implements a
 particular kind of lexcial binding.
-The same @tech{lexical identifier} can be shadowed by nested
-@values-lang-v3[let] expressions, and nested @values-lang-v3[let] expressions
-can refer to the bindings of prior @values-lang-v3[let] expressions.
+The same @tech{name} can be shadowed by nested @values-lang-v3[let] expressions,
+and nested @values-lang-v3[let] expressions can refer to the bindings of prior
+@values-lang-v3[let] expressions.
 However, in the @emph{same} @values-lang-v3[let] expression, the binding are
 considered @emph{parallel}---they do not shadow, and cannot refer to each other.
 This means we can freely reorder the bindings in a single @values-lang-v3[let]
 statement.
 This can be useful for optimization.
-However, it means we cannot allow duplicate bindings or allow reference to
-bindings in the same @values-lang-v3[let] statement.
-Otherwise, the ability to reorder could introduce @tech{undefined behaviour}.
+However, it means we cannot allow duplicate @tech{names} to be bound in a single
+@values-lang-v3[let] or allow references to @tech{names} within the bound
+expressions the same @values-lang-v3[let] expression.
+Otherwise, the ability to reorder could introduce @ch-bp-tech{undefined
+behaviour}.
 
-To guard against this undefined behaviour, we introduce a validator.
+To guard against this @ch-bp-tech{undefined behaviour}, we introduce a validator.
 
-We must also check for reference to unbound variables, since these may be
-compiled into reference to uninitialized memory, and resulting in undefined
-behaviour.
+We must also check for reference to unbound @tech{names}, since these may be
+compiled into reference to uninitialized memory, and resulting in
+@ch-bp-tech{undefined behaviour}.
 
 @nested[#:style 'inset
 @defproc[(check-values-lang (p any/c))
