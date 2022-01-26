@@ -15,6 +15,11 @@ I deeply appreciate it.
 @item{Ron Garcia}
 @item{Ben Lerner}
 @item{Jeremy Siek}
+@;for discussions about ANF, "normal" vs "normalization", and the name of the
+@;abstarction for v3
+@item{Conor McBride}
+@item{Sam Tobin-Hochstadt}
+
 @item{Lily Bryant}
 @item{Yuchong Pan}
 @item{The students of CPSC 411 2019w2}
