@@ -23,7 +23,7 @@ There will be some changes this semester.
 @include-section{assignment/a1.scrbl}
 @include-section{assignment/a2.scrbl}
 @;include-section{assignment/a3-wrong.scrbl}
-@;include-section{assignment/a3.scrbl}
+@include-section{assignment/a3.scrbl}
 @;include-section{assignment/a4-wrong.scrbl}
 @;include-section{assignment/a4.scrbl}
 @;include-section{assignment/a5.scrbl}

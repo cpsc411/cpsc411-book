@@ -5,10 +5,10 @@
 @(reset-challenge-counter!)
 
 @(require
-  (for-label cpsc411/reference/a3-solution)
+  (for-label (except-in cpsc411/reference/a3-solution assign-homes))
   (for-label (only-in
               cpsc411/reference/a2-solution
-              [assign-homes v2:assign-homes]))
+              assign-homes))
   (for-label cpsc411/compiler-lib))
 
 @(define (rtech . x) (apply tech #:tag-prefixes '("book:" "chp-reg-alloc:") x))
@@ -19,7 +19,7 @@
 
 The goal of this assignment is to introduce (1) "optimizing" compilation (2)
 register allocation, a critically important "optimization".
-In this assignment, you will replace the @racket[v2:assign-homes] pass with
+In this assignment, you will replace the @racket[assign-homes] pass with
 @racket[assign-homes-opt], a version that tries hard to put variables into
 registers instead of in the frame.
 
@@ -97,22 +97,22 @@ detect bugs in the register allocator.
 }
 
 @exercise{Implement @racket[assign-homes-opt], which has the same interface and
-performs the same function as @racket[v2:assign-homes], but uses register
+performs the same function as @racket[assign-homes], but uses register
 allocation instead of assigning all @ch2-tech{abstract locations} to
 @ch2-tech{frame variables}.
 
 @racket[assign-homes-opt] should be a drop-in replacement for
-@racket[v2:assign-homes].
+@racket[assign-homes].
 
 Run your test suite and ensure you get the same outputs whether you use
-@racket[v2:assign-homes] or @racket[assign-homes-opt].
+@racket[assign-homes] or @racket[assign-homes-opt].
 }
 
 @exercise{Create two versions of your compiler by defining two functions,
-@racket[compile-a2] and @racket[compile-a3].
+@racket[compile-m2] and @racket[compile-m3].
 The source language should be @ch3-tech{Values-lang v3} and the target should be
 @ch1-tech{x64}, represented as a string.
-@racket[compile-a2] should use @racket[v2:assign-homes], while
+@racket[compile-a2] should use @racket[assign-homes], while
 @racket[compile-a3] should use @racket[assign-homes-opt] instead.
 You should use @racket[parameterize] and @racket[current-pass-list].
 
@@ -159,8 +159,8 @@ Are there any surprises?}
 @;          (halt x.1))))
 @;]
 
-@challenge{
-Design and implement the function @racket[bury-dead], which removes assignments
+@exercise[#:optional #t]{
+Design and implement a function @racket[bury-dead], which removes assignments
 to unused abstract locations.
 The source language is @rtech{Asm-lang v2/undead} and the target language is
 @rtech{Asm-lang v2/undead}.
