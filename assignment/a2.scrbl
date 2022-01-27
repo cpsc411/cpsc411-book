@@ -156,7 +156,7 @@ You may find the functions @racket[aloc?] helpful and @racket[fresh] helpful.
 @exercise{Implement @racket[assign-homes].}
 
 @exercise{Design and implement @racket[uncover-locals] to analyze which
-@ch2-tech{abstract locations} need to be assigned @tech{physical locations}.
+@ch2-tech{abstract locations} need to be assigned @ch2-tech{physical locations}.
 
 You may find the function @racket[aloc?] helpful.
 For working with sets, you may want to use @secref["sets" #:doc '(lib
@@ -164,11 +164,11 @@ For working with sets, you may want to use @secref["sets" #:doc '(lib
 }
 
 @exercise{Design and implement @racket[assign-fvars] assign @ch2-tech{abstract
-locations} to @tech{physical location}.
+locations} to @ch2-tech{physical location}.
 }
 
 @exercise{Design and implement @racket[replace-locations] to replace
-@ch2-tech{abstract locations} with their assigned @tech{physical location}.
+@ch2-tech{abstract locations} with their assigned @ch2-tech{physical location}.
 }
 
 @exercise{Design and implement @racket[flatten-begins] to flatten nested

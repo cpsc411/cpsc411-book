@@ -3,6 +3,8 @@
 @(require
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
+  (for-syntax racket/base)
+  scribble/racket
   (for-label cpsc411/reference/a2-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v2
@@ -19,6 +21,13 @@
   (make-cached-eval "ch3-eval"
    '(require cpsc411/reference/a2-solution cpsc411/compiler-lib cpsc411/2c-run-time)
    '(current-stack-size 512)))
+
+@; TODO: Copy/paste from scribble/bettergrammar
+@(define-for-syntax datum-literal-transformer
+   (make-element-id-transformer
+    (lambda (x)
+      (quasisyntax/loc x
+        (elem #:style symbol-color (to-element '#,x))))))
 
 @declare-exporting[cpsc411/reference/a2-solution]
 
@@ -85,7 +94,7 @@ L9 -> L11 [label = "interp-paren-x64"];
 @; ----- end of Language Defs ------
 
 
-@title[#:tag "top" #:tag-prefix "chp3:"]{Monadic Expressions}
+@title[#:tag "top" #:tag-prefix "chp3:"]{Value Orientation}
 @todo{Feel like I can make a joke or point about imperative and sequentiality.
 I don't care when things happen, so long as they happen, in a value-oriented
 language.}
@@ -132,8 +141,8 @@ stored.
 Intermediate operations can be named using @values-lang-v3[let], which
 binds an arbitrary number of independent computations to @tech{names}.
 
-This language introduces two new abstractions: @tech{names}, and @tech{monadic
-expressions}.
+This language introduces two new abstractions: @tech{names} and
+@deftech{expressions}.
 
 A @deftech{name}, or @deftech{lexical identifier}, is a placeholder that is
 indistinguishable from the value of the expression it names.
@@ -164,16 +173,21 @@ to @racket[(execute p)].
         (+ x y)))))
 ]
 
-@deftech{Monadic expressions} enable composing expressions that compute to
-values from other values (but not other expressions).
-
+@deftech{Expressions} are computations that represent values, without reference
+to any machine state.
+The expression @values-lang-v3[(+ 2 2)] represents and computes to the value
+@values-lang-v3[4], and hides any reference to where these values are located on
+the machine.
 This gives the programmer the ability to compose computations locally, without
 know anything about the state of the machine.
-When we need some sub-computation, we are able to make up a brand new @tech{name}
-without fear that we will erroneously overwrite some existing value; at worst,
-we locally shadow it.
-We also do not manually move values into locations, but rather name them and let
-the language sort out where values live.
+For the moment, our @tech{expressions} are very limited---we can only compute
+over values, and to compose two @tech{expressions}, we explicitly name the
+value of the @tech{expression} using @values-lang-v3[let].
+This makes dependency between @tech{expressions} explicit in our syntax.
+But, with @tech{names}, we are able to make up a brand new @tech{name} without
+fear that we will erroneously overwrite some existing value; at worst, we
+locally shadow it.
+This again hides the details of the machine state from the programmer.
 
 Some of the names for non-terminals are counter-intuitive.
 For example, @values-lang-v3[triv] for trivial values makes sense, but
@@ -274,18 +288,18 @@ But the assembly language is still an (@emph{extremely}) imperative machine
 language.
 The operations it provides are: (1) move a value to a location (2) perform a
 binary operation on a location.
-This requires the programmer to always remember the values of @tech{abstract
-locations} and manipulate this underlying state to program.
+This requires the programmer to always remember the values of
+@ch2-tech{abstract locations} and manipulate this underlying state to program.
 
 
 We design @deftech{Imp-cmf-lang v3}, an imperative language that allows
 expressing operations on values directly, and composing them by sequencing
-these computation through @tech{abstract location}.
+these computation through @ch2-tech{abstract location}.
 This removes some amount of imperativity from the language.
 The programmer can reason about each primitive operation using only values, and
 needs only to think about the state of the machine when composing operations.
 
-@margin-note{@tech{Imp-cmf-lang v3} is in a variant of @deftech{a-normal form}
+@margin-note{@tech{Imp-cmf-lang v3} is in a variant of @deftech{A-normal form}
 (@deftech{ANF}), a syntactic form that restricts all operations to trivial
 values, and forbids nesting.
 It is roughly equivalence to other compiler intermediate forms, such as
@@ -293,17 +307,22 @@ static-single assignment.}
 @todo{Add ANF citation}
 @todo{This is no longer ANF}
 
-@bettergrammar*-diff[asm-lang-v2 imp-cmf-lang-v3]
+@bettergrammar*-ndiff[
+#:labels ("Imp-cmf-lang-v3" "Diff" "Asm-lang-v2")
+(imp-cmf-lang-v3)
+(asm-lang-v2 imp-cmf-lang-v3)
+(asm-lang-v2)
+]
 
 We add the @imp-cmf-lang-v3[value] non-terminal to represent operations that
 produce values at run time.
 Now, @imp-cmf-lang-v3[set!] simply assigns any value, or operation that
-produces a value, to an @tech{abstract location}.
+produces a value, to an @ch2-tech{abstract location}.
 At the top-level, a program is a @imp-cmf-lang-v3[tail], which represents the
 last computation executed in a program.
 It is either an operation that produces a value, or a sequence of such
 operations composed by storing the result of the @imp-cmf-lang-v3[value] in an
-intermediate @tech{abstract locations}.
+intermediate @ch2-tech{abstract locations}.
 The @tech{Imp-cmf-lang v3} program implicitly halts with the final value of the
 @imp-cmf-lang-v3[tail].
 
@@ -311,7 +330,7 @@ To implement this language, we compile each operation to a sequence of
 @ch2-tech{Asm-lang v2} instructions.
 This involves select inserting an explicit @asm-lang-v2[halt] in the final value
 of the @imp-cmf-lang-v3[tail], and selecting instruction sequences to implement
-primitive operations, and possibly introducing auxiliary @tech{abstract locations}.
+primitive operations, and possibly introducing auxiliary @ch2-tech{abstract locations}.
 
 @nested[#:style 'inset
 @defproc[(select-instructions (p imp-cmf-lang-v3))
@@ -350,14 +369,19 @@ This is an annoying detail that the language could manage instead.
 Below, we design @deftech{Imp-mf-lang v3}, which allows nesting effects in most
 contexts.
 
-@bettergrammar*-diff[imp-cmf-lang-v3 imp-mf-lang-v3]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Imp-mf-lang-v3" "Imp-cmf-lang-v3")
+(imp-cmf-lang-v3 imp-mf-lang-v3)
+(imp-mf-lang-v3)
+(imp-cmf-lang-v3)
+]
 
 @todo{Why not support empty begin?}
 @todo{Where else should (nop) be added?}
 
 @digression{@tech{Imp-mf-lang v3} is in @deftech{monadic form} (@deftech{MF}),
 a syntactic form that allows composing operations that operate on values and
-have no side-effect (such as changing the value of an @tech{abstract location}),
+have no side-effect (such as changing the value of an @ch2-tech{abstract location}),
 but requires explicit sequencing any effectful operations.
 This allows additional nesting compared to @tech{ANF}.
 @tech{Monadic form} is often used in high-level functional languages to support
@@ -408,12 +432,32 @@ Compiles @tech{Imp-mf-lang v3} to @tech{Imp-cmf-lang v3}, pushing
 @imp-mf-lang-v3[set!] is simple value-producing operation.
 This normalizes @tech{Imp-mf-lang v3} with respect to the equations
 @tabular[
+#:sep @hspace[3]
+#:column-properties '(left center right)
 (list
 (list
-@imp-mf-lang-v3[(set! aloc (begin effect_1 ... value))]
+@;imp-mf-lang-v3[(set! aloc (begin effect_1 ... value))]
+ @(let-syntax ([set! datum-literal-transformer]
+               [begin datum-literal-transformer]
+               [... datum-literal-transformer]
+               [aloc (make-variable-id 'aloc)]
+               [effect_1 (make-variable-id 'effect_1)]
+               [value (make-variable-id 'value)]
+               )
+    @racketblock0[(set! aloc
+                       (begin effect_1 ...
+                              value))])
 "="
-@imp-mf-lang-v3[(begin effect_1 ... (set! aloc value))])
-)
+@(let-syntax ([set! datum-literal-transformer]
+              [begin datum-literal-transformer]
+              [... datum-literal-transformer]
+              [aloc (make-variable-id 'aloc)]
+              [effect_1 (make-variable-id 'effect_1)]
+              [value (make-variable-id 'value)])
+  @racketblock0[(begin effect_1 ...
+                       (set! aloc value))])
+@;imp-mf-lang-v3[(begin effect_1 ... (set! aloc value))])
+))
 ]
 }
 ]
@@ -428,7 +472,7 @@ context, we'll want nested begin.
 
 @section{Be, not Do}
 Now we want to abstract further, away from locations and focus on values and
-operations on values.
+coperations on values.
 This allows us to express computation as something that represents a value, not
 a sequence of operations to compute a value.
 That is, to declare what @emph{is}, not instruct what @emph{to do}.
@@ -443,10 +487,15 @@ expression.
 
 But dealing with names is hard, so we make a simplifying assumption.
 We assume that actually, someone has already resolved all @tech{names} into
-@tech{abstract locations}.
+@ch2-tech{abstract locations}.
 This gives us the language @deftech{Values-unique-lang v3}, defined below.
 
-@bettergrammar*[values-unique-lang-v3]
+@bettergrammar*-ndiff[
+#:labels ("Values-unique-lang-v3" "Diff" "Imp-mf-lang-v3")
+(values-unique-lang-v3)
+(values-unique-lang-v3 imp-mf-lang-v3)
+(imp-mf-lang-v3)
+]
 
 This language is similar to @tech{Imp-mf-lang v3}, but uses
 @values-unique-lang-v3[let] to compose operations rather than sequential,
@@ -459,21 +508,42 @@ bindings to some values exist.
 For example, the following two @tech{Values-unique-lang v3} programs are
 equivalent:
 @tabular[
+#:sep @hspace[3]
+#:column-properties '(left center right)
 (list
  (list
-  @values-unique-lang-v3[(let ([x.1 5] [y.2 6]) (+ x.1 y.2))]
+  (let-syntax ([let datum-literal-transformer]
+               [+ datum-literal-transformer])
+    @racketblock0[(let ([x.1 5] [y.2 6])
+                    (+ x.1 y.2))])
   "="
-  @values-unique-lang-v3[(let ([y.2 6] [x.1 5]) (+ x.1 y.2))]))
+  (let-syntax ([let datum-literal-transformer]
+               [+ datum-literal-transformer])
+    @racketblock0[(let ([y.2 6] [x.1 5])
+                    (+ x.1 y.2))])))
 ]
 
 However, the apparently similar @tech{Imp-mf-lang v3} programs are not, since
 @imp-mf-lang-v3[set!]s are required to happen in-order:
 @tabular[
+#:sep @hspace[3]
+#:column-properties '(left center right)
 (list
  (list
-  @imp-mf-lang-v3[(begin (set! x.1 5) (set! y.2 6) (+ x.1 y.2))]
+  @; Pattern: bettergrammar should provide lang-block and lang-block0
+  (let-syntax ([begin datum-literal-transformer]
+               [set! datum-literal-transformer]
+               [+ datum-literal-transformer])
+    @racketblock0[(begin (set! x.1 5)
+                         (set! y.2 6)
+                         (+ x.1 y.2))])
   "≠"
-  @imp-mf-lang-v3[(begin (set! y.2 6) (set! x.1 5) (+ x.1 y.2))]))
+  (let-syntax ([begin datum-literal-transformer]
+               [set! datum-literal-transformer]
+               [+ datum-literal-transformer])
+    @racketblock0[(begin (set! y.2 6)
+                         (set! x.1 5)
+                         (+ x.1 y.2))])))
 ]
 
 This means we can implement optimizations over @tech{Values-unique-lang v3} that
@@ -481,8 +551,8 @@ are not possible in @tech{Imp-mf-lang v3}, although no such optimizations are
 apparent yet.
 
 @nested[#:style 'inset
-@defproc[(optimize-let-bindings (p Values-unique-lang-v3.p))
-          Values-unique-lang-v3.p]{
+@defproc[(optimize-let-bindings (p Values-unique-lang-v3?))
+          values-unique-lang-v3?]{
 Optimizes @values-unique-lang-v3[let] bindings by reordering them to minimize or
 maximize some metric.
 }
@@ -491,8 +561,8 @@ maximize some metric.
 To implement @tech{Values-unique-lang v3}, we must sequentalize @values-unique-lang-v3[let].
 
 @nested[#:style 'inset
-@defproc[(sequentialize-let (p Values-unique-lang-v3.p))
-          imp-mf-lang-v3.p]{
+@defproc[(sequentialize-let (p values-unique-lang-v3?))
+          imp-mf-lang-v3?]{
 Compiles @tech{Values-unique-lang v3} to @tech{Imp-mf-lang v3} by picking a
 particular order to implement @values-unique-lang-v3[let] expressions using
 @imp-mf-lang-v3[set!].
@@ -503,7 +573,12 @@ Finally, we must discharge our assumption that all names are unique.
 Below we define @deftech{Values-lang v3}, a value-oriented language with simple
 binary expressions and lexical binding.
 
-@bettergrammar*-diff[values-unique-lang-v3 values-lang-v3]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Values-lang-v3" "Values-unique-lang-v3 ")
+(values-unique-lang-v3 values-lang-v3)
+(values-lang-v3)
+(values-unique-lang-v3 )
+]
 
 @values-lang-v3[x] is a short-hand non-terminal for names, which are arbitrary
 symbols.
@@ -511,13 +586,13 @@ To ensure transform names into abstract location, it suffices to append a unique
 number to each.
 
 To implement this language, we must resolve all lexical binding and replace
-@tech{names} by @tech{abstract locations}
+@tech{names} by @ch2-tech{abstract locations}
 
 @nested[#:style 'inset
-@defproc[(uniquify (p Values-lang-v3.p))
-          Values-unique-lang-v3.p]{
+@defproc[(uniquify (p values-lang-v3?))
+          values-unique-lang-v3?]{
 Compiles @tech{Values-lang v3} to @tech{Values-unique-lang v3} by resolving all
-@tech{lexical identifiers} to @tech{abstract locations}.
+@tech{lexical identifiers} to @ch2-tech{abstract locations}.
 
 @examples[#:eval sb
 (uniquify '(module (+ 2 2)))
