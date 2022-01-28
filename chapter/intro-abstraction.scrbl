@@ -442,7 +442,7 @@ sequences, and @racket[current-return-value-register] for compiling
     (set! r9 42)
     (set! rbx rcx)
     (set! rbx (+ rbx r9))
-    (halt rbx)))
+    (halt rbx))
 ]
 }
 ]
