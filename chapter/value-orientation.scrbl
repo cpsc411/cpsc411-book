@@ -493,7 +493,7 @@ This gives us the language @deftech{Values-unique-lang v3}, defined below.
 @bettergrammar*-ndiff[
 #:labels ("Values-unique-lang-v3" "Diff" "Imp-mf-lang-v3")
 (values-unique-lang-v3)
-(values-unique-lang-v3 imp-mf-lang-v3)
+(imp-mf-lang-v3 values-unique-lang-v3)
 (imp-mf-lang-v3)
 ]
 
