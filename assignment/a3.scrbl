@@ -112,8 +112,8 @@ Run your test suite and ensure you get the same outputs whether you use
 @racket[compile-m2] and @racket[compile-m3].
 The source language should be @ch3-tech{Values-lang v3} and the target should be
 @ch1-tech{x64}, represented as a string.
-@racket[compile-a2] should use @racket[assign-homes], while
-@racket[compile-a3] should use @racket[assign-homes-opt] instead.
+@racket[compile-m2] should use @racket[assign-homes], while
+@racket[compile-m3] should use @racket[assign-homes-opt] instead.
 You should use @racket[parameterize] and @racket[current-pass-list].
 
 Write a paragraph comparing the two compilers.
