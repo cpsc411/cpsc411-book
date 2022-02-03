@@ -8,8 +8,10 @@
   (for-label
     (only-in cpsc411/reference/a2-solution uncover-locals replace-locations assign-homes))
   (for-label (except-in cpsc411/compiler-lib compile))
+  cpsc411/langs/v1
   cpsc411/langs/v2
   (for-label cpsc411/langs/v2)
+  (for-label cpsc411/langs/v2-reg-alloc)
   cpsc411/langs/v2-reg-alloc)
 
 @(provide
@@ -74,7 +76,7 @@ L4 -> L62 [label=" assign-homes-opt"];
 With @ch2-tech{Asm-lang v2}, we introduced @ch2-tech{abstract locations} to free
 the programmer from thinking about @ch2-tech{physical locations}.
 Unfortunately, our implementation strategy has a severe limitation.
-While it's simple and works, it's extremely slow!
+While it's simple and works, generates extremely slow code!
 Each and every variable assignment or reference accesses memory.
 While memory accesses have improved a lot compared to old computers due to
 caching, accessing memory are still orders of magnitude slower than accessing a
@@ -83,16 +85,20 @@ cache).
 Our compiler will have better performance if we help the machine out by using
 registers as much as possible.
 
-Assigning variables to registers automatically is a non-trivial task.
-There's a reason we started out by compiling to @ch2-tech{frame variables}.
-There are infinitely many @ch2-tech{frame variables}, but only 16 registers.
+Assigning @ch2-tech{abstract locations} to registers automatically is a
+non-trivial task.
+We started out by compiling to @ch2-tech{frame variables} because there are
+infinitely many @ch2-tech{frame variables}, but only 16 registers.
+Actually, fewer than 16, since the compiler and run-time system reserve some of
+those for various purposes.
 To assign an @ch2-tech{abstract location} a new @ch2-tech{frame variable} is
-trivial---just pick a new one, there's always new one.
-It's a simple, systematic algorithm.
+trivial---just pick a new one, there's always new one, just like
+@ch2-tech{abstract locations}.
+This one-to-one mapping between abstractions means assigment is a simple,
+systematic algorithm.
 To assign an @ch2-tech{abstract location} to a register, however, we need to
-pick a register that isn't currently in use.
-Since there's only 16 registers, we very quickly run out of registers... unless
-we're clever.
+pick a register that isn't currently in use, and figuring out which registers
+aren't in use requires a clever program analysis.
 
 In general, being clever should be a last resort.
 
@@ -103,13 +109,14 @@ Conceptually, register allocation is a simple idea.
 might still be needed after each instruction.
 }
 @item{Conflict analysis: figure out which @ch2-tech{abstract locations}
-cannot be assigned to the same register.
+cannot be assigned to the same @ch2-tech{physical location} because they
+both contain values that are needed at the same time.
 }
 @item{Register allocation: assign each @ch2-tech{abstract locations} to a
 register that is different from any conflicting @ch2-tech{abstract locations}.
 }
 @item{Spilling: if we fail to find a register for an @ch2-tech{abstract
-location}, put it in a @ch2-tech{frame variable}.
+location}, put it in a @ch2-tech{frame variable} instead.
 }
 ]
 
@@ -154,14 +161,30 @@ The register allocator takes over from here to perform that assignment.
 
 And we use @ch2-tech{Asm-lang v2/assignments}, reproduced below.
 
-@bettergrammar*[asm-lang-v2/assignments]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Asm-lang v2/assignments" "Asm-lang v2/locals")
+(asm-lang-v2/locals asm-lang-v2/assignments)
+(asm-lang-v2/assignments)
+(asm-lang-v2/locals)
+]
 
 After this, our existing pass @racket[replace-locations] should handle replacing
 @ch2-tech{abstract locations} by the assigned @ch2-tech{physical locations}.
 
-An optimization should be seen as a drop-in replacement for some existing
-functionality, but one that performs "better" (for some definition of "better").
-We will replace @racket[assign-homes] with @racket[assign-homes-opt].
+Any compiler optimization should be seen as a transformation between programs in
+the @emph{same language}, @ie, an @emph{intra-language transformation}.
+The point is not to introduce a new layer of abstraction, but to improve some
+performance metric of a program in some language.
+In this case, the optimization happens in @ch2-tech{Asm-lang v2/assignments}; all
+the programs we generate are equivalent to a program that only uses
+@ch2-tech{frame variable} in its @asm-lang-v2/assignments[assigments] field.
+In this case, performing the optimization requires additional steps of
+analysis, so we introduce several administrative languages prior to
+@ch2-tech{Asm-lang v2/assignments}.
+@todo{Make this actually intra-language.}
+
+To emphasize that this is an optimizatiom, we design @racket[assign-homes-opt]
+as a drop-in replacement for @racket[assign-homes].
 
 @nested[#:style 'inset]{
 @defproc[(assign-homes-opt [p asm-lang-v2?]) nested-asm-lang-v2?]{
@@ -171,113 +194,132 @@ This version performs graph-colouring register allocation.
 }
 }
 
+This pass is still a composition of several passes, which we design next.
+
 @section{Undeadness Analysis}
 We begin the register allocation by figuring out which locations might still
 be needed after each instruction.
 This process is often called liveness analysis, but we refer to it as undeadness
 analysis for reasons we explain shortly.
 
-A variable (either @ch2-tech{abstract location} or @ch2-tech{physical location})
-with a @emph{particular} value that @emph{definitely} will be used is considered
-@deftech{live}, and any variable (with a particular value) that
-@emph{definitely} won't be used is considered @deftech{dead}.
+A @deftech{variable} (either @ch2-tech{abstract location} or @ch2-tech{physical
+location}) with a @emph{particular} value that @emph{definitely} will be used is
+considered @deftech{live}, and any @tech{variable} (with a particular value)
+that @emph{definitely} won't be used is considered @deftech{dead}.
+
 Recall that due to Rice's Theorem, we know it's generally impossible to decide
-whether a variable is @tech{dead} or @tech[#:key "live"]{alive}.
+whether a @tech{variable} is @tech{dead} or @tech[#:key "live"]{alive}.
 This means that when writing an analysis, we must assume partial knowledge.
-The result is that we ignore @tech{live}ness entirely.
+The result is that we ignore @tech{live}ness entirely, which is hard to prove,
+and focus on @tech{dead}ness, which is easy to prove.
+
 @todo{Want to make clear the variable-at-a-point-in-time abstraction is what
 we're analyzing, not merely variable.
 This is why SSA is valuable; makes variables = variables-at-point-in-time.}
 @margin-note{
-@ch2-tech{Asm-lang v2/locals} is a simple enough language that we can tell whether a
-variable is @tech{dead} or @tech[#:key "live"]{alive}.
+@ch2-tech{Asm-lang v2/locals} is a simple enough language that we can tell
+whether a @tech{variable} is @tech{dead} or @tech[#:key "live"]{alive}.
 Later, when we add new instructions, we will modify the @tech{undead} analysis
-and find variables that aren't necessarily @tech{live} or @tech{dead}, and must
-be assumed to be @tech{undead}.
+and find @tech{variables} that aren't necessarily @tech{live} or @tech{dead},
+and must be assumed to be @tech{undead}.
 This is also necessary if we want to handle linking, or separate compilation.
 }
 
-We cannot in general decide the value of a variable at a given instruction.
-Instead, we focus on analyzing each @emph{assignment} to a variable, which
-changes the value of the variable.
+We cannot in general decide the value of a @tech{variable} at a given
+instruction.
+Instead, we focus on analyzing each @emph{assignment} to a @tech{variable},
+which might change the value of the @tech{variable}.
 
-We assume that any variable that gets used, or might get used, might @emph{not}
-be @tech{dead}, @ie we assume it is @deftech{undead}, and consider a variable
-@tech{dead} only when we have conclusive proof---like witnessing an instruction
-driving a new value through its heart, er, storing a new value in its location.
+We assume that any @tech{variable} that gets used, or might get used, might be
+@emph{not} @tech{dead}, @ie we assume it is @deftech{undead}, and consider a
+@tech{variable} @tech{dead} only when we have conclusive proof---like witnessing
+an instruction driving a new value through its heart, er, storing a new value in
+that @tech{variable}.
 
-We collect the @tech{undead} variables into sets.
-The @deftech{undead-out set} of an instruction is a set of variables that are
-@tech{undead} after executing that instruction.
+We collect the @tech{undead} @tech{variables} into sets.
+The @deftech{undead-out set} of an instruction is a set of @tech{variables} that
+are @tech{undead} after executing that instruction.
 @margin-note{
 Most compilers call these live-out or live-after sets.
-This suggests that variables are definitely alive, and that the analysis is
-computing sets of variables that are definitely alive, neither of which is true.
-@tech{Undead} is not exactly the same as not-definitely-dead, except in horror
-movies and video games, but it's more suggestive of reality for compilers.
+This suggests that @tech{variables} are definitely alive, and that the analysis
+is computing sets of @tech{variables} that are definitely alive, neither of
+which is true.
+@tech{Undead} is not exactly the same as not-definitely-dead, but it's more
+suggestive of reality for compilers.
 }
 
 @todo{This is but one algorithm. Should rewrite to make that clear and cite algorithm}
-To determine whether a variable is in the @tech{undead-out set} for an
-instruction, we analyze the program by looping over the instruction sequence
-backwards, starting with the last statement.
-@margin-note*{We don't @emph{need} to analyze the program backwards, but it's
-faster.}
-The loop takes an instruction and its @tech{undead-out set}.
-We analyze each instruction with its @tech{undead-out set} and compute an
+We design an algorithm for computing the @tech{undead-out sets} by taking a
+single linear pass over the program.
+Our algorithm is fast, but slightly counter-intuitive to implement.
+
+To compute the @tech{undead-out sets} for each instruction, we analyze the
+program by looping over the instruction sequence backwards, starting with the
+last statement.
+The loop takes an instruction and its @tech{undead-out set} as input.
+We analyze the instruction with its @tech{undead-out set} and compute an
 @deftech{undead-in set} for the instruction, which is the same as the
-@tech{undead-out set} of the preceding instruction.
+@tech{undead-out set} of the preceding instruction in the program.
 That is, the @tech{undead-in set} for an instruction @object-code{s_i} is the
 @tech{undead-out set} for the instruction @object-code{s_{i-1}} in the program.
+
+To start the loop, this algorithm requires a default @tech{undead-out set} for
+the last instruction in the scope of our analysis.
+The default @tech{undead-out set} for @ch2-tech{Asm-lang v2/locals} is the empty
+set---no variables are @tech[#:key "live"]{alive} after the end of the program,
+are we are analyzing the entire program at once.
+In general, the default set may not be empty, depending on the language and the
+scope of the analysis.
+For example, in @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
+v1}, we assume @paren-x64-v1[rax] after the program finishes.
+When we introduce functions, we will assume that return value locations are live
+at the end of functions.
+If we had global variables, we might need to assume they are live at the end of
+a program.
 
 Each iteration of the loop performs the following analysis on a particular
 instruction.
 We start by assuming the @tech{undead-in set} is the same as the
 @tech{undead-out set}, then update it depending on what happens in the
 instruction.
-If a variable is @emph{used} in the instruction, it @emph{ought to be}
-@tech{live}---we don't actually know, since that instruction's result itself
-might not be used, but the variable is at least acting like its
-@tech{live}---and is added to the @tech{undead-in set}.
-If a variable is @emph{assigned}, @ie its value is overwritten, in the
-instruction, it is @emph{definitely} @tech{dead} at that point, and we remove it
-from the @tech{undead-in set}.
-
-
-To start the loop, this algorithm requires a default @tech{undead-out set} for
-the last instruction; the default @tech{undead-out set} for
-@ch2-tech{Asm-lang v2/locals} is empty.
-In general, the default set may not be empty, because we may assume that some
-values are live after the program.
-For example, in @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
-v1}, we assume @object-code{rax} is live out.
+If a @tech{variable} is @emph{defined}, @ie its value is overwritten in the
+instruction, it is @emph{definitely} @tech{dead} upon entry to this intruction,
+so we remove it from the @tech{undead-in set}.
+If a @tech{variable} is @emph{referenced} in the instruction, it @emph{ought to
+be} @tech{live}---we don't actually know, since that instruction's result itself
+might not be used, or the instruction itself might never be executed, but the
+@tech{variable} is at least acting like it's @tech{live}---and is added to the
+@tech{undead-in set}.
 
 This algorithm creates the @tech{undead-out sets} for each instruction so that
 later passes can associate each instruction with its @tech{undead-out set}.
 There are many ways to associate the @tech{undead-out sets} with instructions.
-A simple way is to create a data structure that maps each set to an instruction.
-
-Since our programs are trees of instructions, we represent the @tech{undead-out
-sets} for each instruction as a tree of @tech{undead-out sets}.
+We choose a representation that implicitly associates each set with an
+instruction.
+Since our programs are trees of instructions, we collect the @tech{undead-out
+sets} for each instruction into a tree of @tech{undead-out sets}, whose
+tree structure mirrors the program's tree structure.
 We define the data @tech{undead-set tree} to mirror the structure of
 @ch2-tech{Asm-lang v2} programs.
-An @deftech{undead-set tree} is either:
+
+An @deftech{undead-set tree} is one of:
 @itemlist[
-@item{an @tech{undead-out set} @asm-lang-v2[(aloc ...)], corresponding to a
-single instruction such as @asm-lang-v2[(halt triv)]}
-@item{or a list of @tech{undead-set tree}s, corresponding to the
-@tech{undead-set tree}s @asm-lang-v2[(undead-set-tree?_1 ... undead-set-tree?_2)]
-corresponding to a @asm-lang-v2[begin] statement
-@asm-lang-v2[(begin effect_1 ... effect_2)]
+@item{an @tech{undead-out set} @asm-lang-v2[(aloc ...)], corresponding to the
+@tech{undead-out set} for a single instruction such as @asm-lang-v2[(halt
+triv)] or @asm-lang-v2[(set! aloc triv)].}
+@item{a list of @tech{undead-set tree}s, @asm-lang-v2[(undead-set-tree?_1 ...
+undead-set-tree?_2)], corresponding to a @asm-lang-v2[begin] statement
+@asm-lang-v2[(begin effect_1 ... effect_2)] or @asm-lang-v2[(begin effect_1 ...
+tail)].
 The first element of the list represents @tech{undead-set tree} for the first
 @asm-lang-v2[effect], the second element represents the @tech{undead-set tree}
 for the second @asm-lang-v2[effect], and so on.
 }
 ]
-An @tech{undead-set tree} @asm-lang-v2[(undead-set-tree? ...)] together with a
-list of instructions @asm-lang-v2[(effect ...)] can be traversed together using
-the template for two trees simultaneously.
-This is similar to traversing two lists simultaneously:
+We always traverse an @tech{undead-set tree} together with a corresponding
+program; the @tech{undead-set tree} cannot be interpreted in isolation.
+For example, given a list of @tech{undead-set tree}s @racket[undead-outs] and a
+list of effects @racket[ss], we would traverse with the following template:
 @racketblock[
 (define (fn-for-s-and-undead-outs ss undead-outs)
   (match (cons ss undead-outs)
@@ -288,11 +330,7 @@ This is similar to traversing two lists simultaneously:
           (fn-for-ss-and-undead-outs rest-ss rest-undead-outs))]))
 ]
 
-You'll need to design the template for traversing @asm-lang-v2[tail] and
-@asm-lang-v2[effect] trees simultaneously with an @tech{undead-set tree}
-yourself.
-
-To describe the output of the analysis, we define a new @tech{administrative
+To describe the output of the analysis, we define a new @ch2-tech{administrative
 language}.
 We collect the @tech{undead-set tree} a new @asm-lang-v2/undead[info] field.
 Below, we define @deftech{Asm-lang v2/undead}.
@@ -300,7 +338,12 @@ The only change compared to @ch2-tech{Asm-lang v2/locals} is in the
 @asm-lang-v2/undead[info] field, so we typeset the difference in the
 @asm-lang-v2/undead[info] field.
 
-@bettergrammar*-diff[asm-lang-v2/locals asm-lang-v2/undead]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Asm-lang v2/undead" "Asm-lang v2/locals")
+(asm-lang-v2/locals asm-lang-v2/undead)
+(asm-lang-v2/undead)
+(asm-lang-v2/locals)
+]
 
 @nested[#:style 'inset]{
 @defproc[(undead-analysis [p asm-lang-v2/locals?]) asm-lang-v2/undead?]{
@@ -353,7 +396,11 @@ appear in a program.
       (halt x.1))))
 ]
 
-In a realistic compiler, unused variables should be removed be an optimization.
+We could use the undead information to design an optimization to remove dead
+@tech{variables}.
+However, to separate concerns, we should not do this during register allocation.
+Instead, later, we'll design more general optimization pass that happens before
+register allocation.
 
 @;@challenge{
 @;Design and implement the function @racket[bury-dead], which removes assignments
@@ -369,9 +416,8 @@ In a realistic compiler, unused variables should be removed be an optimization.
 
 @section{Conflict Analysis}
 To assign @ch2-tech{abstract locations} to @ch2-tech{physical locations}
-efficiently, we need to know when any two variables are @emph{in conflict}, @ie
-cannot be assigned to the same @ch2-tech{physical location} because different
-values might be in those variables at the same time.
+efficiently, we need to know when any two @tech{variables} are @emph{in
+conflict}, @ie contain different values might be in use at the same time.
 
 We start by defining what a conflict is precisely.
 
@@ -387,73 +433,82 @@ We also do not know which variables are @tech{live}, only which are @tech{undead
 Therefore, we can only approximate conflicts.
 
 To approximate conflicts, we ignore values, and once more focus on assignments
-to variables.
-An assignment to the variable means the it @emph{might} take on a
-new value that @emph{might} be different from the value of any variable which
+to @tech{variables}.
+An assignment to the @tech{variable} means it @emph{might} take on a new
+value that @emph{might} be different from the value of any @tech{variable} which
 @emph{might} be @tech{live} at that point.
-We have already approximated liveness via @tech{undead-out sets}, so what remains
-is to approximate when a variable takes on a new value.
-Below, we describe how to approximate conflcits and slightly refine these criteria.
+We have already approximated liveness via @tech{undead-out sets}, so what
+remains is to approximate when a @tech{variable} takes on a new value.
+Below, we describe how to approximate conflicts and slightly refine these
+criteria.
 
-We represent conflicts in a data structure called a @deftech{conflict graph}.
-Interpreted as an undirected graph, the variables are represented as nodes (also
-known as vertexes), and conflicts between variables are represented as an edge
-from the variable to each of the variables in the associated set of conflicts.
+We choose to represent conflicts in a data structure called a @deftech{conflict
+graph}.
+Interpreted as an undirected graph, the @tech{variables} are represented as
+nodes (also known as vertexes), and conflicts between @tech{variables} are
+represented as an edge from the @tech{variable} to each of the @tech{variables}
+in the associated set of conflicts.
 If there is an edge between any two nodes, then they are in conflict.
-Interpreted as a dictionary, the @tech{conflict graph} maps each variable to a
-set of variables with which it is in conflict.
+Interpreted as a dictionary, the @tech{conflict graph} maps each @tech{variable}
+to a set of @tech{variables} with which it is in conflict.
 
 @todo{Assigned vs defined; also "assigned" not defined before use (above and in
 undead analysis). "Assigned" is also bad since it overlaps with "register
 assignments".}
 We create a @tech{conflict graph} from the @tech{undead-out sets} as follows.
-Any variable that is @emph{defined} during an instruction is in conflict with
-every variable (except itself) in the @tech{undead-out set} associated with that
-instruction.
-For example, the variable @asm-lang-v2[x.1] is defined in @asm-lang-v2[(set! x.1
-(+ x.1 x.2))], while the variables @asm-lang-v2[x.2] and @asm-lang-v2[x.1] are
-referenced.
-No variable can conflict with itself, since it always has the same value as
-itself.
-We approximate the values of variables by assuming each @emph{definition}
-assigns a new unique value to the variable, and by assuming each variable in the
+Any @tech{variable} that is @emph{defined} during an instruction is in conflict
+with every @tech{variable} (except itself) in the @tech{undead-out set}
+associated with that instruction.
+For example, the @tech{variable} @asm-lang-v2[x.1] is defined in
+@asm-lang-v2[(set! x.1 (+ x.1 x.2))], while the @tech{variables}
+@asm-lang-v2[x.2] and @asm-lang-v2[x.1] are referenced.
+No @tech{variable} can conflict with itself, since it always has the same value
+as itself.
+We approximate the values of @tech{variables} by assuming each @emph{definition}
+changes the @tech{variable}'s value, and by assuming each @tech{variable} in the
 @tech{undead-out set} also has a unique value.
 This approximation tells us that @asm-lang-v2[x.1] cannot be assigned the same
-@ch2-tech{physical location} as any other variable in the @tech{undead-out set}.
+@ch2-tech{physical location} as any other @tech{variable} in the
+@tech{undead-out set}.
 If @asm-lang-v2[x.2] is @tech[#:key "undead-out set"]{undead-out} at this
 instruction, and we try to put @asm-lang-v2[x.1] in the same @ch2-tech{physical
 location} as @asm-lang-v2[x.2], then the value of @asm-lang-v2[x.2] would be
 overwritten by the value of @asm-lang-v2[(+ x.1 x.2)].
 
-We can reduce the number of conflicts, and thus possibly fit more variables into
-registers, by observing that one instruction does tell us that two values will
-be the same.
-A move instruction, such as @object-code{(set! x.1 x.2)}, is an instruction that
+We can reduce the number of conflicts, and thus possibly fit more
+@tech{variables} into registers, by observing that one instruction does tell us
+that two values will be the same.
+A move instruction, such as @asm-lang-v2[(set! x.1 x.2)], is an instruction that
 simply defines the value of one variable to be that of another.
 
 @emph{Approximation of Conflict}
 @itemlist[
 @item{
-Any variable @emph{defined} during a non-move instruction is in conflict with
-every variable (except itself) in the @tech{undead-out set} associated with the
-instruction.
+Any @tech{variable} @emph{defined} during a non-move instruction is in conflict
+with every @tech{variable} (except itself) in the @tech{undead-out set}
+associated with the instruction.
 }
 @item{
-Any variable @emph{defined} during a move instruction is in conflict with
-every variable in the @tech{undead-out set} associated with the instruction,
-except itself and the variable referenced in the move.
+Any @tech{variable} @emph{defined} during a move instruction is in conflict with
+every @tech{variable} in the @tech{undead-out set} associated with the
+instruction, except itself and the @tech{variable} referenced in the move.
 }
 ]
 
 To implement conflict analysis, we design the language @deftech{Asm-lang
-v2/conflicts} to capture the conflict graph.
+v2/conflicts} to capture the @tech{conflict graph}.
 We typeset the difference compared to @tech{Asm-lang v2/undead}.
 
-
-@bettergrammar*-diff[#:include (info) asm-lang-v2/undead asm-lang-v2/conflicts]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Asm-lang v2/conflicts" "Asm-lang v2/undead")
+(#:include (info) asm-lang-v2/undead asm-lang-v2/conflicts)
+(asm-lang-v2/conflicts)
+(asm-lang-v2/undead)
+]
 
 The @asm-lang-v2/conflicts[info] field is extended with a @tech{conflict graph},
-represented as an association list from a variable to @tech{undead-out sets}.
+represented as an association list from a @tech{variable} to sets of
+@ch2-tech{abstract locations}.
 
 As in @tech{Asm-lang v2/undead}, the @asm-lang-v2/conflicts[info] field also
 contains a declaration of the @ch2-tech{abstract locations} that may be used in the
@@ -529,11 +584,11 @@ Decorates a program with its @tech{conflict graph}.
 @section{Register Allocation}
 Register allocation, as in the step that actually assigns @ch2-tech{abstract
 locations} to @ch2-tech{physical locations}, takes the set of @ch2-tech{abstract
-locations} to assign homes, the conflict graph, and some set of assignable
-registers, and tries to assign the most @ch2-tech{abstract locations} to
-registers.
-As usual, Rice's Theorem tells us we'll never be able to decide the maximal
-number of variables we can fit in registers.
+locations} to assign homes, the @tech{conflict graph}, and some set of assignable
+registers, and tries to assign each @ch2-tech{abstract location} to
+a register.
+As usual, Rice's Theorem tells us we'll never be able to decide, in general, the
+maximal number of @ch2-tech{abstract locations} we can fit in registers.
 We'll have to approximate.
 
 @define[variable @ch2-tech{abstract location}]
@@ -563,6 +618,12 @@ Otherwise, pick an arbitrary @ch2-tech{abstract location} from the set.
 A @deftech{low-degree} @ch2-tech{abstract location} is one with fewer than
 @tt{k} conflicts, for some for pre-defined @tt{k}.
 We pick @tt{k} to be the number of registers in the set of assignable registers.
+
+You can simply sort the @ch2-tech{abstract locations} in degree-order and pick
+the first one, on each iteration of the loop, although this may not be the
+fastest way to pick a @tech{low-degree} node.
+Note that @ch2-tech{abstract locations} are removed from the conflict graph, so
+we must re-sort or otherwise calculate @tech{low-degree} on each iteration.
 }
 @item{Recur with the chosen @ch2-tech{abstract location} removed from the input set and
 the conflict graph.
@@ -577,7 +638,10 @@ call).
 @item{If you succeed in selecting a register, then add the assignment for
 the chosen @variable to the result of the recursive call.}
 @item{Otherwise, we cannot assign the choosen @variable to a register.
-Instead, we @emph{spill it}, @ie we assign it a fresh @ch2-tech{frame variable}.}
+Instead, we @emph{spill it}, @ie we assign it a @ch2-tech{frame variable}.
+We can assign a @ch2-tech{fresh variable}, but we can reduce memory usage by
+trying to assign a non-conflicting @ch2-tech{frame variable}.
+}
 ]}
 ]
 @margin-note{
@@ -586,16 +650,17 @@ register allocation described in "Improvements to graph coloring register
 allocation" (ACM TOPLAS 6:3, 1994) by Preston Briggs, et al.
 }
 
-We can simplify the implementation of this algorithm by separting it into two
-parts: first, sort all @variables in degree order, then assign each register in
-sorted order.
-
 To describe the output of the register allocator, we reuse @ch2-tech{Asm-lang
 v2/assignments}.
 Below, we typeset the changes compared to @tech{Asm-lang v2/conflicts}.
 Note only the @asm-lang-v2/assignments[info] field changes.
 
-@bettergrammar*-diff[#:include (info) asm-lang-v2/conflicts asm-lang-v2/assignments]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Asm-lang v2/assignments" "Asm-lang v2/conflicts")
+(#:include (info) asm-lang-v2/conflicts asm-lang-v2/assignments)
+(asm-lang-v2/assignments)
+(asm-lang-v2/conflicts)
+]
 
 @nested[#:style 'inset]{
 @defproc[(assign-registers [p asm-lang-v2/conflicts]) asm-lang-v2/assignments?]{
