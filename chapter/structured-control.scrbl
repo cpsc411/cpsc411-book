@@ -119,7 +119,7 @@ subgraph DoNotcluster1 {
 @title[#:tag "top" #:tag-prefix "chp4:"]{Structured Control Flow}
 
 @section{Preface: What's wrong with our language?}
-In the last chapter, we designed the language @ch3-tech{Values-lang v3}.
+For our last abstraction, we designed the language @ch3-tech{Values-lang v3}.
 This language is an improvement over @ch1-tech{x64}, but has a significant
 limitation: we can only express simple, straight-line arithmetic
 computations. We'll never be able to write any interesting programs!
@@ -141,8 +141,12 @@ feature: a form of @values-lang-v4[if] expression.
 
 Our goal is @tech{Values-lang v4}, duplicated below.
 
-@bettergrammar*-diff[values-lang-v3 values-lang-v4]
-
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Values-lang v4" "Values-lang v3")
+(values-lang-v3 values-lang-v4)
+(values-lang-v4)
+(values-lang-v3)
+]
 
 Note that an @values-lang-v4[if] expression, @values-lang-v4[(if pred e e)], is
 limited: it cannot branch on an arbitrary expression.
@@ -168,10 +172,12 @@ leading to type confusion when reading and writing data.
 If a programmer sees the number @racket[-5] printed or in a program, is it a
 boolean or a number?
 
-There are many ways to solve the problem, but the most robust way is to add
-proper booleans as a separate primitive data type.
-That is a task separate from adding control-flow, so we deal with it later, and
-instead implement a limited form of structured control-flow.
+There are many ways to solve the problem, but to keeping with our design
+principles of designing clear abstraction boundaries, we will later add proper
+booleans as a separate primitive data type.
+That is a task separate from adding control flow, so we deal with it later, and
+instead implement a limited form of structured control-flow first that booleans
+can compile to later.
 }
 
 @section{Exposing Control-Flow Primitives}
@@ -194,7 +200,18 @@ L1:
 L2:
   mov rax, 42
 }
-@todo{Add jump example}
+
+To use labels, we have a variety of @tt{jmp} instructions, which take a label
+and cause control to move to that label, instead of the next instruction.
+In this example, @tt{rax} is set to @tt{5} at the end of the program, as the
+instruction that sets @tt{rax} to @tt{42} is not executed due to the @tt{jmp}
+instruction.
+@verbatim{
+  mov rax, 5
+  jmp L1
+  mov rax, 42
+L1:
+}
 
 We'll begin the next version of our compiler by designing a new
 @deftech{Paren-x64 v4} to expose the additional features of @ch1-tech{x64}
@@ -202,16 +219,25 @@ necessary to implement control flow abstractions.
 This extends the previous @ch2-tech{Paren-x64 v2} with comparison operations,
 labels, and conditional and unconditional jump operations.
 
-@bettergrammar*-diff[paren-x64-v2 paren-x64-v4]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Paren-x64 v4" "Paren-x64 v2")
+(#:exclude (reg addr fbp binop) paren-x64-v2 paren-x64-v4)
+(paren-x64-v4)
+(paren-x64-v2)
+]
 
 Labels are too complex to define by grammar; instead, they're defined by the
 @racket[label?] predicate in @racketmodname[cpsc411/compiler-lib].
 
-NASM and @a0-tech{x64} impose some additional restriction on labels, some of
+NASM and @ch1-tech{x64} impose some additional restriction on labels, some of
 which we've discussed already.
 @itemlist[
-@item{A @tt{mov} instruction to an @object-code{addr} can only move 32-bit
-integers. @object-code{(set! (rbp + 0) 9223372036854775807)} is invalid.}
+@item{Recall that a @tt{mov} instruction to an @paren-x64-v4[addr] can only move
+32-bit integers literals.
+While on a 64-bit machine, labels could be 64-bits, the SYS V ABI also specifies
+a @emph{small code} model.
+In this model, all labels are 32-bits, so can be moved into memory directly.
+}
 @item{The only valid characters in labels are letters, numbers, _, $, #, @"@",
 ~, ., and ?. The only characters which may be used as the first character of an
 identifier are letters, . (with has a special meaning and shouldn't be used), _
@@ -293,9 +319,20 @@ and comparing it to an interpreter for a language without them.
 We can no longer write the @tech{Paren-x64 v4} interpreter in one simple loop
 over the instructions.
 Instead, we need some way to resolve labels.
-That way, when running the interpreter, we can easily jump to any expression at
-any time---a possibility the language now allows.
+That way, when running the interpreter, we must be able to jump to any
+expression at any time---a possibility the language now allows.
 This process of resolving labels is called @deftech{linking}.
+
+@margin-note*{
+We only cover @tech{linking} local labels in this chapter.
+More generally, @tech{linking} requires resolving references to
+external labels, @ie, linking imported libraries, and in the context of many
+operating systems, preparing some additional metadata so the operating system
+knows where to begin executing.
+The more general instance is conceptually similar to what we present here---the
+key concept is transforming the abstraction of labels to code and data into some
+encoding used by the underlying implementation.
+}
 
 We can view the process of linking as yet another compiler, and thus a language
 design problem.
@@ -306,13 +343,15 @@ system's linker: we first resolve all labels to their address in memory (in our
 case, their index in the instruction sequence) and then implement jumps by
 simply setting a program counter to the instruction's address.
 
-To do this, we design a new language @deftech{Paren-x64-rt v4}, which represents
-the @emph{r}un-@emph{t}ime language used by the interpreter after linking.
+To do this, we design a new language @deftech{Paren-x64-rt v4}
+(@racket[paren-x64-rt-v4]), which represents the @emph{r}un-@emph{t}ime language
+used by the interpreter after linking.
 
-@bettergrammar*-diff[paren-x64-v4 paren-x64-rt-v4]
-
-@racketblock[
-  (define pc-addr? natural-number/c)
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Paren-x64-rt v4" "Paren-x64 v4")
+(#:exclude (reg triv opand loc binop addr fbp relop) paren-x64-v4 paren-x64-rt-v4)
+(paren-x64-rt-v4)
+(paren-x64-v4)
 ]
 
 We remove the instruction @paren-x64-rt-v4[(with-label label s)] and turn all label
@@ -349,16 +388,16 @@ indicated in the jump.
 @defproc[(interp-paren-x64 (p paren-x64-v4?))
          int64?]{
 Interpret the @tech{Paren-x64 v4} program @racket[p] as a value, returning the
-exit code for @racket[p].
+final value of @paren-x64-v4[rax].
 }
 
 @defproc[(interp-loop (code (listof paren-x64-rt-v4.s))
-                      (memory dict?)
+                      (env dict?)
                       (pc natural-number/c))
          int64?]{
 The main loop of the interpreter for @tech{Paren-x64-rt v4}.
 @racket[code] does not change.
-@racket[memory] is a @racket[dict?] mapping @tech{physical locations} (as
+@racket[env] is a @racket[dict?] mapping @ch2-tech{physical locations} (as
 @racket[symbol?]s) to their values (@racket[int64?]).
 @racket[pc] is the program counter, indicating the current instruction being
 executed as an index into the list @racket[code].
@@ -369,28 +408,33 @@ executed as an index into the list @racket[code].
 Having exposed @ch1-tech{x64} features to our compiler internal languages, we
 now need to find the right boundary at which to abstract away from the
 low-level representation of control-flow---labels and jumps---and introduce a
-more structured form of control flow, @object-code{if}.
+more structured form of control flow, @values-lang-v4[if].
 
 @todo{Opportunity for a "finger exercise"}
 
 Our next two languages in the pipeline, bottom-up, are @tech{Paren-x64-fvars
 v4} and @tech{Para-asm-lang v4}.
-Both of these languages abstract machine-specific details about @tech{physical locations}.
+Both of these languages abstract machine-specific details about
+@ch2-tech{physical locations}.
 This doesn't seem very related to control-flow, so we simply want to propagate
 our new primitives up through these layers of abstraction.
 We expose the new instructions while abstracting away from the machine
 constraints about which instructions work on which physical locations.
-Now jumps can target arbitrary locations, and compare can compare arbitrary
-locations.
-We can also move labels into locations.
+Now jumps can target arbitrary locations, and @para-asm-lang-v4[compare] can
+compare arbitrary locations.
+We can also move labels into arbitrary locations.
 @todo{Talk about why trg and not just "loc"}
 
 @todo{Talk about opand vs triv}
 
-Below we typeset @deftech{Paren-x64-fvars v4} with differences compared to
-@ch2-tech{Paren-x64-fvars v2}.
+Below we typeset @deftech{Paren-x64-fvars v4} (@racket[paren-x64-fvars-v4]).
 
-@bettergrammar*-diff[paren-x64-fvars-v2 paren-x64-fvars-v4]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Paren-x64-fvars v4" "Paren-x64-fvars v2")
+(#:exclude (reg binop int64 int32 fvar) paren-x64-fvars-v2 paren-x64-fvars-v4)
+(paren-x64-fvars-v4)
+(paren-x64-fvars-v2)
+]
 
 Nothing important changes in @tech{Paren-x64-fvars v4}.
 We simply add the new control-flow primitives.
@@ -400,13 +444,18 @@ We simply add the new control-flow primitives.
          paren-x64-v4?]{
 Compile the @tech{Paren-x64-fvars v4} to @tech{Paren-x64 v4} by reifying
 @paren-x64-fvars-v4[fvar]s into displacement mode operands.
-The pass should use @racket[current-frame-base-pointer].
+The pass should use @racket[current-frame-base-pointer-register].
 }
 ]
 
-Next we typeset @deftech{Para-asm-lang v4} compared to @ch2-tech{Para-asm-lang v2}.
+Next we typeset @deftech{Para-asm-lang v4}.
 
-@bettergrammar*-diff[para-asm-lang-v2 para-asm-lang-v4]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Para-asm-lang v4" "Para-asm-lang v2")
+(#:exclude (reg binop int64) para-asm-lang-v2 para-asm-lang-v4)
+(para-asm-lang-v4)
+(para-asm-lang-v2)
+]
 
 While @para-asm-lang-v4[halt] is still an instruction, we assume that there is
 exactly one @emph{dynamic} halt and that it is the final instruction executed in
@@ -422,10 +471,15 @@ syntactically, but only one will ever be executed due to conditional jumps.
 
 This also means compiling @para-asm-lang-v4[halt] is slightly more complicated.
 We must ensure that @para-asm-lang-v4[halt] is the last instruction executed.
-The run-time system provides a special label, the symbol @racket['done], which
-is expected to be executed at the end of the program.
-Straightline code will fall through to this label, but it can be jumped to
-instead.
+Previously, all @para-asm-lang-v4[halt] had to do was set the appropriate
+register, since it was always the final instruction.
+Now, the compiler must ensure it is the final instruction.
+This is simple to do by ensuring the compiler installs a special label after all
+instructions in the program, and generating a jump to that instruction.
+@margin-note{
+For convenience, the @racketmodname[cpsc411/2c-run-time] provides such a label,
+the symbol @racket['done].
+}
 
 @;We continue to support nested @para-asm-lang-v4[tail]s for backwards compatibility,
 @;but it will turn out that we no longer generate these in @tech{Para-asm-lang v4}.

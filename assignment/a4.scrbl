@@ -18,7 +18,7 @@ from the target language to the compiler, (2) introduce designing abstractions
 to tame low-level operations, (3) demonstrate the problems that control flow
 causes with program analysis, (4) introduce linking, and (5) practice thinking
 about programming at different levels of abstraction.
-We'll expose labels and @object-code{jmp} instructions from @ch1-tech{x64},
+We'll expose labels and @tt{jmp} instructions from @ch1-tech{x64},
 provide abstractions for using them in the source language, compile the latter
 abstraction to the former implementation, and practice reasoning about our new
 source language.

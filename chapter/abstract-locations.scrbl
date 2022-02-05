@@ -6,7 +6,9 @@
   cpsc411/langs/v1
   cpsc411/langs/v2
   (for-label cpsc411/langs/v2)
-  (for-label cpsc411/reference/a2-solution)
+  ; check-paren-x64 only defined in the a1 chapter
+  (for-label (except-in cpsc411/reference/a2-solution check-paren-x64))
+  (for-label (only-in cpsc411/reference/a1-solution check-paren-x64))
   (for-label (except-in cpsc411/compiler-lib compile))
   #;(except-in "abstracting-boilerplate.scrbl" doc))
 
@@ -36,7 +38,7 @@ node [ fontname="Courier", shape="box", fontsize=12 ]
 L4 [label="Asm-lang-v2"];
 
 L62 [label="Nested-asm v2"]
-L7 [label="Para-asm v2"];
+L7 [label="Para-asm-lang v2"];
 L8 [label="Paren-x64-fvars v2"];
 L9 [label="Paren-x64 v2"];
 L10 [label="x64"];
@@ -193,6 +195,16 @@ For example, if @tt{rbp} holds a memory address, we can move the value
 We can move the value from memory into the register @tt{rax} using the
 instruction @tt{mov rax, QWORD [rbp - 0]}.
 
+Note that a @tt{mov} instruction to an address can only move 32-bit integer
+literals.
+@tt{mov [rbp + 0], 9223372036854775807} is invalid; instead, the interger would
+need to be moved into a register, first, as in:
+@;
+@verbatim{
+mov r9, 9223372036854775807
+mov [rbp + 0], r9
+}
+
 Our offsets are multiples of 8.
 The offset is a number of bytes, and since we are dealing primarily with 64-bit
 values, we increment pointers in multiples of 8.
@@ -210,7 +222,7 @@ These accesses grow @emph{downwards}, subtracting from the base pointer rather
 than adding, following common conventions about how stack memory is used.
 This is an arbitrary choice, but we choose to follow the convention.
 
-The new version of @deftech{Paren-x64 v2} (@racket[paren-x6-v2]) is below.
+The new version of @deftech{Paren-x64 v2} (@racket[paren-x64-v2]) is below.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff" "Paren-x64 v2" "Paren-x64 v1")
@@ -221,8 +233,8 @@ The new version of @deftech{Paren-x64 v2} (@racket[paren-x6-v2]) is below.
 
 We add the new non-terminal @paren-x64-v2[addr] to the language, and add
 @paren-x64-v2[addr] as a production to @paren-x64-v2[loc].
-The @paren-x64-v2[addr] non-terminal represents a displacement mode operand to an
-instruction.
+The @paren-x64-v2[addr] non-terminal represents a @tech{displacement mode
+operand} to an instruction.
 We abstract the language over the @deftech{base frame pointer}, the pointer to
 the start of the current stack frame, which is stored in the parameter
 @racket[current-frame-base-pointer-register] and is
@@ -388,7 +400,7 @@ violate stack discipline when using
 @defproc[(implement-fvars (p paren-x64-fvars-v2?))
          paren-x64-v2?]{
 Compiles the @tech{Paren-x64-fvars v2} to @tech{Paren-x64 v2} by reifying
-@paren-x64-fvars-v2[fvar]s into @tech{displacement mode operands.}
+@paren-x64-fvars-v2[fvar]s into @tech{displacement mode operands}.
 The pass should use @racket[current-frame-base-pointer-register].
 }
 ]
@@ -405,7 +417,7 @@ any kind of @tech{physical locations}.
 This way, the language is responsible for managing these annoying details
 instead of the programmer.
 
-We do this by defining @deftech{Para-asm v2} (@racket[para-asm-v2]), a kind of
+We do this by defining @deftech{Para-asm-lang v2} (@racket[para-asm-lang-v2]), a kind of
 less finiky assembly language.
 We can think of this language as @emph{para}meterized by the set of locations,
 hence the name.
@@ -440,7 +452,7 @@ and it must be present.
 
 Notice that two registers, @para-asm-lang-v2[r10], and @para-asm-lang-v2[r11], have been
 removed from @para-asm-lang-v2[reg].
-@tech{Para-asm v2} assumes control of these registers, forbidding the
+@tech{Para-asm-lang v2} assumes control of these registers, forbidding the
 programmer from using them directly.
 Instead, the language implementation will make use of this when compiling to
 @tech{Paren-x64 v2}.
@@ -464,7 +476,7 @@ the @tech{stack discipline} invariant for the
 @nested[#:style 'inset
 @defproc[(patch-instructions (p para-asm-lang-v2?))
           paren-x64-fvars-v2?]{
-Compiles @tech{Para-asm v2} to @tech{Paren-x64-fvars v2} by patching
+Compiles @tech{Para-asm-lang v2} to @tech{Paren-x64-fvars v2} by patching
 instructions that have no @ch1-tech{x64} analogue into a sequence of
 instructions.
 The implementation should use auxiliary registers from
@@ -516,7 +528,7 @@ Below, we design @deftech{nested-asm-lang-v2}.
 @bettergrammar*-diff[para-asm-lang-v2 nested-asm-lang-v2]
 
 We add a @para-asm-lang-v2[tail] production which loosely corresponds to the
-top-level program from @tech{Para-asm v2}.
+top-level program from @tech{Para-asm-lang v2}.
 However, these can be nested, before eventually ending in a @nested-asm-lang-v2[halt]
 instruction.
 The @nested-asm-lang-v2[tail] production represents the "tail", or last, computation
