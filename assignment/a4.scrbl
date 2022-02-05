@@ -26,7 +26,7 @@ source language.
 This milestone is due @(due 'a4).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a4}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a4}.
 
 @todo{Design component? Might be a heavy assignment already.}
 
@@ -112,7 +112,7 @@ reading the entire chapter.
 
 @exercise{Extend @racket[generate-x64] to support control-flow primitives.
 
-To compile @object-code{halt}, it may help if you generate a labeled instruction
+To compile @para-asm-lang-v4[halt], it may help if you generate a labeled instruction
 that essentially does nothing.
 This way, you can insert a label at the end of your program.
 Otherwise, you'll need to think carefully about how to arrange and generate
@@ -120,12 +120,13 @@ blocks.
 }
 @todo{Why is halt still in paren-x64?}
 
-@exercise{Design and implement @racket[link-paren-x64], which resolves all
-labels into the address of the instruction in the instruction sequence.
+@exercise[#:optional #t]{Design and implement @racket[link-paren-x64], which
+resolves all labels into the address of the instruction in the instruction
+sequence.
 }
 
-@exercise{Redesign and extend the implementation of @racket[interp-paren-x64]
-to support control-flow primitives.
+@exercise[#:optional #t]{Redesign and extend the implementation of
+@racket[interp-paren-x64] to support control-flow primitives.
 
 It should use @racket[link-paren-x64] to resolve all labels, and should use a
 program counter to loop over the instruction sequence instead of folding over
@@ -141,10 +142,6 @@ to implement the new instructions jump and compare instructions that don't
 exist in @ch1-tech{x64} by instruction sequences that are valid in
 @ch4-tech{Paren-x64 v4}.
 
-@;It will be tricky to implement the instruction @object-code{(compare addr addr)}
-@;with only one auxiliary register.
-@;You can do it in four @ch4-tech{Paren-x64 v4} instructions.
-
 Remember to use the auxiliary registers from
 @racket[current-patch-instructions-registers].
 }
@@ -153,16 +150,18 @@ Remember to use the auxiliary registers from
 @ch4-tech{basic blocks} into straight-line code.
 }
 
-@challenge{
+@exercise[#:optional #t]{
 In @ch4-tech{Para-asm-lang v4}, it's unnecessary to have a jump when the target of the
 jump is the next instruction.
 Design and implement an optimization pass, called @racket[inline-jump], that
 eliminates these unnecessary jumps.
 The source language is @ch4-tech{Para-asm-lang v4} and target is
-@ch4-tech{Para-asm-lang v4}
+@ch4-tech{Para-asm-lang v4}.
+
+Be careful to only eliminate the label if you know its unused.
 }
 
-@challenge{
+@exercise[#:optional #t]{
 Branches are often thought of as expensive, so real compilers often perform
 @emph{trace scheduling}, an optimization that rearranges blocks and takes
 advantage of fall-through between blocks to reduce the number of jumps.
@@ -187,8 +186,9 @@ with jumps.
 
 You may want to use @racket[fresh-label] from @racketmodname[cpsc411/compiler-lib].
 
+@todo{These were really needed earlier}
 In Racket, you can pass multiple return values using @racket[values], and bind them using
-@racket[let-values], @racket[let-values*], or @racket[define-values].
+@racket[let-values], @racket[let*-values], or @racket[define-values].
 You should use @racket[fresh-label] to generate new unique labels.
 @todo{elaborate}
 
@@ -221,8 +221,8 @@ blocks and the control-flow primitives.
 Redesign and extend the implementation of @racket[assign-registers] to assign
 registers for each block.
 
-Recall that you may not use the register @object-code{rax}, since it is used to
-patch instructions, or @object-code{rbp}, since it contains the frame pointer.
+Recall that you may not use the register @nested-asm-lang-v4[rax], since it is used to
+patch instructions, or @nested-asm-lang-v4[rbp], since it contains the frame pointer.
 }
 
 @exercise{
@@ -266,7 +266,13 @@ The code is annotated to demonstrate idiomatic Racket style, and explain feature
 you may be unfamiliar with.
 }
 
-@exercise{
+@exercise[#:optional #t]{
 Redesign and extend the function @racket[interp-values-lang], an interpreter
 for @ch4-tech{Values-lang v4}.
+}
+
+
+@exercise[#:optional #t]{
+Redesign and extend the function @racket[check-values-lang], a validator for
+@ch4-tech{Values-lang v4}.
 }
