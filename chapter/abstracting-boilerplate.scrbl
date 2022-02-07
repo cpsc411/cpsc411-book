@@ -19,7 +19,7 @@
       cpsc411/reference/a1-solution
       (except-in cpsc411/compiler-lib compile))))
 
-@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{The First Compiler, and Abstracting Boilerplate}
+@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{v1: Abstracting Boilerplate}
 In this chapter, we walk through the design of an entire @ch1-tech{compiler}.
 It's a small one that merely abstracts some boilerplate, but it serves as a
 concrete example of the entire design process.
@@ -67,6 +67,32 @@ The abstract we introduce to remove boilerplate is not a new syntactic form, but
 a @deftech{convention}: a pattern programs in the language must follow to be
 implemented correctly.
 
+}
+@nested[#:style 'inset]{
+@emph{A note on conventions.} In each chapter, we incrementally design a whole
+compiler.
+Each subsequent design will be an iteration on the previous design.
+To distinguish them, we include a version tag for each; the version tag in
+this chapter is @emph{v1}.
+Since our compilers are designed around languages, we include this version tag
+in the language name, even if the set of features in the language does not
+change from one chapter to the next.
+For example, in this chapter, we design @tech{Paren-x64 v1}
+(@racket[paren-x64-v1]), a subset of @ch1-tech{x64}.
+This language will go through many iterations, and its version tag will change
+with each.
+
+This version tag is also used in the various support libraries that accompany
+this book when support code must be sensitive to the compiler or language
+versions.
+For example, the reference implementations of the @emph{v1} languages are found
+in the library @racketmodname[cpsc411/langs/v1], and the test suites for the
+@emph{v1} compiler as in @racketmodname[cpsc411/test-suite/public/v1].
+
+The tag is usually, but not necessarily, a number.
+When a chapter does not change any interface at all, the version number may
+remain the same with some additional suffix added to the tag, akin to semantic
+versioning.
 }
 @section{Designing an Abstraction}
 As always, we start by asking: what's wrong with our current language, namely,
