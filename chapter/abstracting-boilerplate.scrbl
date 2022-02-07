@@ -542,11 +542,11 @@ v1} syntax, or raises an error with a descriptive error message.
 }
 
 @examples[#:eval eg
-(check-paren-x64
+(check-paren-x64-syntax
  `(begin (set! rax ,(min-int 64))))
 
 (eval:error
- (check-paren-x64
+ (check-paren-x64-syntax
   `(begin (set! rax ,(- (min-int 64) 1)))))
 
 (eval:error
