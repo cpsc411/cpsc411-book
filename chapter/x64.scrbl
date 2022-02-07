@@ -67,7 +67,7 @@ design.
 
 However, choosing such languages as a target has a cost.
 These targets come with their own implementations, their own compilers and
-@tech{run-time systems}.
+@ch-bp-tech{run-time systems}.
 If we want to use them, we commit ourselves to using their toolchains as well.
 This may complicate our own development if it is difficult to setup those
 toolchains.
