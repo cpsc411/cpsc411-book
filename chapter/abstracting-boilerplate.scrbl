@@ -19,16 +19,26 @@
       cpsc411/reference/a1-solution
       (except-in cpsc411/compiler-lib compile))))
 
-@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{v1: Abstracting Boilerplate}
+@title[#:tag "top" #:tag-prefix "chp-boilerplate:"]{Abstracting Boilerplate (@emph{v1})}
 In this chapter, we walk through the design of an entire @ch1-tech{compiler}.
 It's a small one that merely abstracts some boilerplate, but it serves as a
-concrete example of the entire design process.
+concrete example of the entire process.
 
 We will design our compilers by starting from a fixed abstraction boundary, an
 existing @ch1-tech{target language}, and building a new layer of abstraction
 atop it.
-We have fixed some set of abstractions, and from this starting point, we ask a
-question:
+Our goal is to systematically design and build a new layer of abstraction,
+formalized as a new programming language, a @deftech{source language}, that can
+be implemented by translation into a corresponding @ch1-tech{target language}.
+The new abstraction is meant to solve some problem, such as software development
+being error-prone, software design being complex, or software produced in the
+language being unsafe, unportable, or verbose.
+Ideally, we solve this problem without introducing some cost, such as a high
+learning curve, or some performance penalty.
+
+To solve a problem, we must first concretely identify one, and then design
+a layer of abstraction to address it.
+Starting from the @ch1-tech{target language}, we ask a question:
 @todo{Also talk about validators and undefined behaviour in this chapter. Should
 that be separate from abstracting boilerplate?}
 
@@ -36,34 +46,33 @@ that be separate from abstracting boilerplate?}
   What's wrong with this language?
 }
 
-Our goal is to systematically design and build new layers of abstractions,
-formalized as a new programming language, a @deftech{source language}, that can
-be implemented by translation into a corresponding @ch1-tech{target language}.
-These abstractions are meant to solve some problem, such as software development
-being error-prone, software design being complex, or software produced in the
-language being unsafe, unportable, or verbose.
-Ideally, we solve these problems without introducing some cost, such as a high
-learning curve, or some performance penalty.
-To solve these problems, we must first concretely identify one, and then design
-a layer of abstraction to address it.
-
 Once we identify a concrete problem, we design a new @tech{source language} that
-solves the problem, and design a @ch1-tech{compiler} to transform the
+solves the problem, and then design a @ch1-tech{compiler} to transform the
 @tech{source language} into the @ch1-tech{target language}.
-We aim to derive the transformation from the language definitions; this is
-easiest when we focus on a single problem at a time, so we will introduce
-many @deftech{intermediate languages} in the process---languages that are both
-@tech[#:key "source language"]{source} and @ch1-tech{target languages}, serving
-some larger overall compiler.
-The transformations may be as simple as inserting some code, or as complex as
-analyzing and rewriting the structure of many pieces of interacting code.
-Some transformations we present have been designed after years of iteration to
-effectively implement some well-known abstraction, but some are easily derived
-from our language definitions.
+The @tech{source language} in its definition should capture all there is to the
+new abstraction.
+Our goal is to faithfully implement the new abstraction in terms of the old one.
+
+We aim to derive each @ch1-tech{compiler} from these language definitions,
+letting the abstractions be our guide.
+This is easiest when we focus on a single problem at a time, so we will
+introduce many @deftech{intermediate languages} in the process---languages that
+are both @tech[#:key "source language"]{source} and @ch1-tech{target languages},
+serving some intermediate @ch1-tech{compilers}.
+Each of these intermediate @ch1-tech{compilers} is more called a @deftech{compiler
+pass} or just @deftech{pass}, while @ch1-tech{compiler} is reserved for the
+transformation from a @tech{source language} in which a programmer writes
+programs.
+Each of our @tech[#:key "pass"]{passes} may be as simple as inserting some code,
+or as complex as analyzing and rewriting the structure of many pieces of
+interacting code.
+While some of our @tech[#:key "pass"]{passes} are easily derived from our
+language definitions, some have been designed after years of iteration to
+effectively implement some well-known abstraction.
 @todo{
 Abstraction vs convention?
 
-The abstract we introduce to remove boilerplate is not a new syntactic form, but
+The abstraction we introduce to remove boilerplate is not a new syntactic form, but
 a @deftech{convention}: a pattern programs in the language must follow to be
 implemented correctly.
 
@@ -95,10 +104,12 @@ remain the same with some additional suffix added to the tag, akin to semantic
 versioning.
 }
 @section{Designing an Abstraction}
-As always, we start by asking: what's wrong with our current language, namely,
-@ch1-tech{x64}?
+Our current abstraction boundary, @ie, our current language, is @ch1-tech{x64}.
+So we start by asking: what's wrong with @ch1-tech{x64}?
 
-The first limitation in @ch1-tech{x64} we identify is boilerplate.
+There is a lot wrong with @ch1-tech{x64}, but we'll start with one problem that
+many programmers are familiar with, and one that is simple to address:
+boilerplate.
 Writing programs in @ch1-tech{x64} requires the programmer to insert repetitive
 boilerplate, such as the declaration of the initial label, and some code to exit
 the program and report the result to the user.
@@ -107,13 +118,33 @@ them to copy and paste the same snippets of code into their programs, an
 error-prone process if that snippet ever needs to change.
 
 We could solve this problem by allowing the programmer to focus on writing and
-composing sequences of instructions, giving those sequences meaning independent
-of the boilerplate and the run-time system.
+composing sequences of instructions, by giving those sequences meaning
+independent of the boilerplate and the run-time system.
+For example, a programmer should be able to write two sequences, separately:
+@verbatim{
+;; Program 1
+mov r9, 42
+}
 
-Our goal is to introduce the abstraction of @deftech{instruction sequences}:
+Somewhere, separately:
+@verbatim{
+;; Program 2
+mov rax, r9
+}
+
+And, in our desired language, combining these would be well defined, such as in
+the following example, without ever referring to the boilerplate requried by
+@tt{nasm}.
+@verbatim{
+;; Program 3, by combining Program 1 and Program 2
+mov r9, 42
+mov rax, r9
+}
+
+@todo{Also, convention: rax contains the answer}
+Our goal is to introduce this abstraction of @deftech{instruction sequences}:
 lists of instructions that represent the code of an @ch1-tech{x64} program.
 @tech{Instruction sequences} separate the code from the boilerplate.
-@todo{Also, convention: rax contains the answer}
 As a result, we get a notion of program composition, allowing us to focus on the
 program, and decompose a program into separate pieces that we can easily stitch
 together.
@@ -122,19 +153,9 @@ then there exists @racket[(p-append _p_1 _p_2)] (for some definition of
 @racket[p-append]) which first executes the instructions in @metavar{p_1} and then
 executes the instructions in @metavar{p_2}.
 
-Since these are not valid @ch1-tech{x64} programs on their own, we need to define
-the meaning of @tech{instruction sequences} to make clear whether we are compiling
-them correctly.
-We define their meaning by designing an interpreter for @tech{instruction
-sequences}: executing the @tech{instruction sequence} begins at the first
-instruction in the sequence, and ends with the last instruction.
-We design this interpreter after we pick a specific set of instructions.
-@;The final result of the @tech{instruction sequence} is the value of some
-@;designated register after the last instruction is executed.
-@;Note that this language definition combines a new abstraction, the
-@;@tech{instruction sequence}, with a @tech{convention} for using the abstraction.
-
-Below, we select the subset of @ch1-tech{x64} instructions we plan to suppport.
+Below, we select the subset of @ch1-tech{x64} instructions we plan to suppport
+in our @tech{compiler}, but note that the abstraction of @tech{instruction
+sequences} applies to all @ch1-tech{x64} instructions.
 
 @itemlist[
 
@@ -184,7 +205,6 @@ a register @tt{imul @metavar{reg_1}, @metavar{reg_2}}.
 }
 ]
 
-
 Below is an example of a valid @tech{instruction sequence} in our subset of
 @ch1-tech{x64}.
 @nested[#:style 'inset
@@ -201,20 +221,22 @@ Below is an example of a valid @tech{instruction sequence} in our subset of
 Note that this does not correspond to a @ch1-tech{x64} @emph{program}, as it is
 missing much of the structure: the starting label, the section declarations,
 etc.
-It has no meaning on its own, and part of the job of our compiler is to give it
-a meaning.
-You probably have some idea of how to fix this program meaning, but we will be
-systematic, but we will be systematic in our approach in defining its meaning.
+It has no meaning on its own in @tt{nasm}, and part of the job of our compiler
+is to transform it so that it does have meaning when given to @tt{nasm}.
+You probably have some idea of how to fix this program to have meaning, but we
+will be systematic in our approach in defining its meaning.
 
 We represent @ch1-tech{x64} @tech{instruction sequences} as Racket strings, with
 each instruction separated by newline characters.
-For example, the following @ch1-tech{x64} instruction sequence @tt{mov rax, 42}
+For example, the @ch1-tech{x64} instruction sequence @tt{mov rax, 42}
 corresponds to the Racket string @racket{  mov rax, 42}.
 
-Note that the representation of @ch1-tech{x64} @tech{instruction sequences} is
-whitespace sensitive.
-For example, the following program corresponds to the Racket string
-@racket{  mov rbx, 2147483648\n  add rax, rbx}.
+Note that this representation of @ch1-tech{x64} @tech{instruction sequences} is
+whitespace sensitive, and is thus, not @deftech{canonical}---two programs that
+we wish to consider as the same have different representations.
+For example, the following @tech{instruction sequence} is represented by both
+the Racket string @racket{ mov rbx, 2147483648\n add rax, rbx} and @racket{\nmov
+rbx, 2147483648\n\nadd rax, rbx\n}.
 
 @nested[#:style 'inset
 @verbatim{
@@ -222,6 +244,22 @@ For example, the following program corresponds to the Racket string
   add rax, rbx
 }
 ]
+
+This is one of the first problems we will solve, by moving away from
+strings as a representation.
+
+Before we can begin compiling, we need to define what an @tech{instruction
+sequence} means, independent of how it is implemented.
+Otherwise, we would not know whether we are compiling them correctly.
+
+We address both of these problems next by designing a @tech{source language}
+that captures the meaning of @tech{instruction sequences}, for our choosen
+subset of @ch1-tech{x64}, and choosing a new representation of programs that we
+will use for the rest of this book.
+@;The final result of the @tech{instruction sequence} is the value of some
+@;designated register after the last instruction is executed.
+@;Note that this language definition combines a new abstraction, the
+@;@tech{instruction sequence}, with a @tech{convention} for using the abstraction.
 
 @section{Defining a Source Language}
 Our next step is to capture this abstraction in its own language.
