@@ -235,8 +235,8 @@ Note that this representation of @ch1-tech{x64} @tech{instruction sequences} is
 whitespace sensitive, and is thus, not @deftech{canonical}---two programs that
 we wish to consider as the same have different representations.
 For example, the following @tech{instruction sequence} is represented by both
-the Racket string @racket{ mov rbx, 2147483648\n add rax, rbx} and @racket{\nmov
-rbx, 2147483648\n\nadd rax, rbx\n}.
+the Racket string @racket{ mov rbx, 2147483648\n add rax, rbx} and
+@racket{\nmov rbx, 2147483648\n\nadd rax, rbx\n}.
 
 @nested[#:style 'inset
 @verbatim{
