@@ -594,7 +594,7 @@ We'll have to approximate.
 @define[variable @ch2-tech{abstract location}]
 @define[variables @ch2-tech{abstract locations}]
 
-We'll use graph-colouring register allocation, an algorithm that is quadratic
+We'll use @deftech{graph-colouring register allocation}, an algorithm that is quadratic
 (and slows compile time down quite a lot), but usually assigns more @variables
 to registers than other faster algorithms.
 @margin-note{It's worth noting that since this core pass is quadratic, compile
