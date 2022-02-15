@@ -465,28 +465,39 @@ Next we typeset @deftech{Para-asm-lang v4}.
 (para-asm-lang-v2)
 ]
 
-While @para-asm-lang-v4[halt] is still an instruction, we assume that there is
-exactly one @emph{dynamic} halt and that it is the final instruction executed in
-the program.
+While @para-asm-lang-v4[halt] is still an instruction, we must handle it
+differently now that we have control flow.
+@para-asm-lang-v4[halt] is a control-flow effect, immediately ending the control
+flow of the program, similar to @racket[exit].
+Previously, this did not matter, since we had no control flow that could be
+affected, and we ensured @para-asm-lang-v4[halt] was the final instruction.
+Now, we have control flow.
+
+We restrict @tech{Para-asm-lang v4}, requiring that there is exactly one
+@emph{dynamic} halt and that it is the final instruction executed in the
+program.
 We cannot restrict the syntax to require this, since we now support jumps.
 Jumps mean our syntax does not give us a clear indication of which instruction
 is executed last.
-It might be the case that @para-asm-lang-v4[halt] is the second instruction in the
-instruction sequence, but is always executed last because of the control flow of
-the program.
+It might be the case that @para-asm-lang-v4[halt] is the second instruction in
+the instruction sequence, but is always executed last because of the control
+flow of the program.
 It could also be that there are multiple @para-asm-lang-v4[halt] instructions
 syntactically, but only one will ever be executed due to conditional jumps.
 
-This also means compiling @para-asm-lang-v4[halt] is slightly more complicated.
-We must ensure that @para-asm-lang-v4[halt] is the last instruction executed.
+This means compiling @para-asm-lang-v4[halt] is slightly more complicated.
+When implementing @para-asm-lang-v4[halt], we must @emph{ensure} that
+@para-asm-lang-v4[halt] is the last instruction executed.
 Previously, all @para-asm-lang-v4[halt] had to do was set the appropriate
 register, since it was always the final instruction.
-Now, the compiler must ensure it is the final instruction.
-This is simple to do by ensuring the compiler installs a special label after all
-instructions in the program, and generating a jump to that instruction.
+When compiling @para-asm-lang-v4[halt], our job is to ensure our restrictions
+about @para-asm-lang-v4[halt] when compiling.
+This is simple to do by adding a unique label after all instructions in the
+program, and implementing @para-asm-lang-v4[halt] with a jump to that label.
 @margin-note{
 For convenience, the @racketmodname[cpsc411/2c-run-time] provides such a label,
-the symbol @racket['done].
+@(let-syntax ([done datum-literal-transformer]) @racket[done]), which
+your implementation can use instead.
 }
 
 @;We continue to support nested @para-asm-lang-v4[tail]s for backwards compatibility,
