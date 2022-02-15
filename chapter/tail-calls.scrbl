@@ -8,7 +8,8 @@
   cpsc411/langs/v2
   cpsc411/langs/v3
   cpsc411/langs/v4
-  cpsc411/langs/v5)
+  cpsc411/langs/v5
+  (for-label cpsc411/langs/v5))
 
 @(provide
   (all-defined-out)
@@ -663,29 +664,49 @@ This normalizes @tech{Imp-mf-lang v5} with respect to the equations:
 
 @section{Implementing Calling Conventions}
 
-Now we can design @deftech{Imp-cmf-lang v5}.
+Now we can design the language for our calling convention translation.
+
+We start with the source language, @deftech{Proc-imp-cmf-lang v5}.
 The design follows the needs of the translation we designed in @Secref{design-convention-translation}.
 
 @bettergrammar*-ndiff[
-#:labels ("Diff vs Source" "Diff vs v4" "Imp-cmf-lang v5")
-(proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
-(imp-cmf-lang-v4 imp-cmf-lang-v5)
-(imp-cmf-lang-v5)
+#:labels ("Diff vs Source" "Diff vs Imp-cmf-lang v4" "Proc-imp-cmf-lang v5")
+(imp-mf-lang-v5 proc-imp-cmf-lang-v5)
+(imp-cmf-lang-v4 proc-imp-cmf-lang-v5)
+(proc-imp-cmf-lang-v5)
 ]
 
 @todo{Probably want to move that module info field into the blocks earlier, and
 regularize definitions. But that requires introducing an order on definitions,
-which is annoying ....}
+which is annoying ....
 
-We remove the @proc-imp-cmf-lang-v5[call] form and replace it by the
-@imp-mf-lang-v5[jump] form.
+I no longer remember what this refers to}
+
+@tech{Proc-imp-cmf-lang v5} serves as the target for @racket[normalize-bind], so
+viewed in comparison to the source for @racket[normalize-bind], it merely
+removes the nesting in @imp-cmf-lang-v5[value] context.
+The previous iteration of this intermediate language is @ch4-tech{Imp-cmf-lang
+v4}; compared with that, we simply add the @tech{procedure} abstractions, namely
+@tech{tail calls} and @tech{procedure} definitions.
+
+Next, we design @deftech{Imp-cmf-lang v5}, the target language of
+@racket[impose-calling-conventions].
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source (excerpts)" "Imp-cmf-lang v5")
+(#:exclude (relop binop int64 aloc label pred) proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
+(imp-cmf-lang-v5)
+]
+
+Compared to the source, we remove the @proc-imp-cmf-lang-v5[call] form and
+replace it by the @imp-mf-lang-v5[jump] form.
 As described in @Secref{design-convention-translation}, all @tech{calls} are
 compiled to a sequence of @imp-mf-lang-v5[set!]s moving the @tech{arguments}
 followed by a @imp-mf-lang-v5[jump], and all @tech{procedure} definitions are
 compiled to a block that assigns the @tech{parameters}, as directed by the
-calling convention.
+@tech{calling convention}.
 
-Note that we now require @tech{physical locations} in the target language, so we
+Note that we now require @ch2-tech{physical locations} in the target language, so we
 must gradually expose @ch2-tech{physical locations} up to this language from the rest
 of the compiler.
 
@@ -697,15 +718,6 @@ calling conventions on all calls and procedure definitions.
 The parameter registers are defined by the list
 @racket[current-parameter-registers].
 }
-]
-
-Finally, we design @deftech{Imp-cmf-lang v5}.
-
-@bettergrammar*-ndiff[
-#:labels ("Diff vs Source" "Diff vs v4" "Imp-cmf-lang v5")
-(proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
-(imp-cmf-lang-v4 imp-cmf-lang-v5)
-(imp-cmf-lang-v5)
 ]
 
 @section{Exposing Jumps}
