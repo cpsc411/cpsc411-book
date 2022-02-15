@@ -35,7 +35,7 @@ node [ shape="box", fontsize=12 ]
 
 L0 [label="Values-lang v5"];
 L1 [label="Values-unique-lang v5"];
-L2 [label="Proc-imp-mf-lang v5"];
+L2 [label="Proc-imp-cmf-lang v5"];
 L3 [label="Imp-mf-lang v5"];
 L4 [label="Imp-cmf-lang v5"];
 L5 [label="Asm-pred-lang v5"];
@@ -78,9 +78,9 @@ L5 -> L10 [label=" assign-homes-opt"];
 
 L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
-L1 -> L2 [label=" sequentialize-let"];
-L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" normalize-bind"];
+L1 -> L3 [label=" sequentialize-let"];
+L3 -> L2 [label=" normalize-bind"];
+L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5 [label=" select-instructions"];
 
 L10 -> L11 [label=" expose-basic-blocks"];
@@ -434,17 +434,15 @@ language of our new pass.
 Since we changed the target of @racket[normalize-bind] to allow nested
 @imp-cmf-lang-v5[begin], we can still place our new pass before or after
 @racket[normalize-bind].
-
-Finally (and it's important to consider last), we consider minor matters of
-performance.
-Since the new pass will introduce many new instructions, it will increase the
-size of code each pass must transform, and thus slow down the compiler.
-If we place the new pass after @racket[normalize-bind], then 1 fewer pass has
-to run on the larger code.
+We're also likely to add @values-lang-v5[call] in value context.
+Notice that @racket[normalize-bind] is sensitive to forms in
+@imp-mf-lang-v5[value] position, in particular, on the right-hand side of a
+@imp-mf-lang-v5[set!].
+This suggests we should avoid transforming @values-lang-v5[call] until after
+performing @racket[normalize-bind].
 
 We conclude the new pass should go just after @racket[normalize-bind].
-Since we're proceeding top-down, we start by extending the first few passes down
-to @racket[normalize-bind].
+We start by extending the first few passes down to @racket[normalize-bind].
 
 @section{Extending front-end with support for call}
 
