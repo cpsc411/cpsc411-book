@@ -29,24 +29,3 @@
     text-decoration-style: dotted;
 }
 */
-
-
-.tab-frame label {
-    color: #07A;
-}
-
-.tab-frame label:hover {
-    color: #07A;
-    text-decoration-line: underline;
-}
-
-.tab-frame input:checked + label {
-    background: unset !important;
-    border-top: solid;
-    border-right: solid;
-    border-left: solid;
-}
-
-.tab-frame table.tab {
-    border: solid;
-}
