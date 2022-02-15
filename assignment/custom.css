@@ -6,22 +6,19 @@
     width: auto !important;
 }
 
-.navsettop {
-    position: fixed;
-    z-index: 1;
-    background: #a7b0be;
-    top: 0;
-    left: 0;
-}
+/* Relies on scribble >= 8.3? (maybe older) */
 
 .tocset {
-    position: fixed;
-    overflow-y: scroll;
-    top: 0rem;
-    bottom: 0;
-    padding: 0rem 0.5rem 0.5rem 0.5rem;
-    background-color: hsl(216, 15%, 70%);
-    border-top: 6rem solid hsl(216, 15%, 70%);
+    border-top: 2rem solid hsl(216, 15%, 70%) !important;
+}
+
+.navsettop {
+    height: unset;
+}
+
+@media all and (max-width: 720px){
+    .navsettop {
+        height: 4rem;
 }
 
 /*
