@@ -8,7 +8,8 @@
   cpsc411/langs/v2
   cpsc411/langs/v3
   cpsc411/langs/v4
-  cpsc411/langs/v5)
+  cpsc411/langs/v5
+  (for-label cpsc411/langs/v5))
 
 @(provide
   (all-defined-out)
@@ -35,7 +36,7 @@ node [ shape="box", fontsize=12 ]
 
 L0 [label="Values-lang v5"];
 L1 [label="Values-unique-lang v5"];
-L2 [label="Proc-imp-mf-lang v5"];
+L2 [label="Proc-imp-cmf-lang v5"];
 L3 [label="Imp-mf-lang v5"];
 L4 [label="Imp-cmf-lang v5"];
 L5 [label="Asm-pred-lang v5"];
@@ -78,9 +79,9 @@ L5 -> L10 [label=" assign-homes-opt"];
 
 L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
-L1 -> L2 [label=" sequentialize-let"];
-L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" normalize-bind"];
+L1 -> L3 [label=" sequentialize-let"];
+L3 -> L2 [label=" normalize-bind"];
+L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5 [label=" select-instructions"];
 
 L10 -> L11 [label=" expose-basic-blocks"];
@@ -449,17 +450,15 @@ language of our new pass.
 Since we changed the target of @racket[normalize-bind] to allow nested
 @imp-cmf-lang-v5[begin], we can still place our new pass before or after
 @racket[normalize-bind].
-
-Finally (and it's important to consider last), we consider minor matters of
-performance.
-Since the new pass will introduce many new instructions, it will increase the
-size of code each pass must transform, and thus slow down the compiler.
-If we place the new pass after @racket[normalize-bind], then 1 fewer pass has
-to run on the larger code.
+We're also likely to add @values-lang-v5[call] in value context.
+Notice that @racket[normalize-bind] is sensitive to forms in
+@imp-mf-lang-v5[value] position, in particular, on the right-hand side of a
+@imp-mf-lang-v5[set!].
+This suggests we should avoid transforming @values-lang-v5[call] until after
+performing @racket[normalize-bind].
 
 We conclude the new pass should go just after @racket[normalize-bind].
-Since we're proceeding top-down, we start by extending the first few passes down
-to @racket[normalize-bind].
+We start by extending the first few passes down to @racket[normalize-bind].
 
 @section{Extending front-end with support for call}
 
@@ -616,7 +615,7 @@ top-level @ch3-tech{lexical identifiers} into unique labels, and all other
 }
 ]
 
-Next we design @deftech{Proc-imp-mf-lang v5}, an imperative language in monadic
+Next we design @deftech{Imp-mf-lang v5}, an imperative language in monadic
 form with procedures.
 We typeset the differences compared to @tech{Values-unique-lang v5}.
 
@@ -634,61 +633,17 @@ things, from the main chapter?}
 
 @nested[#:style 'inset
 @defproc[(sequentialize-let (p values-unique-lang-v5?))
-         proc-imp-mf-lang-v5?]{
-Compiles @tech{Values-unique-lang v5} to @tech{Proc-imp-mf-lang v5} by picking a
+         imp-mf-lang-v5?]{
+Compiles @tech{Values-unique-lang v5} to @tech{Imp-mf-lang v5} by picking a
 particular order to implement @values-unique-lang-v5[let] expressions using
-@proc-imp-mf-lang-v5[set!].
+@proc-imp-cmf-lang-v5[set!].
 }
 ]
 
-@section{Implementing Calling Conventions}
-
-Now we can design @deftech{Imp-mf-lang v5}.
-The design follows the needs of the translation we designed in @Secref{design-convention-translation}.
-
-@bettergrammar*-ndiff[
-#:labels ("Diff vs Source" "Diff vs v4" "Imp-cmf-lang v5")
-(proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
-(imp-cmf-lang-v4 imp-cmf-lang-v5)
-(imp-cmf-lang-v5)
-]
-
-@todo{Probably want to move that module info field into the blocks earlier, and
-regularize definitions. But that requires introducing an order on definitions,
-which is annoying ....}
-
-We remove the @proc-imp-mf-lang-v5[call] form and replace it by the
-@imp-mf-lang-v5[jump] form.
-As described in @Secref{design-convention-translation}, all @tech{calls} are
-compiled to a sequence of @imp-mf-lang-v5[set!]s moving the @tech{arguments}
-followed by a @imp-mf-lang-v5[jump], and all @tech{procedure} definitions are
-compiled to a block that assigns the @tech{parameters}, as directed by the
-calling convention.
-
-Note that we now require @tech{physical locations} in the target language, so we
-must gradually expose @ch2-tech{physical locations} up to this language from the rest
-of the compiler.
-
 @nested[#:style 'inset
-@defproc[(impose-calling-conventions (p proc-imp-mf-lang-v5))
-         imp-mf-lang-v5.p?]{
-Compiles @tech{Proc-imp-mf-lang v5} to @tech{Imp-mf-lang v5} by imposing calling
-conventions on all calls and procedure definitions.
-The parameter registers are defined by the list
-@racket[current-parameter-registers].
-}
-]
-
-Finally, we design @deftech{Imp-cmf-lang v5}.
-
-@bettergrammar*-diff[imp-mf-lang-v5 imp-cmf-lang-v5]
-
-There are no interesting changes.
-
-@nested[#:style 'inset
-@defproc[(normalize-bind (p imp-mf-lang-v5.p))
-          imp-cmf-lang-v5.p]{
-Compiles @tech{Imp-mf-lang v5} to @tech{Imp-cmf-lang v5}, pushing
+@defproc[(normalize-bind (p imp-mf-lang-v5?))
+          proc-imp-cmf-lang-v5?]{
+Compiles @tech{Imp-mf-lang v5} to @tech{Proc-imp-cmf-lang v5}, pushing
 @imp-mf-lang-v5[set!] under @imp-mf-lang-v5[begin] so that the right-hand-side
 of each @imp-mf-lang-v5[set!] is simple value-producing operation.
 
@@ -704,6 +659,64 @@ This normalizes @tech{Imp-mf-lang v5} with respect to the equations:
 "="
 @imp-mf-lang-v5[(if pred (set! aloc value_1) (set! aloc value_2))]))
 ]
+}
+]
+
+@section{Implementing Calling Conventions}
+
+Now we can design the language for our calling convention translation.
+
+We start with the source language, @deftech{Proc-imp-cmf-lang v5}.
+The design follows the needs of the translation we designed in @Secref{design-convention-translation}.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs Imp-cmf-lang v4" "Proc-imp-cmf-lang v5")
+(imp-mf-lang-v5 proc-imp-cmf-lang-v5)
+(imp-cmf-lang-v4 proc-imp-cmf-lang-v5)
+(proc-imp-cmf-lang-v5)
+]
+
+@todo{Probably want to move that module info field into the blocks earlier, and
+regularize definitions. But that requires introducing an order on definitions,
+which is annoying ....
+
+I no longer remember what this refers to}
+
+@tech{Proc-imp-cmf-lang v5} serves as the target for @racket[normalize-bind], so
+viewed in comparison to the source for @racket[normalize-bind], it merely
+removes the nesting in @imp-cmf-lang-v5[value] context.
+The previous iteration of this intermediate language is @ch4-tech{Imp-cmf-lang
+v4}; compared with that, we simply add the @tech{procedure} abstractions, namely
+@tech{tail calls} and @tech{procedure} definitions.
+
+Next, we design @deftech{Imp-cmf-lang v5}, the target language of
+@racket[impose-calling-conventions].
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source (excerpts)" "Imp-cmf-lang v5")
+(#:exclude (relop binop int64 aloc label pred) proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
+(imp-cmf-lang-v5)
+]
+
+Compared to the source, we remove the @proc-imp-cmf-lang-v5[call] form and
+replace it by the @imp-mf-lang-v5[jump] form.
+As described in @Secref{design-convention-translation}, all @tech{calls} are
+compiled to a sequence of @imp-mf-lang-v5[set!]s moving the @tech{arguments}
+followed by a @imp-mf-lang-v5[jump], and all @tech{procedure} definitions are
+compiled to a block that assigns the @tech{parameters}, as directed by the
+@tech{calling convention}.
+
+Note that we now require @ch2-tech{physical locations} in the target language, so we
+must gradually expose @ch2-tech{physical locations} up to this language from the rest
+of the compiler.
+
+@nested[#:style 'inset
+@defproc[(impose-calling-conventions (p proc-imp-cmf-lang-v5?))
+         imp-cmf-lang-v5?]{
+Compiles @tech{Proc-imp-cmf-lang v5} to @tech{Imp-cmf-lang v5} by imposing
+calling conventions on all calls and procedure definitions.
+The parameter registers are defined by the list
+@racket[current-parameter-registers].
 }
 ]
 
@@ -901,7 +914,7 @@ Nothing else in the compiler needs to change.
 @deflangs[
 values-lang-v5
 values-unique-lang-v5
-proc-imp-mf-lang-v5
+proc-imp-cmf-lang-v5
 imp-mf-lang-v5
 imp-cmf-lang-v5
 asm-pred-lang-v5

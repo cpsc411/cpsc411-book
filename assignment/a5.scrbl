@@ -94,16 +94,18 @@ to ensure safety.}
 To compile procedure names, you should use @racket[fresh-label].
 }
 
-@exercise{Extend @racket[sequentialize-let] with procedure calls.}
+@exercise{Extend @racket[sequentialize-let] with support for procedure
+definitions and tail calls.}
+
+@exercise{Extend @racket[normalize-bind] with support for procedure definitions
+and tail calls.}
 
 @exercise{Design and implement @racket[impose-calling-conventions]
 
-You should use @racket[current-parameter-registers] rather than hard-coding the
-calling convention registers.
+You should use @racket[current-parameter-registers] and
+@racket[current-return-value-register] rather than hard-coding the calling
+convention registers.
 }
-
-@exercise{Extend @racket[normalize-bind] with support for blocks and the jump
-instruction.}
 
 @exercise{Extend @racket[select-instructions] with support for blocks and the
 jump instruction.}

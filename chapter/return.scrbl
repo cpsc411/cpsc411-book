@@ -218,10 +218,10 @@ available immediately for any new calls, but we will not need the
 
 For convenience, we slightly generalize from @ch5-tech{procedures} and define
 @tech{entry points} that load the @racket[current-return-address-register].
-An @deftech{entry point} is the top-level @proc-imp-mf-lang-v6[tail] expression
+An @deftech{entry point} is the top-level @proc-imp-cmf-lang-v6[tail] expression
 that begins execution of code.
 This happens either as the body of a @ch5-tech{procedure}, or as the initial
-@proc-imp-mf-lang-v6[tail] in a module @proc-imp-mf-lang-v6[(module tail)].
+@proc-imp-cmf-lang-v6[tail] in a module @proc-imp-cmf-lang-v6[(module tail)].
 
 @digression{
 This generalization lets us treat all @tech{returns}, including returning the
@@ -264,7 +264,7 @@ address} stored in @racket[aloc_tmp-ra].
 
 
 @itemlist[
-@item{When transforming an @tech{entry point} @proc-imp-mf-lang-v6[entry], we
+@item{When transforming an @tech{entry point} @proc-imp-cmf-lang-v6[entry], we
 generate:
 @racketblock[
 `(begin
@@ -502,11 +502,11 @@ binding into sequential imperative assignments.
 
 @bettergrammar*-ndiff[
 #:labels ("v5 Diff (excerpts)" "Full")
-(#:exclude (triv opand relop int64 aloc label) proc-imp-mf-lang-v5 proc-imp-mf-lang-v6)
-(proc-imp-mf-lang-v6)
+(#:exclude (triv opand relop int64 aloc label) proc-imp-cmf-lang-v5 proc-imp-cmf-lang-v6)
+(proc-imp-cmf-lang-v6)
 ]
 
-Note that this language contains a definition @proc-imp-mf-lang-v6[entry]
+Note that this language contains a definition @proc-imp-cmf-lang-v6[entry]
 designating the top-level tail used as the @tech{entry point} for each
 @ch5-tech{procedure} and for the module as a whole.
 There is no syntactic distinction, but making a semantic distinction will
@@ -518,10 +518,10 @@ exposed in the surface yet.}
 
 @nested[#:style 'inset
 @defproc[(sequentialize-let (p values-unique-lang-v6?))
-         proc-imp-mf-lang-v6?]{
+         proc-imp-cmf-lang-v6?]{
 Compiles @tech{Values-unique-lang v6} to @tech{Proc-imp-mf-lang v6} by picking a
 particular order to implement @values-unique-lang-v6[let] expressions using
-@proc-imp-mf-lang-v6[set!].
+@proc-imp-cmf-lang-v6[set!].
 }
 ]
 
@@ -584,7 +584,7 @@ field represents newly defined @imp-mf-lang-v6[aloc]s.
 It would not make sense for the same @imp-mf-lang-v6[aloc] to appear in two frames.
 
 @nested[#:style 'inset
-@defproc[(impose-calling-conventions [p proc-imp-mf-lang-v6?]) imp-mf-lang-v6?]{
+@defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v6?]) imp-mf-lang-v6?]{
 Compiles @tech{Proc-imp-mf-lang v6} to @tech{Imp-mf-lang v6} by imposing calling
 conventions on all calls (both tail and non-tail calls), and @tech{entry
 points}.
@@ -1559,7 +1559,7 @@ instructions, represented as a string.
 @deflangs[
 values-lang-v6
 values-unique-lang-v6
-proc-imp-mf-lang-v6
+proc-imp-cmf-lang-v6
 imp-mf-lang-v6
 imp-cmf-lang-v6
 asm-pred-lang-v6
