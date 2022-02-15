@@ -213,40 +213,27 @@ optimization.
 
 
 @exercise{
-Redesign and extend the implementation of @racket[replace-locations] to support
-blocks and the control-flow primitives.
+Redesign and extend the implementation of @racket[replace-locations].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[assign-registers] to assign
-registers for each block.
-
-Recall that you may not use the register @nested-asm-lang-v4[rax], since it is used to
-patch instructions, or @nested-asm-lang-v4[rbp], since it contains the frame pointer.
+Redesign and extend the implementation of @racket[assign-registers].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[conflict-analysis] to
-decorate each block with a conflict graph, then merge them and decorate the
-module with a single conflict graph.
+Redesign and extend the implementation of @racket[conflict-analysis].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[undead-analysis] to collect
-@tech[#:tag-prefixes '("book:" "chp-reg-alloc:")]{undead-out sets} for each block.
-
-Only the @object-code{info} field of each block of the output program is
-modified, with the addition of the the @tech[#:tag-prefixes '("book:" "chp-reg-alloc:")]{undead-out set}.
+Redesign and extend the implementation of @racket[undead-analysis].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[uncover-locals] to add a list
-of all variables used in each block to the info field of the block.
+Redesign and extend the implementation of @racket[uncover-locals].
 }
 
 @exercise{
-Redesign and extend the implementation of @racket[select-instructions] to
-translate value-oriented operations into location-oriented instruction.
+Redesign and extend the implementation of @racket[select-instructions].
 }
 
 @exercise{
