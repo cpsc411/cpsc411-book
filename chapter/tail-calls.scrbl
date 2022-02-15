@@ -154,7 +154,11 @@ Below, we define @deftech{Values-lang v5} by extending @ch4-tech{Values-lang-v4}
 with a @deftech{tail calls}---a procedure @emph{call} in @values-lang-v5[tail]
 position.
 
-@bettergrammar*-diff[values-lang-v4 values-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Values-lang v5")
+(#:exclude (binop relop int64) values-lang-v4 values-lang-v5)
+(values-lang-v5)
+]
 
 A program now begins with a set of declared @deftech{procedures}, named blocks
 of code that are parameterized over some data indicated by the list of names
@@ -175,13 +179,13 @@ Defining what this means in a sensible way is difficult, and requires
 introducing some abstraction to transfer control back from a procedure to the
 middle of some existing computation.
 Recall that a @values-lang-v5[value] in @values-lang-v5[tail] context is
-implicitly the final answer, and is compiled to a @imp-mf-lang-v5[halt]
+implicitly the final answer, and is compiled to a @asm-pred-lang-v5[halt]
 instruction.
 In terms of the lower-level languages, we can understand a @tech{tail call} as
-jumping until the program reaches a @imp-mf-lang-v5[halt] instruction.
+jumping until the program reaches a @asm-pred-lang-v5[halt] instruction.
 
 We already have the machinery to compile procedure definitions and calls.
-Procedure definitions are transformed into basic blocks, and calls into,
+@tech{Procedure} definitions are transformed into basic blocks, and calls into,
 essentially, @tt{jmp} instructions.
 
 The only question is how to pass @tech{arguments}.
@@ -189,12 +193,12 @@ The call instruction needs to know in which locations to store the
 @tech{arguments}, and the called @tech{procedure} needs to know from which
 locations to read its @tech{parameters}.
 The problem is deciding how to ensure the locations end up the same.
+imp
+To solve this, we introduce a @tech{calling convention}.
 
 @todo{Be careful with arguments vs parameters}
 
 @section{Calling Conventions Introduction}
-Introducing a @tech{calling convention} solves the problem mentioned above.
-
 The @deftech{calling convention} gives us a pattern to set up a call to @emph{any}
 procedure.
 We fix a set of @emph{@ch2-tech{physical locations}}.
@@ -206,8 +210,9 @@ Every @tech{call} will first set those locations and pass control to the @tech{p
 Every @tech{procedure} will read from those locations on entry, and move the
 @tech{arguments} into its own @ch2-tech{abstract locations}.
 This way, no procedure needs to know about another's @ch2-tech{abstract
-locations}, and we maintain the per-block regsiter allocator we've used until
-now.
+locations}.
+This allows our register allocator to continue functioning as is, with only a
+small change in scope from the entire program to @tech{procedure} definition.
 
 @digression{
 @todo{This digression seems... more important than a digression.}
@@ -263,8 +268,11 @@ locations} through the register allocator, high in the compiler pipeline.
 Our calling convention is based on the @|x64-abi|.
 We deviate from it slightly and develop a similar, but simplified, calling
 convention.
-The calling convention is defined by parameters in
-@racketmodname[cpsc411/compiler-lib].
+The calling convention is defined by parameters, which will let us be abstract
+with respect to particular choices in the calling convention.
+@margin-note{
+These parameters are all defined in @racketmodname[cpsc411/compiler-lib].
+}
 
 Our calling convention passes the first @racket[n] arguments as registers,
 using the set of registers defined in the parameter
@@ -274,18 +282,19 @@ is defined by the @|x64-abi| to be where the first 6 arguments of any
 @tech{procedure} are stored.
 To deal with an arbitrary number of arguments, we may need more than the
 @racket[n] registers we have available for parameters.
-For the rest, we use fresh frame variables.
+For the rest, we use fresh @ch2-tech{frame variables}.
 
 Since @tech{tail calls} never return, we do not need to worry about what is on
 the frame before a call.
-We can simply overwrite all existing frame variables.
+We can simply overwrite all existing @ch2-tech{frame variables}.
 This means recursive @tech{tail calls} have the same performance characteristic
-as loops: they use a constant amount of stack space, compile directly to jumps,
-and only need registers as long as they use fewer than 6 arguments.
+as, and in fact compile to, loops: they use a constant amount of stack space,
+compile directly to jumps, and only need registers as long as they use fewer
+than 6 arguments.
 
 @subsection[#:tag "design-convention-translation"]{Designing the Calling Convention Translation}
 To design our calling convention translation, we start by looking at how we want
-to translate terms into abstraction we already know about.
+to translate terms into abstractions we already have.
 We then redesign our intermediate languages to support our translation.
 
 @digression{
@@ -340,9 +349,9 @@ limit their live ranges.
 @racketblock[
 `(begin
    (set! ,fv_0 ,v_n) ...
-   (set! ,fv_k-1 ,v_n+k-1) ...
+   (set! ,fv_k-1 ,v_n+k-1)
    (set! ,r_0 ,v_0) ...
-   (set! ,r_n-1 ,v_n-1) ...
+   (set! ,r_n-1 ,v_n-1)
    (jump ,v ,fbp ,r_0 ... ,r_n-1 ,fv_0 ... ,fv_k-1))
 ]
 where:
@@ -363,7 +372,7 @@ as possible.
 
 Here, we decorate the @imp-mf-lang-v5[jump] instruction with its
 @ch-ra-tech{undead-out set}.
-Going top-down, it is not obvious why we would do this.
+Going top-down, it is not obvious why we would do this; let's think ahead:
 @todo{Do I want to include this or leave it for lecture? I think I want the book
 to be self-contained, but I don't want to give away the question from the
 previous chapter... eats a good assignment question. OTOH, students probably
@@ -380,10 +389,16 @@ This means at least exposing @block-pred-lang-v5[jump] through the regsiter
 allocator.
 In @racket[undead-analysis], we will need to decide what set of locations is
 @ch-ra-tech{undead} after a @block-pred-lang-v5[jump].
-In general, if we want to support separate compilation, we cannot answer that
-question.
-To design this @block-pred-lang-v5[jump] abstraction in a way we will be able to
-implement requires explicitly annotating it with its @ch-ra-tech{undead-out set}.
+In general (blame Rice's Theorem), we will not know the target of a
+@block-pred-lang-v5[jump], so we cannot go analyze the target to figure out what
+is live.
+Therefore, we need to either approximate (anything could be live), or we need
+someone to tell us the answer.
+Thankfully, using our @tech{calling convention}, when generating a
+@block-pred-lang-v5[jump], we know exactly which locations will be live---the
+locations used by the caller, and no others.
+So we provide a hint to the undead analysis, annotating each
+@block-pred-lang-v5[jump] with its @ch-ra-tech{undead-out set}.
 }
 
 @;By loading the return address first, we keep live range of @racket[tmp-rp]
