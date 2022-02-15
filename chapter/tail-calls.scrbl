@@ -590,7 +590,12 @@ compile their names to labels rather than @ch2-tech{abstract locations}.
 First, we design @deftech{Values-unique-lang v5}.
 We typeset the differences compared to @tech{Values-lang v5}.
 
-@bettergrammar*-diff[values-lang-v5 values-unique-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs v4" "Values-unique-lang v5")
+(values-lang-v5 values-unique-lang-v5)
+(values-unique-lang-v4 values-unique-lang-v5)
+(values-unique-lang-v5)
+]
 
 As usual, we change local @ch3-tech{lexical identifiers} to @ch2-tech{abstract
 locations}.
@@ -613,7 +618,12 @@ Next we design @deftech{Proc-imp-mf-lang v5}, an imperative language in monadic
 form with procedures.
 We typeset the differences compared to @tech{Values-unique-lang v5}.
 
-@bettergrammar*-diff[values-unique-lang-v5 proc-imp-mf-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs v4" "Imp-mf-lang v5")
+(values-unique-lang-v5 imp-mf-lang-v5)
+(imp-mf-lang-v4 imp-mf-lang-v5)
+(imp-mf-lang-v5)
+]
 
 There are no interesting changes.
 We simply propagate the new procedure forms form down one more level of abstraction.
@@ -634,7 +644,12 @@ particular order to implement @values-unique-lang-v5[let] expressions using
 Now we can design @deftech{Imp-mf-lang v5}.
 The design follows the needs of the translation we designed in @Secref{design-convention-translation}.
 
-@bettergrammar*-diff[proc-imp-mf-lang-v5 imp-mf-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs v4" "Imp-cmf-lang v5")
+(proc-imp-cmf-lang-v5 imp-cmf-lang-v5)
+(imp-cmf-lang-v4 imp-cmf-lang-v5)
+(imp-cmf-lang-v5)
+]
 
 @todo{Probably want to move that module info field into the blocks earlier, and
 regularize definitions. But that requires introducing an order on definitions,
