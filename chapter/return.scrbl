@@ -33,9 +33,9 @@ node [ shape="box", fontsize=12 ]
 
 L0 [label="Values-lang v6"];
 L1 [label="Values-unique-lang v6"];
-L2 [label="Proc-imp-mf-lang v6"];
 L3 [label="Imp-mf-lang v6"];
 L4 [label="Imp-cmf-lang v6"];
+L2 [label="Proc-imp-cmf-lang v6"];
 L5 [label="Asm-pred-lang v6"];
 L6 [label="Asm-pred-lang v6/locals"];
 L7 [label="Asm-pred-lang v6/undead"];
@@ -67,9 +67,9 @@ L9 -> L10 [label=" replace-locations"];
 
 L0 -> L0 [label=" check-values-lang"];
 L0 -> L1 [label=" uniquify"];
-L1 -> L2 [label=" sequentialize-let"];
-L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" normalize-bind"];
+L1 -> L3 [label=" sequentialize-let"];
+L3 -> L2 [label=" normalize-bind"];
+L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5 [label=" select-instructions"];
 
 L10 -> L10 [label=" optimize-predicates"]
@@ -497,7 +497,7 @@ top-level @ch3-tech{lexical identifiers} into unique labels, and all other
 ]
 
 Finally, we expose @tech{non-tail calls} through @racket[sequentialize-let].
-Below we define @deftech{Proc-imp-mf-lang v6}, where we transform lexical
+Below we define @deftech{Proc-imp-cmf-lang v6}, where we transform lexical
 binding into sequential imperative assignments.
 
 @bettergrammar*-ndiff[
@@ -518,10 +518,10 @@ exposed in the surface yet.}
 
 @nested[#:style 'inset
 @defproc[(sequentialize-let (p values-unique-lang-v6?))
-         proc-imp-cmf-lang-v6?]{
-Compiles @tech{Values-unique-lang v6} to @tech{Proc-imp-mf-lang v6} by picking a
+         imp-mf-lang-v6?]{
+Compiles @tech{Values-unique-lang v6} to @tech{Imp-mf-lang v6} by picking a
 particular order to implement @values-unique-lang-v6[let] expressions using
-@proc-imp-cmf-lang-v6[set!].
+@imp-mf-lang-v6[set!].
 }
 ]
 
@@ -584,8 +584,8 @@ field represents newly defined @imp-mf-lang-v6[aloc]s.
 It would not make sense for the same @imp-mf-lang-v6[aloc] to appear in two frames.
 
 @nested[#:style 'inset
-@defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v6?]) imp-mf-lang-v6?]{
-Compiles @tech{Proc-imp-mf-lang v6} to @tech{Imp-mf-lang v6} by imposing calling
+@defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v6?]) imp-cmf-lang-v6?]{
+Compiles @tech{Proc-imp-cmf-lang v6} to @tech{Imp-cmf-lang v6} by imposing calling
 conventions on all calls (both tail and non-tail calls), and @tech{entry
 points}.
 The registers used to passing parameters are defined by
@@ -842,8 +842,8 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
    undead-analysis
    uncover-locals
    select-instructions
-   normalize-bind
    impose-calling-conventions
+   normalize-bind
    sequentialize-let)
   '(module
      (define L.swap.1
@@ -860,8 +860,8 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v6/locals} to
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1115,8 +1115,8 @@ to frame locations.
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1194,8 +1194,8 @@ to frame variables in the new frame.
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1215,8 +1215,8 @@ to frame variables in the new frame.
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1348,8 +1348,8 @@ field.
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1508,8 +1508,8 @@ all nested expressions by generate fresh basic blocks and jumps.
      undead-analysis
      uncover-locals
      select-instructions
-     normalize-bind
      impose-calling-conventions
+     normalize-bind
      sequentialize-let)
     '(module
        (define L.swap.1
@@ -1559,8 +1559,8 @@ instructions, represented as a string.
 @deflangs[
 values-lang-v6
 values-unique-lang-v6
-proc-imp-cmf-lang-v6
 imp-mf-lang-v6
+proc-imp-cmf-lang-v6
 imp-cmf-lang-v6
 asm-pred-lang-v6
 asm-pred-lang-v6/locals
