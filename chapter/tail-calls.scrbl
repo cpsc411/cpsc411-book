@@ -515,9 +515,12 @@ For example, the following is a valid @tech{Values-lang v5} program:
 
 We continue to require that the source program is well bound: all @ch3-tech{lexical
 identifiers} are defined before they are used.
-We also restrict procedure to not bind the same identifier twice.
-We could allow this and define a shadowing order, but this would always
-introduce a dead variable and is probably a mistake in the source language.
+We also restrict @tech{procedures} to not bind the same identifier as a
+@tech{parameter} twice; for example, @values-lang-v5[(lambda (x x) x)] is
+invalid.
+We could allow this and define a shadowing order for @tech{parameters}, but this
+would always introduce a dead variable and is probably a mistake in the source
+language.
 
 We have not introduced a method for dynamically checking that a procedure is
 used correctly yet.
