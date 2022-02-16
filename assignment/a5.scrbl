@@ -26,7 +26,7 @@ This milestone is due @(due 'a5).
 @todo{Design component?}
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a5}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a5}.
 
 @subsection{Learning Objectives}
 @todo{Redo above summary to split out summary from learning objectives.}
@@ -79,15 +79,15 @@ reading the entire chapter.
 
 @section{Exercises}
 
-@exercise{Design and implement @racket[check-values-lang] to validate the safety
-of source programs.
+@exercise[#:optional #t]{Design and implement @racket[check-values-lang] to
+validate the safety of source programs.
 Remember that you will have to reject some safe programs.}
 
-@challenge{Design an extension to @ch5-tech{Values-lang v5} that would enable
-safely passing procedures as arguments.
-Your design should give a grammar for the language, describe the intended
-meaning of any additions to the language, and describe how the features are used
-to ensure safety.}
+@;@exercise[#:optional #t]{Design an extension to @ch5-tech{Values-lang v5} that
+@;would enable safely passing procedures as arguments.
+@;Your design should give a grammar for the language, describe the intended
+@;meaning of any additions to the language, and describe how the features are used
+@;to ensure safety.}
 
 @exercise{Extend @racket[uniquify] to support procedure calls in the source language.
 
