@@ -465,7 +465,11 @@ We start by extending the first few passes down to @racket[normalize-bind].
 We start by formally defining @deftech{Values-lang v5}, the new source language.
 We typeset the difference compared to @ch4-tech{Values-lang v4}.
 
-@bettergrammar*-diff[values-lang-v4 values-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Values-lang v5")
+(values-lang-v4 values-lang-v5)
+(values-lang-v5)
+]
 
 Modules now define a set of @tech{procedures} at the top-level before the
 initial @values-lang-v5[tail].
@@ -476,47 +480,28 @@ The defined @tech{procedures} can be used anywhere in the module.
 We support mutually recursive calls, so @tech{procedures} defined later in the
 module can be referenced by definitions earlier in the module.
 For example, the following is a valid @tech{Values-lang v5} program:
-@; TODO Requires preserving srcloc etc, which ought to have been preserved...
-@;@nested[#:style 'code-inset]{
-@;@values-lang-v5[
-@;(module
-@;  (define odd?
-@;    (lambda (x)
-@;      (if (= x 0)
-@;          0
-@;          (let ([y (- x 1)])
-@;            (even? y)))))
-@;  (define even?
-@;    (lambda (x)
-@;      (if (= x 0)
-@;          1
-@;          (let ([y (- x 1)])
-@;            (odd? y)))))
-@;  (even? 5))
-@;]
-@;}
-
-@codeblock{
+@values-lang-v5-block[
+#:datum-literals (odd? x y even?)
 (module
   (define odd?
     (lambda (x)
       (if (= x 0)
           0
-          (let ([y (+ x -1)])
-            (call even? y)))))
+          (let ([y (- x 1)])
+            (even? y)))))
   (define even?
     (lambda (x)
       (if (= x 0)
           1
-          (let ([y (+ x -1)])
-            (call odd? y)))))
-  (call even? 5))
-}
+          (let ([y (- x 1)])
+            (odd? y)))))
+  (even? 5))
+]
 
 We continue to require that the source program is well bound: all @ch3-tech{lexical
 identifiers} are defined before they are used.
 We also restrict @tech{procedures} to not bind the same identifier as a
-@tech{parameter} twice; for example, @values-lang-v5[(lambda (x x) x)] is
+@tech{parameter} twice; for example, @values-lang-v5[#:datum-literals (x) (lambda (x x) x)] is
 invalid.
 We could allow this and define a shadowing order for @tech{parameters}, but this
 would always introduce a dead variable and is probably a mistake in the source
@@ -536,10 +521,9 @@ procedures.
 This introduces more opportunities for undefined behaviour.
 If we try to compare a procedure to an integer, we will generate code with
 undefined behaviour.
-We therefore must check the source program does not use labels in this way.
+We therefore require that source program does not use labels in this way.
 
-To validate these assumptions, we implement @racket[check-values-lang].
-
+To validate these assumptions, we can implement @racket[check-values-lang].
 
 @racket[check-values-lang] must necessarily rule out many well-defined programs,
 since without modifying the source language, we cannot tell the types of all
@@ -575,8 +559,8 @@ Finally, we have one restriction imposed by the run-time system: the final
 result of the program must be an @values-lang-v5[int64].
 
 @nested[#:style 'inset
-@defproc[(check-values-lang (p Values-lang-v5?))
-          Values-lang-v5?]{
+@defproc[(check-values-lang (p any/c))
+          values-lang-v5?]{
 Validates that the @tech{Values-lang v5} is syntactically well-formed, well
 bound and well typed: all procedure calls pass the correct number of arguments,
 and all @values-lang-v5[binop] and @values-lang-v5[relop] are never used with
@@ -596,7 +580,7 @@ We typeset the differences compared to @tech{Values-lang v5}.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs Source" "Diff vs v4" "Values-unique-lang v5")
-(values-lang-v5 values-unique-lang-v5)
+(#:exclude (relop binop opand triv aloc label int64) values-lang-v5 values-unique-lang-v5)
 (values-unique-lang-v4 values-unique-lang-v5)
 (values-unique-lang-v5)
 ]
@@ -610,8 +594,8 @@ assume they are only used according to the typing rules imposed by
 @racket[check-values-lang].
 
 @nested[#:style 'inset
-@defproc[(uniquify (p Values-lang-v5?))
-         Values-unique-lang-v5?]{
+@defproc[(uniquify (p values-lang-v5?))
+         values-unique-lang-v5?]{
 Compiles @tech{Values-lang v5} to @tech{Values-unique-lang v5} by resolving
 top-level @ch3-tech{lexical identifiers} into unique labels, and all other
 @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
@@ -624,7 +608,7 @@ We typeset the differences compared to @tech{Values-unique-lang v5}.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs Source" "Diff vs v4" "Imp-mf-lang v5")
-(values-unique-lang-v5 imp-mf-lang-v5)
+(#:exclude (opand triv binop relop aloc label int64) values-unique-lang-v5 imp-mf-lang-v5)
 (imp-mf-lang-v4 imp-mf-lang-v5)
 (imp-mf-lang-v5)
 ]
@@ -643,6 +627,27 @@ particular order to implement @values-unique-lang-v5[let] expressions using
 }
 ]
 
+Finally, we need to normalize assignment statements so the right-hand side is a
+"trivial" value.
+Below, design @deftech{Proc-imp-cmf-lang-v5} the target language of
+@racket[normalize-bind].
+
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs v4" "Proc-imp-cmf-lang v5")
+(#:exclude (opand triv binop relop aloc label int64) imp-mf-lang-v5 proc-imp-cmf-lang-v5)
+(imp-cmf-lang-v4 proc-imp-cmf-lang-v5)
+(proc-imp-cmf-lang-v5)
+]
+
+There is no major change, since we've only added @imp-mf-lang-v5[call] to tail
+context, and @racket[normalize-bind] is only concerned with value context.
+Viewed in comparison to the source for @racket[normalize-bind], it merely
+removes the nesting in @imp-cmf-lang-v5[value] context.
+The previous iteration of this intermediate language is @ch4-tech{Imp-cmf-lang
+v4}; compared with that, we simply add the @tech{procedure} abstractions, namely
+@tech{tail calls} and @tech{procedure} definitions.
+
 @nested[#:style 'inset
 @defproc[(normalize-bind (p imp-mf-lang-v5?))
           proc-imp-cmf-lang-v5?]{
@@ -652,15 +657,25 @@ of each @imp-mf-lang-v5[set!] is simple value-producing operation.
 
 This normalizes @tech{Imp-mf-lang v5} with respect to the equations:
 @tabular[
+#:sep @hspace[3]
+#:column-properties '(left center right)
 (list
-(list
-@imp-mf-lang-v5[(set! aloc (begin effect_1 ... value))]
-"="
-@imp-mf-lang-v5[(begin effect_1 ... (set! aloc value))])
-(list
-@imp-mf-lang-v5[(set! aloc (if pred value_1 value_2))]
-"="
-@imp-mf-lang-v5[(if pred (set! aloc value_1) (set! aloc value_2))]))
+ (list
+  @imp-mf-lang-v5-block0[(set! aloc
+                               (begin effect_1 ...
+                                      value))]
+  "="
+  @imp-mf-lang-v5-block0[(begin effect_1 ...
+                                (set! aloc value))])
+ (list
+  @imp-mf-lang-v5-block0[(set! aloc
+                               (if pred
+                                   value_1
+                                   value_2))]
+  "="
+  @imp-mf-lang-v5-block0[(if pred
+                             (set! aloc value_1)
+                             (set! aloc value_2))]))
 ]
 }
 ]
@@ -669,30 +684,13 @@ This normalizes @tech{Imp-mf-lang v5} with respect to the equations:
 
 Now we can design the language for our calling convention translation.
 
-We start with the source language, @deftech{Proc-imp-cmf-lang v5}.
-The design follows the needs of the translation we designed in @Secref{design-convention-translation}.
-
-@bettergrammar*-ndiff[
-#:labels ("Diff vs Source" "Diff vs Imp-cmf-lang v4" "Proc-imp-cmf-lang v5")
-(imp-mf-lang-v5 proc-imp-cmf-lang-v5)
-(imp-cmf-lang-v4 proc-imp-cmf-lang-v5)
-(proc-imp-cmf-lang-v5)
-]
-
 @todo{Probably want to move that module info field into the blocks earlier, and
 regularize definitions. But that requires introducing an order on definitions,
 which is annoying ....
 
 I no longer remember what this refers to}
 
-@tech{Proc-imp-cmf-lang v5} serves as the target for @racket[normalize-bind], so
-viewed in comparison to the source for @racket[normalize-bind], it merely
-removes the nesting in @imp-cmf-lang-v5[value] context.
-The previous iteration of this intermediate language is @ch4-tech{Imp-cmf-lang
-v4}; compared with that, we simply add the @tech{procedure} abstractions, namely
-@tech{tail calls} and @tech{procedure} definitions.
-
-Next, we design @deftech{Imp-cmf-lang v5}, the target language of
+We start with the design of @deftech{Imp-cmf-lang v5}, the target language of
 @racket[impose-calling-conventions].
 
 @bettergrammar*-ndiff[
@@ -730,22 +728,31 @@ hid jumps behind an abstraction boundary in @ch4-tech{Block-pred-lang v4}.
 Thankfully, it is not very difficult to propagate jumps up the compiler
 pipeline.
 The main challenge is in adjusting the register allocator, but we have already
-done the design work to simplify that.
+done the design work to simplify that by annotating jumps with their
+@ch-ra-tech{live}-out sets (which can be directly used as @ch-ra-tech{undead-out
+sets}).
 
 First, we design @deftech{Asm-pred-lang v5}, the target of our
 @racket[select-instructions] pass.
 To see how to extend @racket[select-instructions], we should view the
 difference, we typeset the differences compared to @ch4-tech{Asm-pred-lang v4}.
 
-@bettergrammar*-diff[asm-pred-lang-v4 asm-pred-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Diff vs Source" "Asm-pred-lang v5")
+(#:exclude (relop binop) asm-pred-lang-v4 asm-pred-lang-v5)
+(#:exclude (relop binop) imp-cmf-lang-v5 asm-pred-lang-v5)
+(asm-pred-lang-v5)
+]
 
 The main difference is in the addition of the @racket[jump] instruction.
 Note that the "arguments" to the jump are not part of meaning of the
 instruction; they are just metadata used later by the compiler.
+We also must handle @ch2-tech{physical locations} in the source language, but
+this does not cause many changes.
 
 @nested[#:style 'inset
-@defproc[(select-instructions (p imp-cmf-lang-v5.p))
-         asm-pred-lang-v5.p]{
+@defproc[(select-instructions (p imp-cmf-lang-v5?))
+         asm-pred-lang-v5?]{
 Compiles @tech{Imp-cmf-lang v5} to @tech{Asm-pred-lang v5}, selecting
 appropriate sequences of abstract assembly instructions to implement the
 operations of the source language.
@@ -753,6 +760,39 @@ operations of the source language.
 ]
 
 @subsection{Extending Register Allocation}
+@todo{Probably want to discuss the general approach: analyze blocks
+independently, no CFA}
+Now that we have multiple blocks and jumps, we have a design choice to make in
+our compiler.
+When analyzing the program to determine how variables are used, we can either:
+@itemlist[
+@item{
+interpret the program as a tree, analyzing and allocating registers to each
+block separately and essentially ignoring jumps, or
+}
+@item{
+interpret the program as a graph, trying to follow control and data flow to
+determine the destination of a jump, in order to analyze conflicts and allocate
+registers across jumps.
+}
+]
+The first option is @emph{intraprocedural}; it is simpler, and can simply map
+our existing algorithm essentially unchanged over each block.
+The second option is @emph{interprocedural}.
+It would be more complex, but could do a better job allocating registers in some
+cases by allowing a caller and callee to share some registers, thus eliminating
+some moves introduced during a @tech{procedure} call.
+
+We design our compiler using the first option: extending our existing algorithm
+slightly to an intraprocedural analysis and allocator.
+This requires very few extensions over the existing design, except to handle
+@asm-pred-lang-v5[jump], which we have conveniently annotated with its
+@ch-ra-tech{live}-out set.
+Our calling convention is already quite cheap since we can use registers most of
+the time, and the benefit of interprocedural analysis can be recovered somewhat
+by procedure inlining, which has additional benefits besides.
+This small benefit of interprocedural analysis, in our setting, is not worth
+additional complexity in register allocation, which is already quite complex.
 
 First, we extend @racket[uncover-locals] to analyze jumps.
 We design the administrative language @deftech{Asm-pred-lang v5/locals}
@@ -760,7 +800,12 @@ We design the administrative language @deftech{Asm-pred-lang v5/locals}
 Note that the only difference is in the specification of the
 @asm-pred-lang-v5[info] field.
 
-@bettergrammar*-diff[#:include (info p) asm-pred-lang-v5 asm-pred-lang-v5/locals]
+@bettergrammar*-ndiff[
+#:labels ( "Diff vs v4" "Diff vs Source" "Asm-pred-lang v5/locals")
+(#:include (info p tail) asm-pred-lang-v4/locals asm-pred-lang-v5/locals)
+(#:include (info p) asm-pred-lang-v5 asm-pred-lang-v5/locals)
+(asm-pred-lang-v5/locals)
+]
 
 Note that because the source language now includes blocks, we need to perform
 the local analysis over each block.
@@ -768,19 +813,29 @@ Each block gets its own @asm-pred-lang-v5[info] field, with its own locals set.
 The locals set for the initial tail of the module is stored in the module's info
 field.
 
+We also extend the analysis to support @asm-pred-lang-v5[jump].
+Note that @asm-pred-lang-v5[(jump trg loc ...)] only references
+@asm-pred-lang-v5[trg]; the rest of the @asm-pred-lang-v5[loc] are only
+metadata.
+
 @nested[#:style 'inset
-@defproc[(uncover-locals (p asm-pred-lang-v5.p?))
-         asm-pred-lang-v5/locals.p?]{
+@defproc[(uncover-locals (p asm-pred-lang-v5?))
+          asm-pred-lang-v5/locals?]{
 Compiles @tech{Asm-pred-lang v5} to @tech{Asm-pred-lang v5/locals}, analysing
 which @ch2-tech{abstract locations} are used in each block, and each block and the
 module with the set of variables in an @racket[info?] fields.
 }
 ]
 
-Now our undead algorithm must change to analyze jumps.
+Now our undead analysis must change to analyze jumps.
 @deftech{Asm-pred-lang v5/undead} defines the output of @racket[undead-analysis].
 
-@bettergrammar*-diff[#:include (info tail) asm-pred-lang-v5/locals asm-pred-lang-v5/undead]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Diff vs Source" "Asm-pred-lang v5/undead")
+(#:include (p info tail) asm-pred-lang-v4/undead asm-pred-lang-v5/undead)
+(#:include (info tail) asm-pred-lang-v5/locals asm-pred-lang-v5/undead)
+(asm-pred-lang-v5/undead)
+]
 
 When analyzing a @asm-pred-lang-v5[jump] statement, we need to compute its
 @ch-ra-tech{undead-out set}.
@@ -788,17 +843,18 @@ When analyzing a @asm-pred-lang-v5[jump] statement, we need to compute its
 @todo{Could be a design digression instead}
 In general, this is difficult.
 In general, we may not know the destination of the jump, so we would either have
-to conservatively approximate and say "anything could be live, @ie everything is
-undead", or analyze the control flow of the program, following jumps and
-analyzing the destination.
+to conservatively approximate and say "anything could be @ch-ra-tech{live}, @ie
+everything is @ch-ra-tech{undead}", or analyze the control flow of the program,
+following jumps and analyzing the destination.
 @todo{reference to alternative chapter 4?}
 
 Thankfully, none of that is necessary.
-Because jumps in our language only come from procedure calls, and our calling
-convention translation decorated the jump with the locations used by the
-procedure call, our undead analysis is trivial.
-The @ch-ra-tech{undead-out set} of a jump statement @asm-pred-lang-v5[(jump triv_1
-triv_2 ...)] is the set @racket[triv_2 ...].
+Because jumps in our language only come from @tech{procedure} calls, and our
+calling convention translation decorated the jump with the locations used by the
+@tech{procedure} call, @ie, those locations (expected to be) @ch-ra-tech{live}
+after the jump, our undead analysis is trivial.
+The @ch-ra-tech{undead-out set} of a jump statement @asm-pred-lang-v5[(jump
+trg loc ...)] is the set @asm-pred-lang-v5[(loc ...)].
 @;We simply move this set into the @a3-tech{undead-set tree} for the jump instruction,
 @;discarding it from the instruction in the process.
 @;@todo{If I use Kent's fixpoint algorithm, this can't be discarded here.}
@@ -810,8 +866,8 @@ each block, and store @ch-ra-tech{undead-set trees} in the info field for the
 corresponding block.
 
 @nested[#:style 'inset
-@defproc[(undead-analysis (p Asm-pred-lang-v5/locals?))
-         Asm-pred-lang-v5/undead?]{
+@defproc[(undead-analysis (p asm-pred-lang-v5/locals?))
+         asm-pred-lang-v5/undead?]{
 Performs undead analysis, compiling @tech{Asm-pred-lang v5/locals} to
 @tech{Asm-pred-lang v5/undead} by decorating programs with their @ch-ra-tech{undead-set trees}.
 }
@@ -819,40 +875,53 @@ Performs undead analysis, compiling @tech{Asm-pred-lang v5/locals} to
 
 Next we need to compute the conflict graph.
 
-Below, we design @deftech{Asm-pred-lang v5/conflicts} below with structured
-control-flow.
+Below, we design @deftech{Asm-pred-lang v5/conflicts}.
 
-@bettergrammar*-diff[#:include (info) asm-pred-lang-v5/undead asm-pred-lang-v5/conflicts]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Diff vs Source" "Asm-pred-lang v5/conflicts")
+(#:include (info p tail) asm-pred-lang-v4/conflicts asm-pred-lang-v5/conflicts)
+(#:include (info) asm-pred-lang-v5/undead asm-pred-lang-v5/conflicts)
+(asm-pred-lang-v5/conflicts)
+]
 
-The @racket[conflict-analysis] does not change significantly.
-We simply extend the algorithm to support jump statements.
-Note that @asm-pred-lang-v5[jump] only references but never defines an
-@ch2-tech{abstract location}.
+@racket[conflict-analysis] does not change significantly.
+We simply extend the algorithm to support @asm-pred-lang-v5[jump] statements.
+Note that @asm-pred-lang-v5[(jump trg loc ...)] only references
+@asm-pred-lang-v5[trg], and never defines any @ch2-tech{abstract location}.
 
-Again, the analysis should perform local analysis on each block separately.
+Again, the analysis must perform local analysis on each block separately.
 
 @nested[#:style 'inset
-@defproc[(conflict-analysis (p Asm-pred-lang-v5/undead?))
-         Asm-pred-lang-v5/conflicts?]{
+@defproc[(conflict-analysis (p asm-pred-lang-v5/undead?))
+         asm-pred-lang-v5/conflicts?]{
 Performs conflict analysis, compiling @tech{Asm-pred-lang v5/undead}
 to @tech{Asm-pred-lang v5/conflicts} by decorating programs with their conflict
 graph.
 }
 ]
 
-The graph colouring register alloctor does not need major changes.
+The register allocator does not need major changes.
+Notably, since the allocator is defined over the conflict graph, instead of over
+the program, it needs even fewer changes to support the new instructions in the
+language.
+
 Below we define @deftech{Asm-pred-lang v5/assignments}, which only changes in
 the @asm-pred-lang-v5[info] field as usual.
 
-@bettergrammar*-diff[#:include (info) asm-pred-lang-v5/conflicts asm-pred-lang-v5/assignments]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Diff vs Source" "Asm-pred-lang-v5/assignments")
+(#:include (info tail p) asm-pred-lang-v4/assignments asm-pred-lang-v5/assignments)
+(#:include (info) asm-pred-lang-v5/conflicts asm-pred-lang-v5/assignments)
+(asm-pred-lang-v5/assignments)
+]
 
-The allocator should run the same algorithm as before, but this time, on each
-block separately.
+The allocator simply runs the same algorithm as before, but this time, on each
+block's conflict graph, separately.
 
 @nested[#:style 'inset
-@defproc[(assign-registers (p Asm-pred-lang-v5/conflicts?))
-         Asm-pred-lang-v5/assignments?]{
-Performs graph-colouring register allocation, compiling
+@defproc[(assign-registers (p asm-pred-lang-v5/conflicts?))
+          asm-pred-lang-v5/assignments?]{
+Performs @ch-ra-tech{graph-colouring register allocation}, compiling
 @tech{Asm-pred-lang v5/conflicts} to @tech{Asm-pred-lang v5/assignments} by
 decorating programs with their register assignments.
 }
@@ -861,7 +930,14 @@ decorating programs with their register assignments.
 Finally, we actually replace @ch2-tech{abstract locations} with
 @ch2-tech{physical locations}.
 
-@bettergrammar*-diff[asm-pred-lang-v5/assignments nested-asm-lang-v5]
+We design the source, @tech{Nested-asm-lang v5} below, although we discuss its
+design later.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Nested-asm-lang v5")
+(#:include (p info tail loc) asm-pred-lang-v5/assignments nested-asm-lang-v5)
+(nested-asm-lang-v5)
+]
 
 We need to extend the implementation to traverse each block, and support jump
 statements.
@@ -871,39 +947,56 @@ In the process, we also discard the undead annotations on the jump instruction.
 @defproc[(replace-locations [p asm-pred-lang-v5/assignments?])
          nested-asm-lang-v5?]{
 Replaces all @ch2-tech{abstract location} with @ch2-tech{physical locations}
-using the assignment described in the @asm-pred-lang-v5[assignment] info field.
+using the assignment described in the @asm-pred-lang-v5[assignment] info field,
+and dropping any register-allocation-related metadata from the program.
 }
 ]
 
 @subsection{Exposing Basic Blocks}
 The last update need to make is to @racket[expose-basic-blocks].
+
 We design the source, @deftech{Nested-asm-lang v5} below, typeset compared to
 @ch4-tech{Nested-asm-lang v4}
 
-@bettergrammar*-diff[nested-asm-lang-v4 nested-asm-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Nested-asm-lang v5")
+(#:include (p info tail trg opand triv) nested-asm-lang-v4 nested-asm-lang-v5)
+(nested-asm-lang-v5)
+]
 
 The main difference is the inclusion of @nested-asm-lang-v5[jump] expressions and
 block definitions.
 These do not complicate the process of exposing basic blocks much.
-We simply need to traverse each block, exposing new blocks in the process.
+We have only added @nested-asm-lang-v5[jump] in tail position, which matches the
+requirement for a basic block already.
+To extend @racket[expose-basic-blocks], we simply need to traverse each block,
+transforming it into a basic block, and exposing new basic blocks in the
+process.
 
 Note that we again need to impose the convention that execution begins with the
 first basic block, and move the initial @nested-asm-lang-v5[tail] into an explicit
-block.
+basic block.
 
-The target language is @deftech{Block-pred-lang v5}, typeset compared to
-@ch4-tech{Block-pred-lang v4} below.
+The target language is @deftech{Block-pred-lang v5}, has no changes compared to
+@ch4-tech{Block-pred-lang v4}.
 
-@bettergrammar*-diff[block-pred-lang-v4 block-pred-lang-v5]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v4" "Diff vs Source" "Block-pred-lang v5")
+(#:include (p b pred tail effect) block-pred-lang-v4 block-pred-lang-v5)
+(nested-asm-lang-v5 block-pred-lang-v5)
+(block-pred-lang-v5)
+]
 
 @nested[#:style 'inset
 @defproc[(expose-basic-blocks (p nested-asm-lang-v5?))
-          block-pred-lang-v5]{
+          block-pred-lang-v5?]{
 Compile the @tech{Nested-asm-lang v5} to @tech{Block-pred-lang v5}, eliminating
 all nested expressions by generate fresh basic blocks and jumps.
 }
 ]
 
+@tech{Tail calls} are implemented completely as an abstraction over basic
+blocks, with a convention about shared @ch-ra-tech{physical locations}.
 Nothing else in the compiler needs to change.
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
