@@ -500,12 +500,25 @@ For example, the following is a valid @tech{Values-lang v5} program:
 
 We continue to require that the source program is well bound: all @ch3-tech{lexical
 identifiers} are defined before they are used.
-We also restrict @tech{procedures} to not bind the same identifier as a
+But we have new binding rules.
+We restrict @tech{procedures} to not bind the same identifier as a
 @tech{parameter} twice; for example, @values-lang-v5[#:datum-literals (x) (lambda (x x) x)] is
 invalid.
 We could allow this and define a shadowing order for @tech{parameters}, but this
 would always introduce a dead variable and is probably a mistake in the source
 language.
+We also forbid the same identifier being defined twice at the top level.
+For example:
+@values-lang-v5-block[
+#:datum-literals (f x)
+(module
+  (define f (lambda (x) x))
+  (define f (lambda (x) 5))
+  5)
+]
+is invalid.
+Since we support mutually recursive @tech{procedures}, there isn't a sensible
+way to define this binding.
 
 We have not introduced a method for dynamically checking that a procedure is
 used correctly yet.
