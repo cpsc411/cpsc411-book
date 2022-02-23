@@ -9,11 +9,6 @@
 @(reset-exercise-counter!)
 @(reset-challenge-counter!)
 
-@; NB: Do not line wrap this as it might break the link
-@(define x64-abi
-   @hyperlink["https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI"]{x64
-   System V ABI})
-
 @title[#:tag "top" #:tag-prefix "a6:"]{Milestone 6: Adding Return}
 
 @section{Assignment Summary}
@@ -25,7 +20,7 @@ contexts.
 This assignment is due @(due 'a6).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a6}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a6}.
 
 @todo{Design component?}
 
@@ -63,9 +58,9 @@ assign-frame-variables
 @typeset-passlist[
 impose-calling-conventions
 undead-analysis
+assign-registers
 expose-basic-blocks
 implement-fvars
-assign-registers
 ]
 
 @emph{Minor modifications to passes}
@@ -105,8 +100,8 @@ reading the entire chapter.
 
 @section{Exercises}
 
-@exercise{Extend @racket[check-values-lang] to validate the safety
-of source programs.
+@exercise[#:optional #t]{Extend @racket[check-values-lang] to validate the
+safety of source programs.
 Remember that you will have to reject some safe programs.
 }
 
@@ -116,6 +111,8 @@ language.
 
 @exercise{Extend @racket[sequentialize-let] with non-tail calls.}
 
+@exercise{Extend @racket[normalize-bind] with support for return points.}
+
 @exercise{Extend @racket[impose-calling-conventions] with support for non-tail
 calls and return.
 
@@ -123,8 +120,6 @@ You should use @racket[current-return-address-register] and
 @racket[current-return-value-register] rather than hard-coding the calling
 convention registers.
 }
-
-@exercise{Extend @racket[normalize-bind] with support for return points.}
 
 @exercise{Extend @racket[select-instructions] with support for return points.}
 
@@ -135,7 +130,7 @@ convention registers.
 @margin-note{
 Hint:
 
-The simplest way to get the @asm-pred-lang-v6/undead[call-undead] locations is
+A simple way to get the @asm-pred-lang-v6/undead[call-undead] locations is
 to use a single mutable variable that is local to the helper function that
 processes definition.
 See @racket[box]
@@ -155,7 +150,7 @@ spilling.
 You may be able to reuse a lot of code from
 @racket[assign-call-undead-variables], if abstracted properly.
 
-It might help to re-imagine the "pick a low-degree variable" progress in the
+It might help to re-imagine the "pick a low-degree variable" process in the
 allocation algorithm as a sorting problem.
 If the variables are sorted in degree order, then the core assignment algorithm
 doesn't need to know about degrees---it always picks the first variable in the
