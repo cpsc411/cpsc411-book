@@ -122,5 +122,8 @@ instruction.}
 @exercise{Extend @racket[assign-registers] with support for blocks and the jump
 instruction.}
 
+@exercise{Extend @racket[replace-locations] with support for blocks and the jump
+instruction.}
+
 @exercise{Extend @racket[expose-basic-blocks] with support for blocks and the jump
 instruction in the source.}
