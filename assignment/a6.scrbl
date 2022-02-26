@@ -140,13 +140,20 @@ See @racket[box]
 
 @exercise{Extend @racket[conflict-analysis] with support for return points.}
 
-@exercise{Design and implement @racket[assign-call-undead-variables].}
+@exercise{Design and implement @racket[assign-call-undead-variables].
+
+@emph{Hint:}
+Because the core algorithm is similar, much of the core algorithm can be
+abstracted and reused between this pass and @racket[assign-registers].
+}
+}
 
 @exercise{Design and implement @racket[allocate-frames].}
 
 @exercise{Extend @racket[assign-registers] to avoid directly implementing
 spilling.
 
+@emph{Hint:}
 You may be able to reuse a lot of code from
 @racket[assign-call-undead-variables], if abstracted properly.
 
@@ -170,6 +177,7 @@ You should use the parameter @racket[current-assignable-registers].
 
 Be careful when computing which frame variables cannot be used; your conflict
 graph contains a mix of abstract locations and frame locations.}
+
 
 @exercise{Extend @racket[replace-locations] to support return points and
 non-tail calls.}
