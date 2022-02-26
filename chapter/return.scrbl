@@ -178,8 +178,35 @@ when @ch1-tech{x64} supports it.
 This requires almost no changes to the compiler if it parameterized by the set
 of @values-lang-v6[binop]s.
 
-@section{Extending our Calling Convention}
 
+@section{The Stack (of Frames)}
+The key challenge in implementing @tech{return} has little to do with
+implementing control flow---tweaking the the calling convention add labels and
+jumps and a convention on how use them is pretty easy.
+The hard part is how to keep track of all the values of variables that are live
+after a call.
+
+For example, consider the following @tech{Values-lang v6} program:
+@values-lang-v6-block[
+(module
+  ....
+  (define f (lambda (x) ....))
+  (let ([z 6]
+        [y (call f 5)])
+    (+ z y)))
+]
+The value of @values-lang-v6[#:datum-literals (z) z] is needed after the
+@tech{non-tail call} to @values-lang-v6[#:datum-literals (f) f].
+To which @ch2-tech{physical location} can we assign
+@values-lang-v6[#:datum-literals (z) z] to ensure its value is not overwritten
+after the call?
+
+Locally, we have no way of knowing.
+@values-lang-v6[#:datum-literals (f) f] could overwrite any register and any
+@ch2-tech{frame variable}.
+
+
+@section{Extending our Calling Convention}
 @;{
 
 Prior to each call, the caller will store a return address in the parameter
@@ -254,9 +281,8 @@ branch predictor, and could easily be optimized away by a small pass nearly
 anywhere in the compiler pipeline.
 }
 
-Second, we need to a way to introduce a @tech{return address} and update the
-@racket[current-return-address-register] prior to jumping to the procedure for
-@tech{non-tail calls}.
+Second, we need to a way to introduce a @tech{return address} at a
+@tech{non-tail call}, so we can actually return to the middle of a computation.
 Since we do not have access to labels @ch5-tech{Imp-mf-lang v5}, we need to
 introduce an abstraction for creating a @tech{return address} in our new
 intermediate language.
@@ -274,7 +300,7 @@ After returning, the code at the @tech{return address} will read from a
 designated register and continue the rest of the computation.
 We reuse the @racket[current-return-value-register] as this designated register.
 
-Finally, we need to explicitly return a value in @imp-cmf-lang-v6[tail] position.
+Third, we need to explicitly return a value in @imp-cmf-lang-v6[tail] position.
 Previously, the final value in @imp-cmf-lang-v6[tail] position was also the final
 value of the program.
 This value was implicitly returned to the run-time system.
@@ -284,6 +310,11 @@ non-tail call.
 We transform a value in @imp-cmf-lang-v6[tail] position by moving it into the
 @racket[current-return-value-register], and jumping to the @tech{return
 address} stored in @racket[tmp-ra].
+
+Finally, when setting up a @tech{non-tail call}, we must ensure that arguments
+are placed on the callee's @tech{frame} instead of the caller's @tech{frame}.
+Recall that our @ch5-tech{calling convention} passes @ch5-tech{parameters} in
+@ch2-tech{frame variables} when they don't fit in registers.
 
 Making this all concreate, we implement our new calling convention with the
 following transformations:
