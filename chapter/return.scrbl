@@ -103,8 +103,6 @@ subgraph DoNotcluster1 {
 ]
 
 @title[#:tag "top" #:tag-prefix "chp-return:"]{Procedural Abstraction: Return}
-@(define (ch5-tech . rest)
-   (apply tech #:tag-prefixes '("book:" "chp5:") rest))
 
 @section{Preface: What's wrong with our language?}
 In @ch5-tech{Values-lang v5}, we added a limited form of @ch5-tech{procedure}
@@ -123,34 +121,41 @@ forces programmers use it.
 To allow @ch5-tech{calls} in arbitrary context, we need the @deftech{return}
 abstraction, which allows the language to essentially jump back from a
 @ch5-tech{procedure} call into the middle of a computation.
-Thankfully, we already have the abstractions required to implement this: labels,
-jumps, and a calling convention.
+Thankfully, we already have the low-level abstractions required to implement
+this: labels, jumps, and a calling convention.
 All we need to do is slightly generalize the calling convention to introduce a
-new label at the return point of a procedure call, store that label
+new label at the point to which a @ch5-tech{procedure} @ch5-tech{call} must
+@tech{return} after performing its effect or computing a value, store that label
 somewhere, and arrange for the caller to jump back to that label.
 
 @digression{
 We might think we could pre-process @tech{Values-lang v6} to lift all non-tail
-calls into new procedure and rewrite the program to have only tail calls.
-This would correspond to a CPS transformation and would be difficult to optimize
-correctly, particularly at this level of abstraction.
+calls into new procedures and rewrite the program to have only tail calls.
+This is possible, but would correspond to a CPS transformation.
+Thisand would be difficult to implement with without the @ch9-tech{closure}
+abstraction, which we do not have yet, and difficult to optimize, particularly
+at this level of abstraction.
 Each non-tail call would introduce an entire procedure call setup to the "rest"
 of the body, as a continuation.
 Any parameters live across the non-tail call would need to be packaged and
 explicitly passed as arguments to the continuation.
-By creating a return point abstraction, later in the compiler when we have
-access to lower-level abstraction (basic blocks), we'll instead be able to
-generate a single jump back to this return point, instead of a whole procedure
-call.
+By creating a @tech{return point} abstraction, later in the compiler when we
+have access to lower-level abstraction (basic blocks), we'll instead be able to
+generate a single jump back to this @tech{return point}, instead of a whole
+@ch5-tech{procedure} @ch5-tech{call}.
 }
 
 @section{Designing a source language with return}
 Below, we define @deftech{Values-lang v6} by extending @ch5-tech{Values-lang-v5}
 with a @tech{return}, and with @ch5-tech{calls} in arbitrary contexts.
 
-@bettergrammar*-diff[values-lang-v5 values-lang-v6]
+@bettergrammar*-ndiff[
+#:labels ("Diff" "Values-lang v6")
+(#:exclude (pred triv relop int64 x) values-lang-v5 values-lang-v6)
+(values-lang-v6)
+]
 
-The only syntactic change is the addition of @values-lang-v6[(call triv triv
+The major syntactic change is the addition of @values-lang-v6[(call triv triv
 ...)] in @values-lang-v6[value] context.
 The implementation of this requires a semantic change to call, to ensure it
 @tech{returns}.
@@ -159,9 +164,9 @@ would return the value @values-lang-v6[x], and not @values-lang-v6[(+ 1 x)] as
 intended.
 
 Note that @values-lang-v6[tail] and @values-lang-v6[value] context now coincide.
-We do not collapse them yet, as imposing a distinction will improve our
-compiler, by allowing us to transform @ch5-tech{tail calls} (which need not
-@tech{return}) separately from @deftech{non-tail calls}, @ie
+We do not collapse them yet, as imposing a distinction will let us
+systematically derive a compiler design that transforms @ch5-tech{tail calls}
+(which need not @tech{return}) separately from @deftech{non-tail calls}, @ie
 @ch5-tech{calls} in any context other than @values-lang-v6[tail] context.
 This will let us maintain the performance characteristics of @ch5-tech{tail
 calls}, namely that they use a constant amount of stack space, and do not need
@@ -199,69 +204,89 @@ convention}, but only aimed to support @ch5-tech{calls} without @tech{return}.
 We need to modify it in three ways to support @tech{return}, and @tech{non-tail calls}.
 
 First, we modify how we transform each procedure.
-When generating code for a procedure, we cannot know (Rice's Theorem) whether it
-will need to return or not, @ie whether it will be called via a @ch5-tech{tail
-call} or @tech{non-tail call}.
+When generating code for a procedure, we cannot know in general (Rice's Theorem)
+whether it will need to return or not, @ie whether it will be called via a
+@ch5-tech{tail call} or @tech{non-tail call}.
 We therefore design our calling convention to enable any procedure to
 @tech{return}.
 
 We modify our @ch5-tech{calling convention}, designating a register
 @racket[current-return-address-register] in which to pass the
-@deftech{return address}, the label to which the @ch5-tech{procedure} will jump
-after it is finish executing.
+@deftech{return address}, the label for the instruction following a
+@tech{non-tail call}.
+By default, we use @racket[(unsyntax (current-return-address-register))]
+as the @racket[current-return-address-register].
+Every @ch5-tech{procedure} will jump to this @tech{return address} after it is
+finish executing.
 On entry to any @ch5-tech{procedure}, we load the
 @racket[current-return-address-register] into a fresh @ch2-tech{abstract
-location}, which we call @imp-mf-lang-v6[aloc_tmp-ra].
+location}, which we call @racket[tmp-ra].
 This is necessary since the @racket[current-return-address-register] needs to be
 available immediately for any new calls, but we will not need the
 @tech{return address} until the end of the procedure.
 
-For convenience, we slightly generalize from @ch5-tech{procedures} and define
-@tech{entry points} that load the @racket[current-return-address-register].
+To clarify this idea of @emph{on entry}, we introduce a contextual distinction
+between the first @proc-imp-cmf-lang-v6[tail], and other
+@proc-imp-cmf-lang-v6[tail]s in the syntax of the source language.
 An @deftech{entry point} is the top-level @proc-imp-cmf-lang-v6[tail] expression
-that begins execution of code.
+that begins execution of code, and each @tech{entry point} must load the
+@racket[current-return-address-register], preserve its value, and @tech{return}
+to it when finished.
 This happens either as the body of a @ch5-tech{procedure}, or as the initial
 @proc-imp-cmf-lang-v6[tail] in a module @proc-imp-cmf-lang-v6[(module tail)].
+@bettergrammar*-ndiff[
+#:labels ("Proc-imp-mf-lang v6 (excerpt)")
+(#:include (p tail entry) proc-imp-cmf-lang-v6)
+]
 
 @digression{
 This generalization lets us treat all @tech{returns}, including returning the
 final value to the run-time system, uniformly, and allows us to eliminate the
-@imp-mf-lang-v5[halt] instruction.
+@asm-pred-lang-v5[halt] instruction.
 This isn't necessary; we could continue to support
-@imp-mf-lang-v5[halt] and treat the module-level @tech{entry point} separate
+@asm-pred-lang-v5[halt] and treat the module-level @tech{entry point} separate
 from @ch5-tech{procedures}.
 However, there is no benefit to doing so, and it clutters the compiler with
 special cases.
-The only benefit of keeping @imp-mf-lang-v5[halt] would be saving a single jump
+The only benefit of keeping @asm-pred-lang-v5[halt] would be saving a single jump
 instruction, but this has almost no cost, will probably be predicted by a CPU's
 branch predictor, and could easily be optimized away by a small pass nearly
 anywhere in the compiler pipeline.
 }
 
-By default, we use @racket[(unsyntax (current-return-address-register))]
-as the @racket[current-return-address-register].
-
-Second, we need to modify @tech{non-tail calls} to create the @tech{return
-address} and update the @racket[current-return-address-register] prior to
-jumping to the procedure.
-Since we do not have access to labels @ch5-tech{Imp-mf-lang v5}, we will need to
+Second, we need to a way to introduce a @tech{return address} and update the
+@racket[current-return-address-register] prior to jumping to the procedure for
+@tech{non-tail calls}.
+Since we do not have access to labels @ch5-tech{Imp-mf-lang v5}, we need to
 introduce an abstraction for creating a @tech{return address} in our new
 intermediate language.
+We introduce a @deftech{return point}, which creates a @imp-cmf-lang-v6[label]
+for a @imp-cmf-lang-v6[tail] in @imp-cmf-lang-v6[effect] context, so the
+@imp-cmf-lang-v6[effect] position for this language is:
+@bettergrammar*-ndiff[
+#:labels ("Imp-cmf-lang v6 (excerpt)")
+(#:include (effect) imp-cmf-lang-v6)
+]
+A @tech{return point} contains a @imp-cmf-lang-v6[tail], since that computation
+"ends" locally, jumping elsewhere, but is an @imp-cmf-lang-v6[effect], since it
+updates the state of the machine to return to control this location.
 After returning, the code at the @tech{return address} will read from a
 designated register and continue the rest of the computation.
 We reuse the @racket[current-return-value-register] as this designated register.
 
-Finally, we need to explicitly return a value in @imp-mf-lang-v6[tail] position.
-Previously, the final value in @imp-mf-lang-v6[tail] position was also the final
+Finally, we need to explicitly return a value in @imp-cmf-lang-v6[tail] position.
+Previously, the final value in @imp-cmf-lang-v6[tail] position was also the final
 value of the program.
 This value was implicitly returned to the run-time system.
-However, now, a value in @imp-mf-lang-v6[tail] position may either be returned
+However, now, a value in @imp-cmf-lang-v6[tail] position may either be returned
 to the run-time system, or may be returned to some other computation from a
 non-tail call.
-We transform a value in @imp-mf-lang-v6[tail] position by moving it into the
+We transform a value in @imp-cmf-lang-v6[tail] position by moving it into the
 @racket[current-return-value-register], and jumping to the @tech{return
-address} stored in @racket[aloc_tmp-ra].
+address} stored in @racket[tmp-ra].
 
+Making this all concreate, we implement our new calling convention with the
+following transformations:
 
 @itemlist[
 @item{When transforming an @tech{entry point} @proc-imp-cmf-lang-v6[entry], we
@@ -298,8 +323,6 @@ where:
 }
 @item{@racket[r_0 _... r_n-1] are the @racket[n] physical locations from
 @racket[current-parameter-registers].}
-
-
 ]
 
 The order of the @imp-mf-lang-v5[set!]s is not important for correctness, but
@@ -334,9 +357,9 @@ current @tech{entry point}.}
 ]
 }
 
-@item{When transforming a base @imp-mf-lang-v6[value] (either a
-@imp-mf-lang-v6[triv] or @imp-mf-lang-v6[(binop opand opand)]) @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
-position we generate:
+@item{When transforming a @tech{return}, @ie, a base @imp-mf-lang-v6[value]
+(either a @imp-mf-lang-v6[triv] or @imp-mf-lang-v6[(binop opand opand)])
+@imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail] position we generate:
 @racketblock[
 `(begin
    (set! ,rv ,value)
@@ -378,18 +401,20 @@ so when the call is complete we can return to the instruction after the call.
 This @imp-mf-lang-v6[return-point] will be a new instruction in the target
 language that introduces a fresh label @racket[rp-label].
 
-Note that our non-tail calls can appear in value position, for example, as the
-right-hand side of a @imp-mf-lang-v6[(set! aloc value)] instruction.
-Recall that after the non-tail call, the return value of the procedure
-will be stored in @racket[(current-return-value-register)].
-When normalizing the @imp-mf-lang-v6[set!] instructions
-@racket[normalize-bind], we can translate this instruction as:
-@racketblock[
-`(begin
-   ,translation-of-non-tail-call
-   (set! ,aloc ,rv))
-]
+@; Shouldn't be needed now since normalize-bind happens before
+@;Note that our non-tail calls can appear in value position, for example, as the
+@;right-hand side of a @imp-mf-lang-v6[(set! aloc value)] instruction.
+@;Recall that after the non-tail call, the return value of the procedure
+@;will be stored in @racket[(current-return-value-register)].
+@;When normalizing the @imp-mf-lang-v6[set!] instructions
+@;@racket[normalize-bind], we can translate this instruction as:
+@;@racketblock[
+@;`(begin
+@;   ,translation-of-non-tail-call
+@;   (set! ,aloc ,rv))
+@;]
 }
+@; TODO: Need to introduce these in the discussion above, instead of here.
 @item{@racket[nfv_0 _... nfv_k-1] should be the first @racket[k] @emph{frame
 variables}, @ie locations on the @emph{callee's} frame.
 
