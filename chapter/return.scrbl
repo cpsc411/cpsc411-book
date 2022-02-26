@@ -188,6 +188,7 @@ after a call.
 
 For example, consider the following @tech{Values-lang v6} program:
 @values-lang-v6-block[
+#:datum-literals (f z y x)
 (module
   ....
   (define f (lambda (x) ....))
@@ -204,7 +205,62 @@ after the call?
 Locally, we have no way of knowing.
 @values-lang-v6[#:datum-literals (f) f] could overwrite any register and any
 @ch2-tech{frame variable}.
+Recall that our allocator assumes by the end of a block, nothing is live.
+It may overwriten any register not otherwise reserved.
+It also starts counting from @ch2-tech{frame variable} @imp-cmf-lang-v6[fv0]
+when spilling locations to the frame, and could, in principle, use any number of
+@ch2-tech{frame variables}, so the caller has no way of picking a
+@ch2-tech{frame variables} with a high enough index that is safe.
+To make matters worse, the callee itself could execute many @tech{non-tail
+calls}, and have its own values it needs to retain until they return, and so on
+recursively.
 
+We do have one such location already, although we have not used or even consider
+it: negatively-indexed locations on the frame.
+The allocation always starts indexing new @ch2-tech{frame variables} from 0; if
+hide the values that are live across a @tech{non-tail calls} at, say,
+@paren-x64-v6[(rbp + 8)], @paren-x64-v6[(rbp + 16)] so on, they would be safe.
+(Recall the the stack grows downwards, decremeneting from the base pointer, so
+accessing prior values is implementing by incrementing from the base pointer.)
+
+@tabular[
+#:style 'boxed
+#:row-properties '(border)
+'(("fvn" "Might be overwritten")
+  ("..." cont)
+  ("fv1" cont)
+  ("fv0" cont)
+  ("fv-1?" "Allocator cannot overwrite?")
+  ("fv-2?" cont)
+  ("..." cont)
+  ("fv-n?" cont))
+]
+
+We cannot express negatively-indexed @ch2-tech{frame variables}, and even if we
+could, this alone does not handle the general case, where the callee has further
+@tech{non-tail calls}.
+But it gives us the core of the idea: we want to hide our values on the stack,
+but at a location prior the 0-index from which the callee will start counting.
+
+We don't do this by using negative indexes, but instead, by @emph{pushing} a
+@emph{new frame} onto the stack at every @tech{non-tail call}.
+This resets the 0-index for the caller, hiding the caller's @ch2-tech{frame
+variables} from the callee.
+After returning from a call, we @emph{pop} the callee's frame from the stack,
+resetting the 0-index of the frame to its original value for the caller.
+This handles the general case: every @tech{non-tail call} pushes a new frame,
+saving its own values on the stack, and each @ch5-tech{procedure} access its own
+frame starting from @ch2-tech{frame variable} @asm-pred-lang-v6[fv0], the same
+as before.
+This means our stack is not a stack of values, but a stack of frames.
+
+Implementing this stack of frames is our core challenge in adding @tech{non-tail
+calls}.
+The caller in a @tech{non-tail call} will need to access both its own and the
+callee's frame, since it may need to pass some arguments on the callee's frame.
+We will also need to determine how large the caller's frame is at a
+@tech{non-tail call}, so we can increment the frame base pointer that many words
+in order to implement pushing and poping a frame to and from the stack.
 
 @section{Extending our Calling Convention}
 @;{
