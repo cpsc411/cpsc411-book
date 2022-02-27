@@ -1114,18 +1114,17 @@ conflict graph.
 The size of a frame @racket[n] (in slots) for a given @tech{non-tail call} is
 the maximum of:
 @itemlist[
-@item{the number of locations in the undead-out set for the non-tail call, or}
+@item{the number of locations in the @asm-pred-lang-v6[call-undead], or}
 
-@item{one more than the index of the largest frame location in the undead-out
-set for the non-tail call.}
+@item{one more than the index of the largest frame location in the
+@asm-pred-lang-v6[call-undead] set.}
 ]
-It's unlikely that the current compiler implementation will ever create
+So far, it's unlikely that the current compiler implementation will ever create
 a program with a @ch2-tech{frame variable} live after a @tech{non-tail call},
-since allocation hasn't happened yet.
-However, because our source language supports it, we must account for this case,
-and must allocate the @tech{frame} up to that index.
-A later optimization or change to our calling convention intermediate language
-program might have @asm-pred-lang-v6[call-undead] @ch2-tech{frame variables}.
+since register allocation hasn't happened yet.
+However, we will see shortly an example of a @asm-pred-lang-v6[call-undead]
+variables assigned a @ch2-tech{frame variable} with an index greater than the
+size of the @asm-pred-lang-v6[call-undead] set.
 
 @margin-note{In practice, calling conventions distinguish between two sets of
 registers: callee-saved and caller-saved, to allow some registers to be live
@@ -1158,14 +1157,14 @@ the frame, @ie @racket[(* n (current-word-size-bytes))].}
 @racket[current-frame-base-pointer-register].}
 
 @item{@racket[x_0], ... @racket[x_n] are the locations in the
-@ch-ra-tech{undead-out set} for the @tech{non-tail call}.}
+live after the @tech{non-tail call}, which we approximate with the
+@asm-pred-lang-v6[call-undead] set.}
 
 @item{@racket[fv_0], ... @racket[fv_n-1] are @racket[n] free @ch2-tech{frame variables}.}
 ]
 
-This pushes all @asm-pred-lang-v6/pre-framed[call-undead] variables onto the
-frame, pushes the @tech{frame}, performs the call, pops the @tech{frame}, and
-reads back the variables.
+This pushes all call-live variables onto the frame, pushes the @tech{frame},
+performs the call, pops the @tech{frame}, and reads back the variables.
 
 @;Unfortunately, there are two problems with this desired transformation.
 @;
@@ -1268,6 +1267,20 @@ algorithm, could name the break condition "homelessness-eliminated".}
                  z.3))))
        (call L.swap.1 1 2)))))
 ]
+
+Notice in this example that @asm-pred-lang-v6[#:datum-literals (tmp-ra.7)
+tmp-ra.7] gets assigned the @ch2-tech{frame variable} @asm-pred-lang-v6[fv2],
+since it is live across the call, but in conflict with the
+@asm-pred-lang-v6[fv0] and @asm-pred-lang-v6[fv1] due to the calling convention.
+This means the frame will have size 3, to preserve @asm-pred-lang-v6[fv2],
+despite only 1 variable being live across the call.
+
+@margin-note{
+Note that our language is flexible enough to allow us to inline
+@asm-pred-lang-v6[fv2] in the @asm-pred-lang-v6[call-undead] set, or not and
+allow a @racket[allocate-frames] to resolve @asm-pred-lang-v6[call-undead]
+variables using the @asm-pred-lang-v6[assignment].
+}
 
 Now we can allocate @tech{frames} for each @tech{non-tail call}.
 For each block, we compute the size of the @tech{frames} for @emph{all}
