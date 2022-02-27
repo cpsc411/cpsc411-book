@@ -206,61 +206,79 @@ Locally, we have no way of knowing.
 @values-lang-v6[#:datum-literals (f) f] could overwrite any register and any
 @ch2-tech{frame variable}.
 Recall that our allocator assumes by the end of a block, nothing is live.
-It may overwriten any register not otherwise reserved.
-It also starts counting from @ch2-tech{frame variable} @imp-cmf-lang-v6[fv0]
-when spilling locations to the frame, and could, in principle, use any number of
-@ch2-tech{frame variables}, so the caller has no way of picking a
-@ch2-tech{frame variables} with a high enough index that is safe.
+It may overwrite any register not otherwise reserved.
+It also starts counting from @ch2-tech{frame variable}
+@imp-cmf-lang-v6[#:datum-literals (fv0) fv0] when spilling locations, and could,
+in principle, use any number of @ch2-tech{frame variables}, so the caller has no
+way of picking a @ch2-tech{frame variable} with a high enough index that is
+safe.
 To make matters worse, the callee itself could execute many @tech{non-tail
-calls}, and have its own values it needs to retain until they return, and so on
-recursively.
+calls}, and have its own values it needs to retain until they @tech{return}, and
+so on recursively.
 
-We do have one such location already, although we have not used or even consider
-it: negatively-indexed locations on the frame.
-The allocation always starts indexing new @ch2-tech{frame variables} from 0; if
-hide the values that are live across a @tech{non-tail calls} at, say,
-@paren-x64-v6[(rbp + 8)], @paren-x64-v6[(rbp + 16)] so on, they would be safe.
-(Recall the the stack grows downwards, decremeneting from the base pointer, so
+We do have one such location where values are safe, although we have not used or
+even consider it: negatively-indexed locations on the stack, relative to the
+callee.
+The allocator always starts indexing new @ch2-tech{frame variables} from 0 at
+@paren-x64-v6[(rbp - 0)]; if hide the values that are live across a
+@tech{non-tail calls} at, say, @paren-x64-v6[(rbp + 8)], @paren-x64-v6[(rbp +
+16)] so on, they would be safe.
+(Recall the stack grows downwards, decremeneting from the base pointer, so
 accessing prior values is implementing by incrementing from the base pointer.)
 
 @tabular[
 #:style 'boxed
 #:row-properties '(border)
-'(("fvn" "Might be overwritten")
+`((,(paren-x64-v6 (rbp - n*8)) "Might be overwritten")
   ("..." cont)
-  ("fv1" cont)
-  ("fv0" cont)
-  ("fv-1?" "Allocator cannot overwrite?")
-  ("fv-2?" cont)
+  (,(paren-x64-v6 (rbp - 8)) cont)
+  (,(paren-x64-v6 (rbp - 0)) cont)
+  (,(paren-x64-v6 (rbp + 8)) "Allocator cannot overwrite")
+  (,(paren-x64-v6 (rbp + 16)) cont)
   ("..." cont)
-  ("fv-n?" cont))
+  (,(paren-x64-v6 (rbp + m*8)) cont))
 ]
 
-We cannot express negatively-indexed @ch2-tech{frame variables}, and even if we
-could, this alone does not handle the general case, where the callee has further
+We cannot directly express these backwards offsets on the stack since
+our @ch2-tech{frame variables} use natural indexes, and even if we could, this
+alone does not handle the general case, where the callee has further
 @tech{non-tail calls}.
 But it gives us the core of the idea: we want to hide our values on the stack,
-but at a location prior the 0-index from which the callee will start counting.
+but at a location before to the 0-index from which the callee will start
+counting.
 
-We don't do this by using negative indexes, but instead, by @emph{pushing} a
-@emph{new frame} onto the stack at every @tech{non-tail call}.
+We do this by @emph{pushing} the callers's @tech{frame} onto the stack prior to
+a @tech{non-tail call}.
+A @deftech{frame} is a @ch5-tech{procedure}'s set of @ch2-tech{frame variables}
+needed after a @tech{non-tail call}.
+We arrange that all values live after a @tech{non-tail call} are stored in
+@ch2-tech{frame variables}, so they are automatically saved by pushing the
+@tech{frame} onto the stack.
+We push the @tech{frame} by incrementing the frame base pointer past the last
+@ch2-tech{frame variable}.
 This resets the 0-index for the caller, hiding the caller's @ch2-tech{frame
-variables} from the callee.
-After returning from a call, we @emph{pop} the callee's frame from the stack,
-resetting the 0-index of the frame to its original value for the caller.
-This handles the general case: every @tech{non-tail call} pushes a new frame,
-saving its own values on the stack, and each @ch5-tech{procedure} access its own
-frame starting from @ch2-tech{frame variable} @asm-pred-lang-v6[fv0], the same
-as before.
-This means our stack is not a stack of values, but a stack of frames.
+variables} from the callee, so from the callee's perspective, all
+@ch2-tech{frame variables} starting at @asm-pred-lang-v6[#:datum-literals (fv0)
+fv0] are unused.
+After returning from a call, we @emph{pop} the caller's @tech{frame} from the
+stack by decrementing the frame base pointer back to its original value.
+This handles the general case: every @tech{non-tail call} pushes a @tech{frame},
+create a new one for the callee and saving the caller's values on the stack, and
+each @ch5-tech{procedure} accesses its own @tech{frame} starting from
+@ch2-tech{frame variable} @asm-pred-lang-v6[#:datum-literals (fv0) fv0], the
+same as before.
+This means our compiler users the stack not to push and pop values, but to push
+and pop @tech{frames}: it is a stack of @tech{frames}.
 
-Implementing this stack of frames is our core challenge in adding @tech{non-tail
-calls}.
+Implementing this stack of @tech{frames} is our core challenge in adding
+@tech{non-tail calls}.
 The caller in a @tech{non-tail call} will need to access both its own and the
-callee's frame, since it may need to pass some arguments on the callee's frame.
-We will also need to determine how large the caller's frame is at a
-@tech{non-tail call}, so we can increment the frame base pointer that many words
-in order to implement pushing and poping a frame to and from the stack.
+callee's @tech{frame}, since it may need to pass some arguments on the stack as
+part of the callee's @tech{frame}.
+We will also need to determine how large the caller's @tech{frame} is at a
+@tech{non-tail call}, so we know how many words to increment the frame base
+pointer in order to implement pushing and poping a @tech{frame} to and from the
+stack.
 
 @section{Extending our Calling Convention}
 @;{
@@ -502,38 +520,58 @@ language that introduces a fresh label @racket[rp-label].
 @;]
 }
 @; TODO: Need to introduce these in the discussion above, instead of here.
-@item{@racket[nfv_0 _... nfv_k-1] should be the first @racket[k] @emph{frame
-variables}, @ie locations on the @emph{callee's} frame.
+@item{@racket[nfv_0 _... nfv_k-1] should be the first @racket[k] @ch2-tech{frame
+variables} on the @emph{callee's} @tech{frame}.
 
-However, we can't make these frame variables yet.
-These variables are assigned in the caller, and the callee may not have
-the same frame base as the caller.
-Consider the following expression with a non-tail call using frame variables.
-@racketblock[
-`(begin
-   (set! fv0 1)
-   (set! rax 42)
-   (return-point L.rp.1
-     (set! fv0 rax)
-     (set! r15 L.rp.1)
-     (jump L.label.1 rbp r15 fv0))
-   (set! r9 fv0)
-   (set! rax (+ rax r9)))
+However, we can't actually use @ch2-tech{frame variables} yet.
+These variables are assigned in the caller, but must be assigned to the callee's
+@tech{frame}, and we don't yet know how large the caller's @tech{frame} is.
+
+Consider the following example:
+@imp-cmf-lang-v6-block[
+#:datum-literals (L.rp.2 L.label.1 x.1 nfv.2)
+(begin
+  (set! fv0 1)
+  (set! x.1 42)
+  (return-point L.rp.2
+    (set! nfv.2 x.1)
+    (set! r15 L.rp.2)
+    (jump L.label.1 rbp r15 fv0))
+  (set! r9 fv0)
+  (set! rax (+ rax r9)))
 ]
-
 For this example, suppose we've exhausted our
-@racket[(current-parameter-registers)], which we simulate by making it the
-empty set.
+@racket[(current-parameter-registers)], which we simulate by making it the empty
+set, so the argument @imp-cmf-lang-v6[x.1] must be passed on the stack.
 
-The frame location @racket['fv0] is live across the call; we use it after
-the call returns.
-However, we need to store @racket['rax] in the callee's @racket['fv0].
-If we try to use frame variables directly, we overwrite the original value of
-@racket['fv0].
-We first need to figure out how large the caller's frame is, and then move
-@racket['rax] to the index @emph{after} the last frame location used by the
-caller.
+For a @ch5-tech{tail call}, we would have generated
+@imp-cmf-lang-v6[#:datum-literals (x.1) (set! fv0 x.1)].
+But @imp-cmf-lang-v6[fv0] is already in use, on the caller's @tech{frame}, and
+is live across the call.
+We would need to at least use @imp-cmf-lang-v6[fv1], which we know will be
+@imp-cmf-lang-v6[fv0] for the callee.
 
+Figuring how exactly where the end of the caller's @tech{frame} is, and thus
+which index to start using for passing arguments on the callee's @tech{frame},
+is tricky.
+Thus we leave it for a seperate pass.
+For now, we simply record the fact that @imp-cmf-lang-v6[nfv.2] is a
+@deftech{new frame variable}, which must be allocated not on the current
+caller's @tech{frame}, but on the new @tech{frame} created for the callee.
+Some later pass will be responsible for computing @tech{frame} sizes and
+allocating all the @tech{new frame variables} on the appropriate @tech{frame}.
+
+We record the @tech{new frame variables} in a @imp-cmf-lang-v6[info]
+field, @imp-cmf-lang-v6[(new-frames (frame ...))].
+The field is a list of @tech{frames} created for each @tech{non-tail call}, and
+each @imp-cmf-lang-v6[frame] is a list of @tech{new frame variables} that the
+caller will put, in order, on the callee's @tech{frame}.
+
+Note that this is only a problem in a @tech{non-tail call}.
+In a tail call, we can reuse the caller's @tech{frame} as the callee's
+@tech{frame}, since we never @tech{return}.
+
+@;{
 Prior to undead analysis, we don't know how much we need to increment the base
 frame pointer to save variables live after this non-tail call.
 This makes figuring the exact index for these new frame variables non-trivial.
@@ -563,10 +601,8 @@ where @imp-mf-lang-v6[nfv.0] must be assigned to frame location 0 in the
 callee's frame.
 For now, we record these @emph{new-frame variables} in an info field, and
 we'll figure out how to assign frames later.
+}
 
-Note that this is only a problem in a non-tail call.
-In a tail call, we can reuse the caller's frame as the callee's frame, since we
-never return.
 }
 ]
 }
