@@ -1321,6 +1321,7 @@ The output is @deftech{Asm-pred-lang-v6/framed}, which only changes in its
 info fields compared to @tech{Asm-pred-lang-v6/pre-framed}.
 
 @bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Asm-pred-lang v6")
 (#:include (info) asm-pred-lang-v6/pre-framed asm-pred-lang-v6/framed)
 (asm-pred-lang-v6/framed)
 ]
