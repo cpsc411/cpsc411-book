@@ -4,7 +4,7 @@
   "../assignment/assignment-mlang.rkt"
   scriblib/figure
   (for-label cpsc411/reference/a6-solution)
-  (for-label (only-in cpsc411/reference/a6-solution [check-values-lang v5:check-values-lang]))
+  (for-label (prefix-in v5: cpsc411/reference/a5-solution))
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v2
   cpsc411/langs/v3
@@ -270,7 +270,12 @@ same as before.
 This means our compiler users the stack not to push and pop values, but to push
 and pop @tech{frames}: it is a stack of @tech{frames}.
 
-Implementing this stack of @tech{frames} is our core challenge in adding
+It's only when we push a @tech{frame} that stack space is allocated.
+Until then, the stack space is essentially treated as temporary, reclaimed at
+the end of a @ch5-tech{procedure}---a @ch5-tech{tail call} is free to overwrite
+everything starting from the frame base pointer.
+
+Implementing @tech{frame} allocation is our core challenge in adding
 @tech{non-tail calls}.
 The caller in a @tech{non-tail call} will need to access both its own and the
 callee's @tech{frame}, since it may need to pass some arguments on the stack as
@@ -631,7 +636,12 @@ Next, we extend @racket[uniquify].
 First, of course, we design the updated @deftech{Values-unique-lang v6}.
 We typeset the differences with respect to @ch5-tech{Values-unique-lang v5}.
 
-@bettergrammar*-diff[values-unique-lang-v5 values-unique-lang-v6]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v5 (excerpts)" "Diff vs Source" "Values-unique-lang v6")
+(#:exclude (pred tail opand triv relop aloc label int64) values-unique-lang-v5 values-unique-lang-v6)
+(values-lang-v6 values-unique-lang-v6)
+(values-unique-lang-v6)
+]
 
 This requires no changes specific to @tech{non-tail calls}, so the changes
 compared to @racket[v5:uniquify] are trivial.
@@ -645,20 +655,22 @@ top-level @ch3-tech{lexical identifiers} into unique labels, and all other
 ]
 
 Finally, we expose @tech{non-tail calls} through @racket[sequentialize-let].
-Below we define @deftech{Proc-imp-cmf-lang v6}, where we transform lexical
-binding into sequential imperative assignments.
+Below we define the target language, @deftech{Imp-mf-lang v6}, where we
+transform lexical binding into sequential imperative assignments.
 
 @bettergrammar*-ndiff[
-#:labels ("v5 Diff (excerpts)" "Full")
-(#:exclude (triv opand relop int64 aloc label) proc-imp-cmf-lang-v5 proc-imp-cmf-lang-v6)
-(proc-imp-cmf-lang-v6)
+#:labels ("v5 Diff (excerpts)" "Diff vs Source" "Imp-mf-lang v6")
+(#:exclude (int64 triv opand relop int64 aloc label) imp-mf-lang-v5 imp-mf-lang-v6)
+(values-unique-lang-v6 imp-mf-lang-v6)
+(imp-mf-lang-v6)
 ]
 
 Note that this language contains a definition @proc-imp-cmf-lang-v6[entry]
 designating the top-level tail used as the @tech{entry point} for each
 @ch5-tech{procedure} and for the module as a whole.
 There is no syntactic distinction, but making a semantic distinction will
-simplify our implementation of the @tech{calling convention} to support @tech{return}.
+simplify our implementation of the @ch5-tech{calling convention} to support
+@tech{return}.
 
 @todo{Kent adds non-tail calls in effect context in this assignment. We could
 add it here for future-proofing, but probably not important to do so. It's not
@@ -673,63 +685,109 @@ particular order to implement @values-unique-lang-v6[let] expressions using
 }
 ]
 
+Finally, we update @racket[normalize-bind].
+Below we design the target language @deftech{Proc-imp-cmf-lang v6},
+typeset with differences compared to @ch5-tech{Proc-imp-cmf-lang v5}.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v5" "Diff vs Source" "Imp-cmf-lang v6")
+(proc-imp-cmf-lang-v5 proc-imp-cmf-lang-v6)
+(imp-mf-lang-v5 proc-imp-cmf-lang-v6)
+(imp-mf-lang-v6)
+]
+
+We simply extend @ch5-tech{Proc-imp-cmf-lang v5} with our new abstractions, including
+@tech{non-tail calls}.
+
+@nested[#:style 'inset
+@defproc[(normalize-bind (p imp-mf-lang-v6?))
+          proc-imp-cmf-lang-v6?]{
+Compiles @tech{Proc-imp-mf-lang v6} to @tech{Proc-imp-cmf-lang v6}, pushing
+@imp-mf-lang-v6[set!] under @imp-mf-lang-v6[begin] so that the right-hand-side
+of each @imp-mf-lang-v6[set!] is base value-producing operation.
+
+This normalizes @tech{Imp-mf-lang v6} with respect to the equations:
+@tabular[
+#:sep @hspace[3]
+(list
+ (list
+  @imp-mf-lang-v6-block0[(set! aloc
+                               (begin effect_1 ...
+                                      value))]
+  "="
+  @imp-mf-lang-v6-block0[(begin effect_1 ...
+                                (set! aloc value))])
+ (list
+  @imp-mf-lang-v6-block0[(set! aloc
+                               (if pred
+                                   value_1
+                                   value_2))]
+  "="
+  @imp-mf-lang-v6-block0[(if pred
+                             (set! aloc value_1)
+                             (set! aloc value_2))]))]}]
+
 @section{Extending Calling Convention}
-
-Next we design @deftech{Imp-mf-lang v6}, the target language of the calling
+Now we design @deftech{Imp-cmf-lang-v6}, the target language of our calling
 convention translation.
-Below, we typeset the differences compared to @ch5-tech{Imp-mf-lang v5}.
 
-@bettergrammar*-diff[imp-mf-lang-v5 imp-mf-lang-v6]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v5" "Diff vs Source" "Imp-cmf-lang v6")
+(#:exclude (relop trg loc triv opand aloc) imp-cmf-lang-v5 imp-cmf-lang-v6)
+(#:exclude (relop binop label aloc) proc-imp-cmf-lang-v6 imp-cmf-lang-v6)
+(imp-cmf-lang-v6)
+]
 
 @todo{Jump disappears from value context, transformed into effect context.
 Should point that out.. and double check.}
 
-We now allow @imp-mf-lang-v6[(jump trg opand ...)] in @imp-mf-lang-v6[value]
-position.
-This corresponds to the addition of @tech{non-tail calls} to the source
-language.
-
-We also add the @imp-mf-lang-v6[return-point] form to effect context.
-This instruction introducing a new, non-top-level @imp-mf-lang-v6[label] in the
+Compared to @tech{Imp-cmf-lang v5}, the main difference is the
+@imp-cmf-lang-v6[return-point] form in effect context.
+This instruction introduces a new, non-top-level @imp-cmf-lang-v6[label] in the
 middle of an instruction sequence, which is expected to be exclusively used by
-the calling convention to implement @tech{return}.
-By introducing this new abstraction, we are required to implement this
-abstraction lower in the compiler pipeline.
-
-We further assume that a @imp-mf-lang-v6[return-point] cannot appear inside
-another @imp-mf-lang-v6[return-point], @ie there are no nested
-@imp-mf-lang-v6[return-point]s.
+the @ch5-tech{calling convention} to implement @tech{return}.
+We further assume that a @imp-cmf-lang-v6[return-point] cannot appear inside
+another @imp-cmf-lang-v6[return-point], @ie there are no nested
+@imp-cmf-lang-v6[return-point]s.
 Our compiler can never generate this code, and there is no reason to support.
 
-The implicit return value, @imp-mf-lang-v6[value] in @imp-mf-lang-v6[tail]
+The implicit return value, @imp-cmf-lang-v6[value] in @imp-cmf-lang-v6[tail]
 position, is no longer valid.
 Instead, the run-time system will set the first return address, and the final
-result is returned to the run-time system using the @ch5-tech{calling conventions}.
+result of any computation is explicitly returned to the run-time system using
+the @ch5-tech{calling conventions}.
 The run-time system initializes the @racket[current-return-address-register] to
 be the address of the exit procedure.
 
 To implement @tech{return}, we modify every @tech{entry point} to store the
 @racket[current-return-address-register] as described by our calling convention.
-Then we explicitly @tech{return} the base expressions in @imp-mf-lang-v6[value]
-context.
+Then we explicitly @tech{return} the base expressions in @imp-cmf-lang-v6[value]
+context by jumping to that return address.
 
-To implement @imp-mf-lang-v6[fvar]s later, we require that
+@; TODO why is this here?
+@;{
+To implement @imp-cmf-lang-v6[fvar]s later, we require that
 @racket[current-frame-base-pointer-register] is assigned only by
 incrementing or decrementing it by an integer literal.
 Other uses @racket[current-frame-base-pointer-register] are @emph{invalid
 programs}.
 Later passes will assume this in order to compute frame variable locations.
+}
 
-The @imp-mf-lang-v6[info] field records all the new frames created in the block,
-and will be used later to push new frames on to the stack, and assign new-frame
-variables to frame locations.
-There should be one frame for each non-tail call, even if that frame is empty.
-The new-frame variables should be in order.
-Each new-frame variable must only appear in one list in the
-@imp-mf-lang-v6[new-frames] field.
-Recall that @imp-mf-lang-v6[aloc]s are unique, and the @imp-mf-lang-v6[new-frames]
-field represents newly defined @imp-mf-lang-v6[aloc]s.
-It would not make sense for the same @imp-mf-lang-v6[aloc] to appear in two frames.
+The @imp-cmf-lang-v6[new-frames] @imp-cmf-lang-v6[info] field records all the
+new @tech{frames} created in the block, and will be used later to push new
+@tech{frames} on to the stack, and assign @tech{new frame variables} to actual
+@ch2-tech{frame variables}.
+There should be one frame for each @tech{non-tail call}, even if that
+@tech{frame} is empty.
+The @tech{new frame variables} should be in order.
+Each @tech{new frame variable} must only appear in one @tech{frame} in the
+@imp-cmf-lang-v6[new-frames] field.
+Recall that @imp-cmf-lang-v6[aloc]s are unique to a scope, and the
+@imp-cmf-lang-v6[new-frames] field represents newly defined
+@imp-cmf-lang-v6[aloc]s.
+It would not make sense for the same @imp-cmf-lang-v6[aloc] to appear in two
+@tech{frames}.
 
 @nested[#:style 'inset
 @defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v6?]) imp-cmf-lang-v6?]{
@@ -743,20 +801,13 @@ defined by @racket[current-return-address-register] and
 }
 ]
 
-After implementing the calling conventions, we have two abstractions that we
-need to implement.
+After implementing the @ch5-tech{calling conventions}, we have two abstractions that
+we need to implement.
 
-First, we must implement frames, or more specifically, a @tech{stack of frames}
-(also known as a @tech{stack}).
-@tech{Non-tail calls} cannot reuse their frame since some @ch2-tech{abstract
-locations} may be @ch-ra-tech{live} (will be @ch-ra-tech{undead}) after the call.
-In general, there will not be enough registers to keep them all around, so we
-store them on the frame.
-But if the caller starts writing to the frame, it would overwrite live values.
-So we need to install a new frame for the caller before executing the
-@tech{non-tail call}.
-We've already collected the new frame variables, and we need to modify the
-register allocator to determine the size and allocate new frames.
+First, we must allocate @tech{frames}.
+We've already collected the @tech{new frame variables}, so we need to modify the
+allocator to determine the size of each @tech{frame} and allocate them on the
+stack.
 This requires explicitly manipulating the frame base pointer, which also changes
 how @ch2-tech{frame variables} are implemented.
 
@@ -808,44 +859,6 @@ variables to the same frame location.
 @subsection{Updating intermediate passes}
 Before allocating frames, there are a few passes we must update to pass through
 our new abstractions.
-
-First, we extend @racket[normalize-bind].
-We define @deftech{Imp-cmf-lang v6} below.
-We typeset the differences compared to @ch5-tech{Imp-cmf-lang v5}.
-
-@bettergrammar*-diff[imp-cmf-lang-v5 imp-cmf-lang-v6]
-
-We simply extend @ch5-tech{Imp-cmf-lang v5} with our new abstractions, including
-@tech{non-tail calls} and return points.
-We also require the @imp-cmf-lang-v6[new-frames] declaration in the @imp-cmf-lang-v6[info] field.
-
-@nested[#:style 'inset
-@defproc[(normalize-bind (p imp-mf-lang-v6?))
-imp-cmf-lang-v6?]{
-Compiles @tech{Imp-mf-lang v6} to @tech{Imp-cmf-lang v6}, pushing
-@imp-mf-lang-v6[set!] under @imp-mf-lang-v6[begin] so that the right-hand-side
-of each @imp-mf-lang-v6[set!] is base value-producing operation.
-
-This normalizes @tech{Imp-mf-lang v6} with respect to the equations:
-@tabular[
-(list
-(list
-@imp-mf-lang-v6[(set! aloc (begin effect_1 ... value))]
-"="
-@imp-mf-lang-v6[(begin effect_1 ... (set! aloc value))])
-(list
-@imp-mf-lang-v6[(set! aloc (if pred value_1 value_2))]
-"="
-@imp-mf-lang-v6[(if pred (set! aloc value_1) (set! aloc value_2))])
-(list
-@imp-mf-lang-v6[(set! aloc (return-point label tail))]
-"="
-@imp-mf-lang-v6[(begin (return-point label tail) (set! aloc
-,(current-return-value-register)))])
-)
-]
-}
-]
 
 Next we impose some machine restrictions on our language with
 @racket[select-instructions].
