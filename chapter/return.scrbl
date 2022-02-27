@@ -232,14 +232,14 @@ accessing prior values is implementing by incrementing from the base pointer.)
 @tabular[
 #:style 'boxed
 #:row-properties '(border)
-`((,(paren-x64-v6 (rbp - n*8)) "Might be overwritten")
-  ("..." cont)
-  (,(paren-x64-v6 (rbp - 8)) cont)
-  (,(paren-x64-v6 (rbp - 0)) cont)
+`((,(paren-x64-v6 (rbp - n*8)) "↑")
+  ("..." "↑")
+  (,(paren-x64-v6 (rbp - 8)) "↑")
+  (,(paren-x64-v6 (rbp - 0)) "Might be overwritten")
   (,(paren-x64-v6 (rbp + 8)) "Allocator cannot overwrite")
-  (,(paren-x64-v6 (rbp + 16)) cont)
-  ("..." cont)
-  (,(paren-x64-v6 (rbp + m*8)) cont))
+  (,(paren-x64-v6 (rbp + 16)) "↓")
+  ("..." "↓")
+  (,(paren-x64-v6 (rbp + m*8)) "↓"))
 ]
 
 We cannot directly express these backwards offsets on the stack since
