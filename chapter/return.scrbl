@@ -1329,6 +1329,10 @@ info fields compared to @tech{Asm-pred-lang-v6/pre-framed}.
 The only differences are in the info field.
 The call-undead sets and new-frame fields are removed.
 
+Note that if the undead-outs were being preserved for debugging, they must be
+removed after @racket[allocate-frames], since this pass invalidates the
+undead-out sets.
+
 We remove the assigned variables from the locals set, to allow later
 passes to assume the locals set are all unassigned.
 
