@@ -138,6 +138,10 @@ See @racket[box]
 
 }
 
+@margin-note{If you implemented and are maintaining the @racket[bury-dead]
+optional pass, you'll need to update the @asm-pred-lang-v6[call-undead]
+information when burying the dead.}
+
 @exercise{Extend @racket[conflict-analysis] with support for return points.}
 
 @exercise{Design and implement @racket[assign-call-undead-variables].
