@@ -135,7 +135,6 @@ to use a single mutable variable that is local to the helper function that
 processes definition.
 See @racket[box]
 }
-
 }
 
 @margin-note{If you implemented and are maintaining the @racket[bury-dead]
@@ -146,7 +145,7 @@ information when burying the dead.}
 
 @exercise{Design and implement @racket[assign-call-undead-variables].
 
-@emph{Hint:}
+@margin-note{Hint:
 Because the core algorithm is similar, much of the core algorithm can be
 abstracted and reused between this pass and @racket[assign-registers].
 }
