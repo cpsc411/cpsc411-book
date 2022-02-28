@@ -223,9 +223,9 @@ We do have one such location where values are safe, although we have not used or
 even consider it: negatively-indexed locations on the stack, relative to the
 callee.
 The allocator always starts indexing new @ch2-tech{frame variables} from 0 at
-@paren-x64-v6[(rbp - 0)]; if hide the values that are live across a
+@paren-x64-v6[(rbp - 0)]; if we hide the values that are live across a
 @tech{non-tail calls} at, say, @paren-x64-v6[(rbp + 8)], @paren-x64-v6[(rbp +
-16)] so on, they would be safe.
+16)], and so on, they would be safe.
 (Recall the stack grows downwards, decremeneting from the base pointer, so
 accessing prior values is implementing by incrementing from the base pointer.)
 
