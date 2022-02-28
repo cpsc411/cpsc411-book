@@ -58,6 +58,7 @@ undead-analysis
 conflict-analysis
 assign-registers
 replace-locations
+optimize-predicates
 expose-basic-blocks
 ]
 
@@ -124,6 +125,10 @@ instruction.}
 
 @exercise{Extend @racket[replace-locations] with support for blocks and the jump
 instruction.}
+
+
+@exercise{Extend @racket[optimize-predicates] with support for blocks and the jump
+instruction in the source.}
 
 @exercise{Extend @racket[expose-basic-blocks] with support for blocks and the jump
 instruction in the source.}

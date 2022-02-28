@@ -84,6 +84,7 @@ L3 -> L2 [label=" normalize-bind"];
 L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5 [label=" select-instructions"];
 
+L10 -> L10 [label=" optimize-predicates"];
 L10 -> L11 [label=" expose-basic-blocks"];
 L11 -> L12 [label=" resolve-predicates"]
 L12 -> L12a [label=" flatten-program"]
@@ -966,16 +967,23 @@ and dropping any register-allocation-related metadata from the program.
 ]
 
 @subsection{Exposing Basic Blocks}
-The last update need to make is to @racket[expose-basic-blocks].
+The last updates we need to make are to @racket[optimize-predicates] and to
+@racket[expose-basic-blocks], both of use @tech{Nested-asm-lang v5} as the
+source language.
 
 We design the source, @deftech{Nested-asm-lang v5} below, typeset compared to
 @ch4-tech{Nested-asm-lang v4}
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs v4" "Nested-asm-lang v5")
-(#:include (p info tail trg opand triv) nested-asm-lang-v4 nested-asm-lang-v5)
+@;TODO some kind of bug in bettergrammar
+@;(#:include (p tail trg triv opand) nested-asm-lang-v4 nested-asm-lang-v5)
+(#:exclude (pred loc reg binop relop effect int64 aloc fvar label) nested-asm-lang-v4 nested-asm-lang-v5)
 (nested-asm-lang-v5)
 ]
+@margin-note{Please ignore the typesetting issues the claims
+@nested-asm-lang-v4[triv] was removed from @nested-asm-lang-v4[opand], which
+didn't exist in @ch4-tech{Nested-asm-lang v4}.}
 
 The main difference is the inclusion of @nested-asm-lang-v5[jump] expressions and
 block definitions.
@@ -990,8 +998,20 @@ Note that we again need to impose the convention that execution begins with the
 first basic block, and move the initial @nested-asm-lang-v5[tail] into an explicit
 basic block.
 
-The target language is @deftech{Block-pred-lang v5}, has no changes compared to
-@ch4-tech{Block-pred-lang v4}.
+Few changes are needed to @racket[optimize-predicates], since jumps do not
+affect predicate position, so we just need to optimize each block and recognized
+jumps.
+
+@nested[#:style 'inset
+@defproc[(optimize-predicates (p nested-asm-lang-v5?))
+        nested-asm-lang-v5?]{
+Optimize @tech{Nested-asm-lang v5} programs by analyzing and simplifying
+predicates.
+}
+]
+
+The target language of @racket[expose-basic-blocks] is @deftech{Block-pred-lang
+v5}, has no changes compared to @ch4-tech{Block-pred-lang v4}.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs v4" "Diff vs Source" "Block-pred-lang v5")
