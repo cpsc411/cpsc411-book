@@ -1029,7 +1029,7 @@ all nested expressions by generate fresh basic blocks and jumps.
 ]
 
 @tech{Tail calls} are implemented completely as an abstraction over basic
-blocks, with a convention about shared @ch-ra-tech{physical locations}.
+blocks, with a convention about shared @ch2-tech{physical locations}.
 Nothing else in the compiler needs to change.
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
