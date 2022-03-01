@@ -600,10 +600,6 @@ block.
 (block-asm-lang-v4)
 (para-asm-lang-v4)
 ]
-@todo{Fix this issue.}
-@margin-note{There is a typesetting issue in the diff for this grammer; ignore
-the stray @tt{s-} introduced by renaming @para-asm-lang-v4[s] to
-@block-asm-lang-v4[effect].}
 
 In @tech{Block-asm-lang v4}, a program is a non-empty sequence of labeled
 blocks. We consider the first block in the sequence to be the start of the

@@ -976,14 +976,10 @@ We design the source, @deftech{Nested-asm-lang v5} below, typeset compared to
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs v4" "Nested-asm-lang v5")
-@;TODO some kind of bug in bettergrammar
-@;(#:include (p tail trg triv opand) nested-asm-lang-v4 nested-asm-lang-v5)
-(#:exclude (pred loc reg binop relop effect int64 aloc fvar label) nested-asm-lang-v4 nested-asm-lang-v5)
+(#:include (p tail trg triv opand) nested-asm-lang-v4 nested-asm-lang-v5)
+@;(#:exclude (pred loc reg binop relop effect int64 aloc fvar label) nested-asm-lang-v4 nested-asm-lang-v5)
 (nested-asm-lang-v5)
 ]
-@margin-note{Please ignore the typesetting issues the claims
-@nested-asm-lang-v4[triv] was removed from @nested-asm-lang-v4[opand], which
-didn't exist in @ch4-tech{Nested-asm-lang v4}.}
 
 The main difference is the inclusion of @nested-asm-lang-v5[jump] expressions and
 block definitions.
