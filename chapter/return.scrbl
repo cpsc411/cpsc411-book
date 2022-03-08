@@ -631,7 +631,7 @@ The heuristics remain the same as in @racket[v5:check-values-lang].
 @defproc[(check-values-lang [p values-lang-v6?]) values-lang-v6?]{
 Validates that the @tech{Values-lang v6} is well bound and well typed: all
 procedure calls pass the correct number of arguments, and all
-@values-lang-v6[binop] and @values-lang-v6[relop] are never used with labels.
+@values-lang-v6[binop] and @values-lang-v6[relop] are never used on procedures.
 }
 }
 
