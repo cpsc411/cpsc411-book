@@ -6,17 +6,16 @@
                  (eval . (put 'return-point 'racket-indent-function 1))
                  (eval . (put 'nd-match 'racket-indent-function 1))))
  (nil . ((ispell-buffer-session-localwords
-         "lang" "rkt" "TODO" "eg" "eval"
-         "behaviour" "pm" "url" "todo" "subsubsub" "tt" "ids" "GitHub"
-         "secref" "emph" "itemlist" "primops" "uniquify" "Rice's"
-         "Exprs" "eq" "racketgrammar" "fixnum" "uint" "ascii" "binop"
-         "unop" "deftech" "primop" "int" "racketblock" "lib" "nasm"
-         "Dybvig" "Chez" "ptr" "fixnums" "immediates" "xor" "ptrs"
-         "Paren" "sar" "loc" "ie" "triv" "reg" "trg" "opand" "cmp"
-         "addr" "fbp" "bnf" "ior" "dispoffset" "unsyntax" "neq" "binops"
-         "aloc" "rloc" "fvar" "fvars" "pre" "CPS" "undead" "fx"
-         "codeblock" "falsey" "unops" "NB" "abi" "asm" "rbp" "fv" "tmp"
-         "rp" "opands" "ra" "fb" "fp" "rv" "nfv" "rax" "ctx" "rx" "rsp"
-         "rbx" "rcx" "rdx" "rsi" "rdi" "regexp" "alocs" "ust" "rlocs"
-         "andmap" "listof" "datatype" "interp" "factn" "nb" "jmp"
-         "unspillable" "unspillables" "nop" "ss" "foldr" "NASM" "mov"))))
+          "neq" "nfv" "unops" "Exprs" "fvars" "emph" "addr" "tmp" "itemlist"
+          "trg" "Chez" "unspillable" "fbp" "dispoffset" "mov" "rlocs" "abi"
+          "NASM" "ptrs" "uint" "racketgrammar" "alocs" "xor" "triv" "fixnum"
+          "ior" "int" "codeblock" "NB" "url" "fvar" "bnf" "ust" "ascii" "todo"
+          "ptr" "pre" "interp" "andmap" "asm" "TODO" "behaviour" "immediates"
+          "Paren" "nop" "jmp" "Rice's" "factn" "Dybvig" "rloc" "primops"
+          "primop" "unop" "lib" "cmp" "datatype" "rkt" "unsyntax" "rbp" "binop"
+          "rax" "rbx" "fixnums" "tt" "rcx" "rdi" "falsey" "rp" "pm" "rx" "rdx"
+          "rv" "reg" "ss" "ra" "listof" "subsubsub" "binops" "opand" "ids"
+          "deftech" "GitHub" "nb" "unspillables" "ie" "racketblock" "lang"
+          "uniquify" "regexp" "eval" "nasm" "sar" "eg" "undead" "fx" "eq" "CPS"
+          "fp" "fb" "loc" "fv" "secref" "ctx" "rsi" "foldr" "aloc" "rsp"
+          "opands"))))
