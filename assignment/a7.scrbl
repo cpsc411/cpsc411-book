@@ -31,7 +31,7 @@ undefined behaviour in our surface language.
 This assignment is due @(due 'a7).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a7}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a7}.
 
 @todo{Explicit learning objectives}
 
@@ -54,8 +54,8 @@ You can use the interrogator to get limited access to the reference solution:
 with respect to binops.).
 
 @section{Reading}
-The reading for this week is @Secref[#:tag-prefixes '("book:"
-                                                      "chp-immediates:")]{top}.
+The readings for this week are @Secref[#:tag-prefixes '("book:" "chp-ae:")]{top}
+and @Secref[#:tag-prefixes '("book:" "chp-immediates:")]{top}.
 As usual, this milestone description links to the documentation for each
 exercise in the chapter for convenience, but you are responsible for the
 reading the entire chapter.
@@ -133,7 +133,7 @@ Design and implement the function @racket[implement-safe-primops].
 Redesign and extend the implementation of @racket[uniquify].
 }
 
-@exercise{Design and implement @racket[check-exprs-lang].}
+@exercise[#:optional #t]{Design and implement @racket[check-exprs-lang].}
 
 @;  LocalWords:  lang rkt TODO eg eval behaviour pm url todo subsubsub tt ids
 @;  LocalWords:  GitHub secref emph itemlist primops uniquify Rice's Exprs eq
