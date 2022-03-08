@@ -1,5 +1,7 @@
 #lang scribble/manual
 
+@(require "../assignment/lib.rkt")
+
 @; TODO add a part for prereqs, where we can put some Racket basics, HtDP stuff,
 @; maybe match, maybe stylistic things.
 @; Want parts, so the chapters in the proper part can have numbers that match
