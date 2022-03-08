@@ -13,6 +13,7 @@
 @include-section{chapter/structured-control.scrbl}
 @include-section{chapter/tail-calls.scrbl}
 @include-section{chapter/return.scrbl}
+@include-section{chapter/algebraic-exprs.scrbl}
 @include-section{chapter/immediate-data-types.scrbl}
 @include-section{chapter/structured-data.scrbl}
 @include-section{chapter/closure.scrbl}
