@@ -4,6 +4,7 @@
 
 @(local-table-of-contents #:style 'immediate-only)
 
+@;include-section{chapter/prereq.scrbl}
 @include-section{chapter/x64.scrbl}
 @include-section{chapter/abstracting-boilerplate.scrbl}
 @include-section{chapter/abstract-locations.scrbl}
