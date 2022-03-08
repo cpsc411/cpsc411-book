@@ -108,9 +108,12 @@ subgraph DoNotcluster1 {
 @(define (ch-v6-tech . rest)
   (apply tech #:tag-prefixes '("book:" "chp-return:") rest))
 
-@section{Preface: What's wrong with @ch-v6-tech{Values-lang v6}}
-@ch-v6-tech{Values-lang v6} gained the ability to express non-tail calls, an
-important step forward in writing real programs.
+@(define (ch-ae-tech . rest)
+  (apply tech #:tag-prefixes '("book:" "chp-ae:") rest))
+
+@section{Preface: What's wrong with @ch-ae-tech{Exprs-lang v6.5}}
+@ch-ae-tech{Exprs-lang v6.5} gained the ability to nest expressions pretty much
+arbitrarily.
 However, our functions are still limited to work on machine integers.
 A realistic language would allow us to express programs over more interesting
 data types than mere machine integers.
@@ -118,10 +121,10 @@ data types than mere machine integers.
 Unfortunately, once we add data types, we have a problem distinguishing between
 any two data types.
 Everything is eventually represented as 64-bit integers in @ch1-tech{x64}.
-We need some way to distinguish a collection of 64-bit as an integer, from a
+We need some way to distinguish a collection of 64 bits as an integer, from a
 boolean, from the empty list, from a pointer to a procedure.
 Otherwise, we will have serious problems: undefined behaviours, unsafe casts,
-or memory safety errors.
+and/or memory safety errors.
 
 @;One way to add data types is to add a static type system.
 @;This will certainly restrict undefined behaviour, but may impose a higher cost
@@ -136,37 +139,16 @@ language.
 A static type system could take care to prevent the user from calling an
 integer as a procedure, for example.
 However, the language itself may need to distinguish different kinds of data at
-run-time.
+run time.
 For example, a garbage collector may need to traverse data structures, but not
 immediate data like integers; a pretty printer may want to print different data
 differently.
 
 To enable the language to distinguish different kinds of data, we can steal a
-few of our 64-bits to represent a data type tag.
+few of our 64 bits to represent a data type tag.
 This limits the range of machine integers, but allows us to us to distinguish
 data dynamically, enabling safety and abstractions that must differentiate data
 dynamically.
-
-There's a second limitation in @ch-v6-tech{Values-lang v6} that we lift this
-week.
-So far, we do not have algebraic expressions---we have limited ability to nest
-expressions, and must manually bind many intermediate computations to names.
-This is particularly tedious since we know how to write a compiler, which ought
-to do the tedious work of binding expressions to temporary names.
-After we have proper data types with dynamic checking, we can more easily nest
-expressions, particularly in the predicate position of an @exprs-lang-v7[if].
-@digression{
-Normally, we take care to design each new abstraction independently from each
-other, when we can.
-However, data types and algebraic expressions are difficult to separate without
-sacrificing some design goal.
-With only algebraic expressions and no data types, it becomes difficult to
-enforce safety without adding a more sophisticated type system with type
-annotations.
-With only data types and no algebraic expressions, implementing the compiler
-passes is more tedious because implementing pointer manipulation operations to
-implement data type tags benefits from algebraic expressions.
-}
 
 Our goal in this assignment is to implement the following language,
 @tech{Exprs-lang v7}.
