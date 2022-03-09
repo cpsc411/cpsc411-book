@@ -6,6 +6,7 @@
   (for-label cpsc411/reference/a7-solution)
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v6
+  cpsc411/langs/v6-5
   cpsc411/langs/v7
   (for-label cpsc411/langs/v7))
 
@@ -126,14 +127,6 @@ boolean, from the empty list, from a pointer to a procedure.
 Otherwise, we will have serious problems: undefined behaviours, unsafe casts,
 and/or memory safety errors.
 
-@;One way to add data types is to add a static type system.
-@;This will certainly restrict undefined behaviour, but may impose a higher cost
-@;on programming.
-@;Due to Rice's Theorem@margin-note*{Still a huge buzz kill.}, we will never be
-@;able to decide whether an arbitrary program is well typed.
-@;Instead, we will be required to approximate and/or require user annotations,
-@;ruling out some well-behaved programs to ensure no undefined behaviour.
-
 This is not only a problem for ruling out unsafe behaviour in the source
 language.
 A static type system could take care to prevent the user from calling an
@@ -153,7 +146,11 @@ dynamically.
 Our goal in this assignment is to implement the following language,
 @tech{Exprs-lang v7}.
 
-@bettergrammar*[exprs-lang-v7]
+@bettergrammar*-ndiff[
+#:labels ("Exprs-lang v7" "Diff vs v6.5")
+(exprs-lang-v7)
+(exprs-lang-v6.5 exprs-lang-v7)
+]
 
 We add a bunch of new values in @tech{Exprs-lang v7}, including booleans, the
 empty list, the void object, (printable) ASCII character literals, and an error
@@ -187,24 +184,70 @@ This will prevent those operations from being a source of undefined behaviour.
 With proper booleans, we can finally allow an arbitrary value in the predicate
 position of an @exprs-lang-v7[if] expression in the surface language.
 
-It is not clear how to support new data types going top-down, so we begin this
-assignment at the bottom.
-
 @section[#:tag "intro-to-tags"]{Introduction to Tagged Object Representation}
+The key challenge we need to solve in adding data types to our language is how
+to implement data-type checking.
+That is, given some value @exprs-lang-v7[triv], branch on whether it is a
+particular type data type such as a boolean or a number: @exprs-lang-v7[(if
+(fixnum? triv) value_1 value_2)] and @exprs-lang-v7[(if (boolean? triv) value_1
+value_2)] should be supported.
+Ideally, each data type is unique: @exprs-lang-v7[(boolean? triv)] and
+@exprs-lang-v7[(fixnum? triv)] should never both be true.
+
+These don't necessarily need to be dynamic checks, as long as they are somehow
+expressible by the compiler, whether as expressions that dynamically check or
+meta-data that is statically checked.
+However, even in a statically typed language, we may need some ability for the
+run-time system to distinguish different kinds of data dynamically.
+
+Depending on how these type checks are implement, this alone is enough to let us
+implement different data types safely.
+We could use procedural abstraction to wrap existing binary operations to
+ensure, @eg that @exprs-lang-v7[+] is only operating on numbers, and not booleans.
+We could expand @exprs-lang-v7[if] to check that the value in predicate position
+is both a boolean (that is, that @exprs-lang-v7[(boolean? triv)] is equal to
+some value using a @exprs-lang-v7[relop]), and that the value is equal to some
+representation of true.
+
 A common approach to efficiently represent word-sized data types is called
 @deftech{object tagging}.
-@digression{Some of our clever tag choices, and some terminology, is borrowed
+This lets us implement data-type checking by providing the following
+primitive operations (which we implement with further, low-level primitives in
+x64):
+@itemlist[
+@item{Tagging, @ie given some machine integer, tag it to indicate what data type
+it represents, producing a tagged representation of the underlying data.
+This tagged representation will happen to correspond to some machine integer,
+since all sequences of bits do, but maybe not in any meaningful way.
+}
+@item{Untagging, @ie given some tagged representation, remove the tag returning
+the underlying data that can be used with primitive x64 instructions.
+}
+@item{Tag checking, @ie given some tagged representation, get the tag or compare
+the tag to something.
+}
+]
+@todo{Make sure to introduce each of these aspects in this section.}
+
+So far, we've treated all of our data as 64-bit integers.
+Now, we treat all our data as 64 bits, which we manipulate to implement various
+data types (including some fixed-sized integers).
+We choose a particular representation of object tagging below that has some nice
+properties, and implement each of these operation by expanding them into
+bitwise operations.
+@margin-note{Some of our clever tag choices, and some terminology, is borrowed
 from R. Kent Dybvig.
 You can learn more about it's use in Chez Scheme from this talk by his former
 PhD student Andy Keep: @url{https://www.youtube.com/watch?v=BcC3KScZ-yA}.
 }
+
 Each data type in our language will now be represented by a @deftech{ptr}
 (pronounced like @emph{footer}).
 A @tech{ptr} is a machine word whose @racket[n] least-significant bits represent
 the @deftech{primary tag}, and whose upper @racket[(- (* 8
 (current-word-size-bytes)) n)] bits represent the data.
 
-In our system, we have 64-bit words and will use the 3 least-significant bits
+In our setting, we have 64-bit words and will use the 3 least-significant bits
 for @tech{primary tags}.
 With 3 bits, we can represent 8 primary data types in a @tech{ptr}.
 We want to reserve these for the most common and most performance critical data
@@ -215,11 +258,11 @@ types---probably a good trade off.
 If we want more than 8 data types, which most languages support, we must reserve
 one tag for "everything else" (a pointer to memory).
 The structure in memory has infinite space in which to store additional tags.
-This seems to leave us only 7 possible data types.
+This seems to leave us only 7 possible data types without going to memory.
 
-Some data types require fewer than 64-bits, and we can exploit this fact to
+Some data types require fewer than 64 bits, and we can exploit this fact to
 gain a few extra data types.
-For example, booleans really only require one bit.
+For example, booleans really only require 1 bit.
 The empty list and the void object only require a tag, since they do not contain
 any data.
 ASCII characters only require 8 bits.
@@ -230,7 +273,7 @@ bargain!
 
 This leaves us 6 @tech{primary tags}.
 One obvious choice is to use one for fixed sized integers; these will now be
-61-bit integers.
+61-bit integers, which we call @exprs-lang-v7[fixnum]s.
 Integer operations are fast, and we don't want to slow them down by making them
 go through heap allocation and pointer indirection.
 If we wanted to support graphics and scientific operations, we would reserve one
@@ -241,8 +284,8 @@ pointers to common heap-allocated structures.
 Storing the tag on the pointer instead of in memory avoids the expense of an
 additional memory access to check a tag and the additional memory overhead of
 storing the tag in memory.
-We'll address the implementation of heap-allocated structured data in a future
-chapter.
+We'll address the implementation of tagged pointers and heap-allocated
+structured data in the next chapter.
 
 Here is the default set of tags we will use in this assignment, given in base 2.
 @itemlist[
@@ -270,7 +313,7 @@ Note that the 3 least-significant bits of @tech{secondary tags} are the shared
 @item{@code{#b00010110}, for @exprs-lang-v7[empty]}
 @item{@code{#b00011110}, for @exprs-lang-v7[(void)]}
 @item{@code{#b00101110}, for an ASCII character}
-@item{@code{#b00111110}, for the error value}
+@item{@code{#b00111110}, for the error exit-code value}
 ]
 @margin-note{For annoying technical reasons, our representation of the empty
 list differs slightly from Racket.
@@ -281,9 +324,9 @@ The integer 7 is @code{#b111} in base 2, and would be represented, in base 2, as
 the @tech{ptr} @code{#b111000}.
 The three low-order bits are the tag @code{#b000}, and the high-order bits are
 the data @code{#b111} (implicitly padded with 0 to 64-bits).
-To perform arithmetic on this representation, we can use simply right-shift the
-@tech{ptr} by the size of a @tech{primary tag} to get a two's complement
-integer:
+
+To implement untagging, we can simply right-shift the @tech{ptr} by the size of
+a @tech{primary tag} to get a two's complement integer:
 @examples[
 (arithmetic-shift #b111000 -3)
 ]
@@ -298,8 +341,11 @@ A handy fact about the choice of tag for fixnums is that any number
 @;#b111
 @;(* 7 8)
 @;]
-This fact allows for some optimizations on fixnum operations, and will make
-porting examples and tests easier.
+This fact allows for implementing fast fixnum operations on the @tech{ptr}
+representation directly.
+That is, we can implement binary operations on fixnums without detagging
+followed by tagging, by relying on some algebraic facts about operations on
+integers.
 
 Similarly, the ASCII character 7 would be as a @tech{ptr}, in base 2,
 @code{#b011011100101110}.
@@ -307,8 +353,8 @@ Similarly, the ASCII character 7 would be as a @tech{ptr}, in base 2,
 @url{https://en.wikipedia.org/wiki/ASCII#Printable_characters} for the
 representation of ASCII characters.
 }
-For character operations, we must right-shift by the size of a @tech{secondary
-tag} (8).
+For character operations, to detag we right-shift by the size of a
+@tech{secondary tag} (8).
 The character @code{#b0110111} is the ASCII representation of 7.
 Combined with its tag, this is @code{#b011011100101110}, which reads in Racket
 as @racket[#b011011100101110].
@@ -331,37 +377,39 @@ Our representation of the number 7 is a fixnum, while the representation of the
 character 7 is not.
 
 The representation of booleans is a bit tricky.
-We don't quite introduce a new tag for booleans, and then add a single bit in
-the payload.
-Instead, we essentially represent @exprs-lang-v7[#t] and @exprs-lang-v7[#f]
-as separate data types, whose tags are @code{#b110} (@racket[#b110]) and
-@code{#b1110} (@racket[#b1110]).
-It makes masking a boolean slightly more complex.
-We use the mask @code{#b11110111} (@racket[#b11110111]), to succeed regardless
-of whether the fourth bit is set.
+We can think of booleans either as the 61-bit values 0 and 1, with
+tag @code{#b110}, or as two separate @tech{secondary tags} (with no payload)
+@code{#b00001110} and @code{#b00000110}.
+I typically think in the the latter interpretation, where we represent
+@exprs-lang-v7[#t] and @exprs-lang-v7[#f] as separate data types, whose tags are
+@code{#b110} (@racket[#b110]) and @code{#b1110} (@racket[#b1110]).
+
+To implement tag checking for booleans, we use the mask @code{#b11110111}
+(@racket[#b11110111]), and compare to the tag @code{#b110}. This succeed
+regardless of whether the fourth bit is set, as long as all the
+other @tech{secondary tag} bits are 0.
 @examples[
 (eq? (bitwise-and #b00001110 #b11110111) #b110)
 (eq? (bitwise-and #b00000110 #b11110111) #b110)
 ]
-The benefit is that any immediate that is not @exprs-lang-v7[#f]
-can be interpreted as @exprs-lang-v7[#t] using @exprs-lang-v7[bitwise-xor],
-instead of converting to a boolean and using an arithmetic shift to compute the
-value of the boolean.
-Only @exprs-lang-v7[#f] is 0 when "xor"'d with the non-fixnum immediate tag,
-@code{#b110}.
+
+To extract the payload for booleans, all we really need to know is whether the
+boolean is false.
+We can perform this test without untagged, merely by comparing to @code{#b110}
+(with all other bits 0, implicitly).
+This gives us the same result as explicitly untagging, and compares to 0.
 @examples[
 (eq? (arithmetic-shift #b00000110 -3) 0)
 (eq? (arithmetic-shift #b00001110 -3) 0)
-(eq? (bitwise-xor #b00000110 #b110) 0)
-(eq? (bitwise-xor #b00001110 #b110) 0)
-(eq? (bitwise-xor #b00111000 #b110) 0)
-(eq? (bitwise-and #b00001110 #b111) 0)
-(eq? (bitwise-xor #b011011100101110 #b110) 0)
+(eq? #b00000110 #b110)
+(eq? #b00001110 #b110)
 ]
+To implement branching on booleans in terms of predicates, we can compile a
+boolean @exprs-lang-v7[value] to the predicate @exprs-lang-v7[(not (!= value
+#b110))].
 
-@todo{Why not just... (!= #b110)?}
-
-The representation of @exprs-lang-v7[error] is inefficient.
+The representation of @exprs-lang-v7[error], which represents an exit code, is
+inefficient.
 We only require 8 bits of data for the error code, so 24 bits are wasted.
 But we're not adding more data types with @tech{secondary tags}, so it is
 not worth over-engineering.
@@ -374,97 +422,96 @@ We therefore should introduce abstractions to keep the compiler abstract with
 respect to particular tag choices, so we can change our minds later if a better
 representation occurs to us.
 
-To implement @tech{ptrs}, we need bitwise operations so that we can mask off the
-tags bits and operate on the data.
-This means we need to expose bitwise operations from @ch1-tech{x64}.
+To implement @tech{ptrs}, we need bitwise operations such as
+@racket[arithmetic-shift] so that we can implement tag checking, tagging, and
+untagging.
+This means we need to expose bitwise operations from @ch1-tech{x64}, all the way
+through the compiler pipeline.
+This is not very interesting, so we begin by implementing tagged objects in
+terms of these, and then extending the rest of the compiler to expost bitwise
+operations.
 
-@section{Exposing Bitwise Operations in Paren-x64}
+@section{Extending the source and front-end passes}
+We start by deiscussing the design of @deftech{Exprs-lang v7}.
 
-We expose the following @ch1-tech{x64} instructions this week.
-@itemlist[
-@item{@tt{sar @paren-x64-v7[loc], @paren-x64-v7[int]}
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v6.5" "Exprs-lang v7")
+(exprs-lang-v6.5 exprs-lang-v7)
+(exprs-lang-v7)
+]
 
-Perform arithmetic right-shift by @paren-x64-v7[int] on @paren-x64-v7[loc].
+As usual, we allow arbitrary shadowing.
+This means users can shadow @exprs-unique-lang-v7{prim-f}s.
 
-This instruction requires that its second operand be an integer literal between
-0 and 63, inclusive, @ie @racket[0 <= int <= 63].
-We will assume this constraint in the intermediate languages, and
-never expose this operation in @tech{Exprs-lang v7}.}
+Now, all operations on data types in the source are procedures.
+This is because we'll need to implement binary operations by detagging,
+operating on the underlying data, and retagging.
+For safety, we also should perform dynamic tag checking, to ensure we never add
+booleans or characters, or other odd and undefined behaviour.
 
-@item{@tt{and @paren-x64-v7[loc], @paren-x64-v7[op]}
+We could distinguish procedure calls from primitive operations, and implement
+them by expanding to expressions, but this risks duplicating code (although, not
+much code).
+But, at some point, primitive operations will need to be wrapped as procedures
+if we want to use them with functional abstractions, so we might as well do it
+now, and leave some other pass to implement procedure inlining.
 
-Compute the bitwise "and" of @paren-x64-v7[loc] and @paren-x64-v7[op], storing
-the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[op] is an integer, it
-must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
-@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
-}
+We also expose the tag checking operations to the source, again as procedures.
+This is a design choice, and this choice moves us toward a dynamically typed
+language.
 
-@item{@tt{or @paren-x64-v7[loc], @paren-x64-v7[op]}
+These choices mean we can change our validator, @racket[check-exprs-lang].
+We no longer need to type check the arguments (previously, operands) to
+primitive operations, except to @exprs-lang-v7[call], which still must be a
+statically known @ch5-tech{procedure} (since we don't have a tagged
+representation of @ch5-tech{procedures}, yet).
+Instead, we statically allow expressions like @exprs-lang-v7[(call * #f #\y)],
+but expect this to raise a dynamic error.
 
-Compute the bitwise "inclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
-storing the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[op] is an integer, it
-must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
-@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
-}
-
-@item{@tt{xor @paren-x64-v7[loc], @paren-x64-v7[op]}
-
-Compute the bitwise "exclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
-storing the result in @paren-x64-v7[loc].
-Like with other binary operations, when @paren-x64-v7[op] is an integer, it
-must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
-@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
+@nested[#:style 'inset
+@defproc[(check-exprs-lang [p any/c])
+         exprs-lang-v7]{
+Checks that a @tech{Exprs-lang v7} program is well typed (only that procedures
+are called with the right number of arguments), and well scoped.
 }
 ]
 
-First, we add each of these operations as a @paren-x64-v7[binop] to
-@deftech{Paren-x64 v7} below.
-The differences are typeset with respect to @ch-v6-tech{Paren-x64 v6}.
+We extend @racket[uniquify] as usual.
+Below, we design @deftech{Exprs-unique-lang v7}.
 
-@bettergrammar*-diff[paren-x64-v6 paren-x64-v7]
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v6.5" "Diff vs Source" "Exprs-unique-lang v7")
+(exprs-unique-lang-v7 exprs-unique-lang-v6.5)
+(exprs-unique-lang-v7 exprs-lang-v7)
+(exprs-unique-lang-v7)
+]
 
-@defproc[(generate-x64 [p paren-x64-v7?])
-         (and/c string? x64-instructions?)]{
-Compile the @tech{Paren-x64 v7} program into a valid sequence of @ch1-tech{x64}
-instructions, represented as a string.
+As usual, we transform names into either @ch2-tech{abstract locations} or labels.
+Data types do not complicate this.
+
+@nested[#:style 'inset
+@defproc[(uniquify [p exprs-lang-v7])
+         exprs-unique-lang-v7]{
+Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
+other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }
+]
 
-@section{Exposing Bitwise Operations}
-Specifying the tagged representation happens very close to our source language.
-We need to expose these operations all the way up to our prior source language,
-@ch-v6-tech{Values-unique-lang-v6}.
-Below, we design the new @deftech{Values-bits-lang v7}, typeset with differences
-compared to @ch-v6-tech{Values-unique-lang-v6}.
+And now, we figure out where to place our new passes.
 
-@bettergrammar*-diff[values-unique-lang-v6 values-bits-lang-v7]
-
-The only data type in @tech{Values-bits-lang v7} is BITS, 64 for them,
-interpreted as an integer sometimes.
-
-We assume that each @values-bits-lang-v7[binop] is well-typed; they shouldn't be
-used with labels as arguments, the and calls to
-@values-bits-lang-v7[arithmetic-shift-right] follow the restrictions required by
-@ch1-tech{x64}.
-
-The new operations do not have large effects on the language designs or compiler
-passes between @racket[sequentialize-let] and @racket[generate-x64], so these
-details are left unspecified in this chapter.
-You will need to redesign the intermediate languages with the new operations.
-
-@section{Algebraic Expressions}
 As we saw in @secref{intro-to-tags}, many of the operations we want to perform
 on @tech{ptrs} are easily expressed as algebraic expressions.
-The expression @object-code{(fixnum? 7)} is expressed as
-@code{(eq? (bitwise-and 7 #b111) #b000)}.
-Representing this in @tech{Values-bits-lang v7}, which does not have algebraic
-expressions, is unnecessarily complicated.
-We would have to introduce auxiliary variables, manually pass them around the
-compiler, and generate code with additional let-bindings.
-This is particularly silly; we know how to write compilers, so the compiler
-should do this for us, and allow us to write the code we want to write.
+The expression @object-code{(fixnum? 7)} is expressed as @code{(eq? (bitwise-and
+7 #b111) #b000)}.
 
+Thankfully, we just added @tech{algebraic expressions}.
+If we position our new passes @emph{above} @racket[remove-complex-opera*], we
+don't need to manually introduce auxiliary variables, or generate code with
+additional let-bindings.
+The compiler will do this for us, and allow us to write the code we want to
+write.
+
+@section{Specifying Data Type Representation}
 We therefore design @deftech{Exprs-bits-lang v7}, a language that has only bits
 and bitwise operations, but that allows algebraic expressions in most
 positions.
@@ -474,123 +521,7 @@ expressions without booleans.
 
 @bettergrammar*[exprs-bits-lang-v7]
 
-Looking at this grammar, it may not be obvious how to transform this into
-@tech{Values-bits-lang v7}.
-We can see the structure of the pass more clearly if we expand the grammar
-slightly.
-Below, we define the expanded grammar @deftech{Exprs-bit-lang v7/context}.
-We typeset the differences compared to @tech{Values-bits-lang v7}
 
-@bettergrammar*-diff[values-bits-lang-v7 exprs-bits-lang-v7/contexts]
-
-Now we can see the the main difference, semantically, is additional nesting in
-the value context.
-Calls and binary operations can now take nested @values-bits-lang-v7[value]
-expressions rather than @values-bits-lang-v7[triv]s.
-While this means we can collapse the syntax, separating the syntax semantically
-helps us see the true difference and see that the essence of the transformation
-is let-binding intermediate results to make all operands trivial.
-
-To transform this into @tech{Values-bits-lang v7}, we need to perform the
-moandic form translation.
-In essence, we recursively translate any nested expression that is not a
-@values-bits-lang-v7[value] into one by let-binding all intermediate
-computations.
-For example, we would transform a call @racket[`(call ,e_1 ,e_2)] into something
-like the following:
-@racketblock[
-`(let ([,x_1 ,(normalize e_1)])
-    (let ([,x_2 ,(normalize e_2)])
-      (call ,x_1 ,x_2)))
-]
-If you've written any examples or tests in @ch-v6-tech{Values-lang v6}, you've
-probably done this tranformation by hand many times.
-
-@digression{
-We can do a better job if we follow the template for the output language
-while processing the input language.
-In this way, we design functions for each non-terminal in the output language.
-These functions describe in what context the current term is being processed.
-For example, when processing @exprs-bits-lang-v7[(relop value_1 value_2)], we
-want to process @exprs-bits-lang-v7[value_1] in
-@values-bits-lang-v7[aloc] context, since that's the restriction in the target
-language, but can process @exprs-bits-lang-v7[value_2] in
-@values-bits-lang-v7[triv] context to avoid creating an unnecessary auxiliary
-binding.
-}
-
-For historical reasons, we call this pass @racket[remove-complex-opera*].
-
-@defproc[(remove-complex-opera* [p exprs-bits-lang-v7?])
-         values-bits-lang-v7?]{
-Performs the monadic form transformation, unnesting all non-trivial operators
-and operands to @exprs-bits-lang-v7[binop]s, @exprs-bits-lang-v7[call]s, and
-@exprs-bits-lang-v7[relops]s, making data flow explicit and and simple to
-implement imperatively.
-}
-
-@;We've already seen a transformation that can elaborate this into
-@;@tech{Values-bits-lang v7}: the A-normal form translation.
-@;The idea is essentially to transform expressions like
-@;@racket[`(apply ,e_1 ,e_2)] into
-@;@racketblock[
-@;`(let ([,x_10 ,v_10])
-@;   ...
-@;    (let ([,x_1 ,v_1])
-@;      (let ([,x_20 ,v_20])
-@;        ...
-@;        (let ([,x_2 ,v_2])
-@;          (apply ,x_1 ,x_2)))))
-@;]
-@;
-@;@todo{make self-contained; removed references to class}
-@;As we discussed in class, dealing with code duplication for in
-@;@exprs-bits-lang-v7[if] expressions is a bit annoying in ANF, so our compiler is
-@;designed a bit differently.
-@;In monadic, we can simply this and let a later pass deal with
-@;@exprs-bits-value[if] when
-
-@;I recommended that you use a procedural accumulator, @ie write the
-@;transformation in CPS.
-@;This will turn your mind inside out, but after that, the code writes itself.
-@;
-@;The translation of @object-code{if} is tricky.  There are two ways to
-@;accomplish it, but one of them requires first-class functions, so we must use
-@;the naive form for now.
-@;You must essentially push the surrounding context into the branches of the
-@;@object-code{if}:
-@;@racketblock[
-@;(equal?
-@;  (a-normalize `(module (+ (if (eq? 1 1) 5 6) 5)))
-@;  `(module
-@;     (if (eq? 1 1)
-@;         (+ 5 5)
-@;         (+ 6 5))))
-@;]
-@;This is straightforward, particularly in CPS, and correct, but can cause
-@;considerable code duplication.
-@;We'll address that later.
-@;@;Or, you can introduce a @deftech{join-point}, a function that abstracts over the
-@;@;context and is called in both branches:
-@;@;@racketblock[
-@;@;(equal?
-@;@;  (a-normalize `(module (+ (if (eq? 1 1) 5 6) 5)))
-@;@;  `(module
-@;@;     (define L.jp.1 (lambda (x) (+ 5 x)))
-@;@;     (if (eq? 1 1)
-@;@;         (apply L.jp.1 5)
-@;@;         (apply L.jp.1 6))))
-@;@;]
-@;@;This introduces a function call, but it's a known function in tail position, so
-@;@;it can be heavily optimized.
-@;
-@;A-normal form was introduced in
-@;@hyperlink["https://slang.soe.ucsc.edu/cormac/papers/pldi93.pdf"]{this paper},
-@;which you might be interested in reading, and it is still of active interest in
-@;the compiler construction and research community.
-
-
-@section{Specifying Data Type Representation}
 @subsection{specify-representation}
 Next we design @deftech{Exprs-unsafe-data-lang v7}.
 We replace bits with proper data types, and lift the restriction on
@@ -716,18 +647,87 @@ Implement safe primitive operations by inserting procedure definitions for each
 primitive operation which perform dynamic tag checking, to ensure type safety.
 }
 
-@subsection{uniquify}
-Last but not least, we update uniquify.
-The source language, @deftech{Exprs-lang v7}, is defined below.
+@section{Exposing Bitwise Operations}
+Specifying the tagged representation happens very close to our source language.
+We need to expose these operations all the way up to our prior source language,
+@ch-v6-tech{Values-unique-lang-v6}.
+Below, we design the new @deftech{Values-bits-lang v7}, typeset with differences
+compared to @ch-v6-tech{Values-unique-lang-v6}.
 
-@bettergrammar*-diff[exprs-unique-lang-v7 exprs-lang-v7]
+@bettergrammar*-diff[values-unique-lang-v6 values-bits-lang-v7]
 
-You are allowed to shadow @exprs-unique-lang-v7{prim-f}s.
+The only data type in @tech{Values-bits-lang v7} is BITS, 64 for them,
+interpreted as an integer sometimes.
 
-@defproc[(uniquify [p exprs-lang-v7])
-         exprs-unique-lang-v7]{
-Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
-other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
+We assume that each @values-bits-lang-v7[binop] is well-typed; they shouldn't be
+used with labels as arguments, the and calls to
+@values-bits-lang-v7[arithmetic-shift-right] follow the restrictions required by
+@ch1-tech{x64}.
+
+The new operations do not have large effects on the language designs or compiler
+passes between @racket[sequentialize-let] and @racket[generate-x64], so these
+details are left unspecified in this chapter.
+You will need to redesign the intermediate languages with the new operations.
+
+@defproc[(remove-complex-opera* [p exprs-bits-lang-v7?])
+values-bits-lang-v7?]{
+Performs the monadic form transformation, unnesting all non-trivial operators
+and operands to @exprs-bits-lang-v7[binop]s, @exprs-bits-lang-v7[call]s, and
+@exprs-bits-lang-v7[relops]s, making data flow explicit and and simple to
+implement imperatively.
+}
+
+@section{Exposing Bitwise Operations in Paren-x64}
+
+We expose the following @ch1-tech{x64} instructions this week.
+@itemlist[
+@item{@tt{sar @paren-x64-v7[loc], @paren-x64-v7[int]}
+
+Perform arithmetic right-shift by @paren-x64-v7[int] on @paren-x64-v7[loc].
+
+This instruction requires that its second operand be an integer literal between
+0 and 63, inclusive, @ie @racket[0 <= int <= 63].
+We will assume this constraint in the intermediate languages, and
+never expose this operation in @tech{Exprs-lang v7}.}
+
+@item{@tt{and @paren-x64-v7[loc], @paren-x64-v7[op]}
+
+Compute the bitwise "and" of @paren-x64-v7[loc] and @paren-x64-v7[op], storing
+the result in @paren-x64-v7[loc].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
+}
+
+@item{@tt{or @paren-x64-v7[loc], @paren-x64-v7[op]}
+
+Compute the bitwise "inclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
+storing the result in @paren-x64-v7[loc].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
+}
+
+@item{@tt{xor @paren-x64-v7[loc], @paren-x64-v7[op]}
+
+Compute the bitwise "exclusive or" of @paren-x64-v7[loc] and @paren-x64-v7[op],
+storing the result in @paren-x64-v7[loc].
+Like with other binary operations, when @paren-x64-v7[op] is an integer, it
+must be an @paren-x64-v7[int32], and when @paren-x64-v7[op] is an
+@paren-x64-v7[addr], @paren-x64-v7[loc] cannot also be an @paren-x64-v7[addr].
+}
+]
+
+First, we add each of these operations as a @paren-x64-v7[binop] to
+@deftech{Paren-x64 v7} below.
+The differences are typeset with respect to @ch-v6-tech{Paren-x64 v6}.
+
+@bettergrammar*-diff[paren-x64-v6 paren-x64-v7]
+
+@defproc[(generate-x64 [p paren-x64-v7?])
+         (and/c string? x64-instructions?)]{
+Compile the @tech{Paren-x64 v7} program into a valid sequence of @ch1-tech{x64}
+instructions, represented as a string.
 }
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
