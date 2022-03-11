@@ -967,7 +967,7 @@ corresponds to @asm-pred-lang-v6[tail_1] and
 @asm-pred-lang-v6[return-point] statement @asm-pred-lang-v6[(return-point label
 tail)].
 The @asm-pred-lang-v6[undead-set] is the @ch-ra-tech{undead-out set} for the
-@asm-pred-lang-v6[return-point], and the @asm-pred-lang-v6[(undead-set-tree?)]
+@asm-pred-lang-v6[return-point], and the @asm-pred-lang-v6[undead-set-tree?]
 in the list is the @tech{undead-set tree} for the @asm-pred-lang-v6[tail] of the
 @asm-pred-lang-v6[return-point].
 }
