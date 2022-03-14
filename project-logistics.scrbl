@@ -54,12 +54,27 @@ milestone.
 Generally, this includes each pass defined in the milestone, and may include an
 interpreters, type checkers, and program validators.
 
-Per @secref[#:tag-prefixes '("book:" "prelim:" "style:")]{top}, you are not
-required to keep all of your code in this single file; the file is an interface.
-However, you must follow the instructions on organizing your code from
-@secref[#:tag-prefixes '("book:" "prelim:" "style:")]{top}, as we will be
-grading code on design as well as functionality and need to be able to navigate
-code easily.
+You are not required to keep all of your code in this single file; the file is
+an interface.
+However, you must follow the following instructions:
+
+If you're going to refactor your code out of a single file, you must following
+these instructions.
+@itemlist[
+@item{Use suggestive file names, like
+@tt{assign-register-tests.rkt}, or @tt{register-allocator.rkt}, or @tt{undead-lang.rkt}.}
+@item{Create a file called @tt{README.md}, which tells us in which file each
+exercise can be found.
+Make it simple and clear, like
+@verbatim{
+Exercise 2, assign-registers -> register-allocator.rkt
+Exercise 2, assign-registers tests -> tests/register-allocator-tests.rkt
+}
+}
+]
+
+@secref["Units_of_Code" #:doc '(lib "scribblings/style/style.scrbl")] provides
+advice on organizing Racket code.
 
 Regardless of how your code is organized, to simplify grading, you must add a
 comment with the exercise number before the code for each of your exercises:
