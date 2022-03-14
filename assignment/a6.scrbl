@@ -74,12 +74,14 @@ select-instructions
 uncover-locals
 conflict-analysis
 replace-locations
+optimize-predicates
 ]
 
 @emph{(Possibly) no modifications to passes}
 
 @typeset-passlist[
 resolve-predicates
+flatten-program
 patch-instructions
 generate-x64
 ]
@@ -199,6 +201,12 @@ non-tail calls.}
 @;This will help @racket[patch-instructions] produce better code.}
 @;]
 @;}
+
+@exercise{Extend @racket[optimize-predicates] support the return point
+abstraction.
+Note that after a return point, you don't know almost anything, since the callee
+could have modified any registers.
+}
 
 @exercise{Extend @racket[expose-basic-blocks] to implement the return point
 abstraction.}
