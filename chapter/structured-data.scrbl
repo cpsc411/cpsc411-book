@@ -32,8 +32,8 @@ Ly [label="Exprs-unique-lang v8"];
 Lz [label="Exprs-unsafe-data-lang v8"];
 L0 [label="Exprs-bits-lang v8"];
 L1 [label="Values-bits-lang v8"];
-L2 [label="Proc-imp-mf-lang v8"];
 L3 [label="Imp-mf-lang v8"];
+L2 [label="Proc-imp-cmf-lang v8"];
 L4 [label="Imp-cmf-lang v8"];
 L5_1 [label="Asm-alloc-lang v8"];
 L5 [label="Asm-pred-lang v8"];
@@ -70,9 +70,9 @@ Lx -> Ly [label=" uniquify"];
 Ly -> Lz [label=" implement-safe-primops"];
 Lz -> L0 [label=" specify-representation"];
 L0 -> L1 [label=" remove-complex-opera*"];
-L1 -> L2 [label=" sequentialize-let"];
+L1 -> L3 [label=" sequentialize-let"];
+L3 -> L2 [label=" normalize-bind"];
 L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" normalize-bind"];
 L4 -> L5_1 [label=" select-instructions"];
 L5_1 -> L5 [label= " expose-allocation-pointer"];
 
@@ -450,7 +450,7 @@ We design @deftech{Values-bits-lang v8} to include a few imperative features.
 @bettergrammar*-ndiff[
 #:labels ("v7 Diff (excerpts)" "Source/Target Diff (Excerpts)" "Full")
 (#:exclude (opand triv binop relop int64 aloc label) values-bits-lang-v7 values-bits-lang-v8)
-(#:exclude (opand triv binop relop int64 aloc label) values-bits-lang-v8 proc-imp-mf-lang-v8)
+(#:exclude (opand triv binop relop int64 aloc label) values-bits-lang-v8 proc-imp-cmf-lang-v8)
 (values-bits-lang-v8)
 ]
 
@@ -496,7 +496,7 @@ sure).
 }
 
 @defproc[(sequentialize-let [s values-bits-lang-v8?])
-          proc-imp-mf-lang-v8?]{
+          proc-imp-cmf-lang-v8?]{
 Picks a particular order to implement @values-bits-lang-v8[let] expressions
 using @imp-mf-lang-v8[set!].
 }
