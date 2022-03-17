@@ -114,6 +114,7 @@ abstracted over @paren-x64-v7[binop]s.
 
 @exercise{
 Redesign and extend the implementation of @racket[patch-instructions].
+This may not require any changes.
 
 You need not support a more general form of
 @paren-x64-v7[arithmetic-shift-right]: it cannot be implemented by simply
