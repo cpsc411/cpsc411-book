@@ -521,8 +521,8 @@ As usual, we transform names into either @ch2-tech{abstract locations} or labels
 Data types do not complicate this.
 
 @nested[#:style 'inset
-@defproc[(uniquify [p exprs-lang-v7])
-         exprs-unique-lang-v7]{
+@defproc[(uniquify [p exprs-lang-v7?])
+         exprs-unique-lang-v7?]{
 Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
 other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }
