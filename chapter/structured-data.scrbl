@@ -72,7 +72,7 @@ Lz -> L0 [label=" specify-representation"];
 L0 -> L1 [label=" remove-complex-opera*"];
 L1 -> L3 [label=" sequentialize-let"];
 L3 -> L2 [label=" normalize-bind"];
-L2 -> L3 [label=" impose-calling-conventions"]
+L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5_1 [label=" select-instructions"];
 L5_1 -> L5 [label= " expose-allocation-pointer"];
 
@@ -279,19 +279,27 @@ We could also over-allocate, then find an address in the allocated range that is
 aligned properly to consider our base.
 We'll assume the run-time system is capable of giving us aligned pointers, so we
 avoid wasting memory through over allocation.
+However, this method means we get pointers whose high-order bits contain part of
+the address, and low-order bits are already zero---we do not need to shift the
+pointer.
+Instead, to tag, we combine the pointer with the tag bits using
+@exprs-bits-lang-v8[bitwise-ior] and untag by using
+the @exprs-bits-lang-v8[bitwise-xor] on the tagged pointer and the tag, which
+resets only the tag bits to 0.
 
-This means anytime we generate an @exprs-bits-lang-v8[alloc], which gives us an
-aligned pointer.
-We immediately tag the pointer, and anytime we access the pointer, we must untag
-it first.
+For example, we generate an aligned pointer for pairs using
+@exprs-bits-lang-v8[(alloc 16)].
+The @ch7-tech{primary tag} for pairs is @racket[(unsyntax (current-pair-tag))].
+We immediately tag the pointer, and anytime we access the pointer (for example,
+to initialize the pair), we must untag it first.
 For example, we would essentially implement @exprs-lang-v8[(cons value_1
 value_2)] as:
 @exprs-bits-lang-v8-block[
 #:datum-literals (x.1)
-(let ([x.1 (bitwise-ior (alloc 16) ,(current-pair-tag))])
+(let ([x.1 (bitwise-ior (alloc 16) (unsyntax (current-pair-tag)))])
   (begin
-    (mset! (bitwise-xor x.1 ,(current-pair-tag)) 0 value_1)
-    (mset! (bitwise-xor x.1 ,(current-pair-tag)) 8 value_2)
+    (mset! (bitwise-xor x.1 (unsyntax (current-pair-tag))) 0 value_1)
+    (mset! (bitwise-xor x.1 (unsyntax (current-pair-tag))) 8 value_2)
     x.1))
 ]
 
@@ -321,7 +329,7 @@ computed memory address.
 We'll assume some abstraction @exprs-bits-lang-v8[(mref value value)], where the
 first operand is the pointer and the second operand is the offset, and which
 returns the value stored at the pointer plus the offset.
-Using this we could implement @exprs-lang-v8[(car value_1)] as:
+Using this we could implement @exprs-lang-v8[(car value_1)] as
 @exprs-bits-lang-v8[(mref value_1 -1)], using the previous optimization to avoid
 the explicit untagging.
 
@@ -359,13 +367,91 @@ addresses from the operating system to enable tagging pointers efficiently.
 We then reuse our object tagging approach from the previous chapter to tag,
 untag, and tag check pointers to our new structured data types.
 
-@section{Bla}
-We want to implement @deftech{Exprs-lang v8}, defined below.
+@section{Memory Allocation and Access in x64}
+To implement the memory allocation and access abstractions we've just
+introduced, we need additional support from @ch1-tech{x64} and from the run-time
+system.
+
+To access memory, we expose the @deftech{index-mode operand} from @ch1-tech{x64}.
+It is written @tt{QWORD [reg_base + reg_offset]}, and refers to the memory
+location whose base pointer is stored in the register @tt{reg_base} and whose
+index is stored in the register @tt{reg_offset}.
+Unlike @ch2-tech{displacement-mode operands}, both components of this operand
+are registers, so both the base and offset can be computed dynamically.
+We also enable a generalization of the @ch2-tech{displacement-mode operand}, so
+we can access statically known offsets from base pointers other than the frame
+base pointer.
+This generalized operand, @tt{QWORD [reg_base + int32]}, adds some static offset
+to a base pointer to compute an address.
+Note that unlike the version used to implement @ch2-tech{frame variables}, we
+@emph{add} to (rather than subtract from) the base pointer, and the index is not
+restricted to a multiple of 8.
+
+Each of these operands can be as part of move and arithmetic instructions.
+For example:
+@verbatim{
+  mov r10, 0
+  mov QWORD [r12 + r10], 0
+  add QWORD [r12 + r10], 1
+  mov rax, QWORD [r12 + r10]
+}
+moves 0 into the address @tt{r12 + r10}, adds 1 to it, then moves the result
+into the return value register.
+It assumes @tt{r12} contains some valid pointer.
+@tech{Index-mode operands} are subject to similar restrictions as with the
+@ch2-tech{displacement-mode operand}.
+We formalize these restrictions in our definition of @tech{Paren-x64 v8}.
+
+To implement allocation, we need some strategy for managing memory.
+Our run-time system or compiler needs to know what memory is in use, how to
+allocate (mark free memory as in use), and how to deallocate memory (return
+in-use memory to the pool of free memory and ultialtey to the system).
+There are many strategies for this, such as "let the user deal with it",
+"add a process to the run-time system that dynamically manages memory", or "make
+the type system so complex that the compiler can statically manage memory".
+Each of these has merits.
+
+We choose an all together different approach: memory is infinite so just keep
+allocating.
+Of course, memory isn't @emph{quite} infinite, but if our programs are
+relatively short lived, and the operating system cleans up a process's memory
+when it finishes running, then this approach will work and save us a lot of
+effort.
+This isn't as unrealistic a strategy as it might as first appear; it's used in
+practice by short-lived programs, such as some Unix command line tools and the
+control systems for some missles.
+@digression{
+In general, a language implementation might abstract access to the @tt{mmap}
+system call for allocation, and implement a strategy (such as garbage
+collection) to deallocate memory that is no longer used.
+Garbage collection is tricky to implement so we avoid it for now to focus on
+implement structured data.
+
+For a quick introduction to garbage collection, see this short video
+@url{https://twitter.com/TartanLlama/status/1296413612907663361?s=20}.
+}
+
+To implement our allocation-only strategy, we need the run-time system to
+provide an initial base pointer from which we can start allocating.
+We reserve another register, the @racket[current-heap-base-pointer-register]
+(abbreviated @paren-x64-v8[hbp]).
+The run-time system initializes this register to point to the base of the heap,
+with all positive-integer indexes after this base as free memory.
+Allocation is implemented by copying the current value of this pointer, and
+incrementing it by the number of bytes we wish to allocate.
+The pointer must only be incremented by word-size multiples of bytes, to ensure
+the 3 low-order bits are 0 and the pointer can be tagged.
+Any other access to this register is now undefined behvaiour, similar to
+accesses to @paren-x64-v8[fbp] that do not obey the stack of frames discipline.
+
+
+@section{Implementing Structured Data}
+We design @deftech{Exprs-lang v8} below.
 The language is large, as we include several new structured data types and their
 primitives.
 
 @bettergrammar*-ndiff[
-#:labels ("Diff vs v7 (excerpts)" "Exprs-lang v8")
+#:labels ("Diff vs v7" "Exprs-lang v8")
 (exprs-lang-v7 exprs-lang-v8)
 (exprs-lang-v8)
 ]
@@ -375,19 +461,23 @@ only give @exprs-lang-v8[primops], rather than distinguishing
 @exprs-lang-v8[unops], @exprs-lang-v8[binops], and so on, so we can easily group
 like primops with like.
 
+As usual, we first task is to @racket[uniquify].
+Below we define the target language, @deftech{Exprs-unique-lang v8}.
 
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v7 (excerpts)" "Exprs-unique-lang v8")
+(#:exclude (aloc label fixnum uint8 ascii-char-literal)
+ exprs-unique-lang-v7 exprs-unique-lang-v8)
+(exprs-unique-lang-v8)
+]
 
-@section{Allocation Primitives}
-@defproc[(specify-representation [p exprs-unsafe-data-lang-v8?])
-exprs-bits-lang-v8/contexts?]{
-Compiles data types and primitive operations into their implementations as
-@v7-tech{ptrs} and primitive bitwise operations on @v7-tech{ptrs}.
-}
+@nested[#:style 'inset
+@defproc[(uniquify [p exprs-lang-v8])
+          exprs-unique-lang-v8]{
+Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
+other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
+}]
 
-@bettergrammar*-diff[exprs-lang-v7 exprs-lang-v8]
-
-
-@section{New Safe Primops}
 @; Don't know how to do this without closures.
 @;Last week, the last piece of undefined behvaiour in our language was in procedure
 @;calls.
@@ -407,36 +497,40 @@ Compiles data types and primitive operations into their implementations as
 @;}
 @;
 @;@subsection{implement-safe-primops}
+Next, we implement new safe primitive operations.
 All the accessors for the new data types can result in undefined behaviour if
 used on the wrong @v7-tech{ptr}.
 Similarly, vector reference can access undefined values if the vector is
 constructed but never initialized.
+We fix this by wrapping each primitive to perform dynamic checks and remove
+undefined behaviour.
 
-Below we define @deftech{Exprs-unique-lang v8}.
+We design the target language, @deftech{Exprs-unsafe-data-lang v8}, below.
 
 @bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Full")
-(#:exclude (aloc label fixnum uint8 ascii-char-literal)
- exprs-unique-lang-v7 exprs-unique-lang-v8)
-(exprs-unique-lang-v8)
+#:labels ("Diff vs v7" "Exprs-unsafe-data-lang v8")
+(exprs-unsafe-data-lang-v7 exprs-unsafe-data-lang-v8)
+(exprs-unsafe-data-lang-v8)
 ]
 
-Note that in this language, we remove @exprs-unsafe-data-lang-v8[begin].
+Note that in this language, we add expose effect context and
+@exprs-unsafe-data-lang-v8[begin].
+In the source, we have an effect procedure, namely @racket[vector-set!].
 The user must manually call impure functions and bind the result.
-The result of an effectful function could be @exprs-unique-lang-v8[void], or an
+The result of an effectful function is either @exprs-unique-lang-v8[void], or an
 @exprs-unique-lang-v8[error].
-It would be unwise, although technically safe, to simple discard errors.
-@;However, it would complicate compilation---notice that none of the features in
-@;the language correspond to an @exprs-unsafe-data-lang-v8[effect] in the target
-@;language, so how would we compile @exprs-unsafe-data-lang-v8[begin]?
+The unsafe variant, @racket[unsafe-vector-set!], does not need to produce a
+value, so we expose effect context.
 
-To implement this safe language, we wrap all accessors to perform dynamic tag checking
+To implement the safe language, we wrap all accessors to perform dynamic tag checking
 before using the unsafe operations.
 We also wrap @exprs-unsafe-data-lang-v8[unsafe-make-vector] to initialize all elements to
 @racket[0].
 
-Writing a compiler for the following specification language may simplify this
-task:
+To implement the safe primops, it may be useful to abstract out the
+safety specification for each primitive operation.
+For example, we could write our compiler as a a function over the program and
+the following specification language.
 @racketblock[
 (code:comment "Symbol x Symbol x (List-of Parameter-Types)")
 (code:comment "The first symbol is the name of a function in the source language.")
@@ -468,21 +562,244 @@ task:
     ,@(map (lambda (x) `(,x ,x (any? any?)))
            '(cons eq?))))
 ]
-@;todo{Handling vector-set! required inlining a bit of context normalization}
+@todo{Handling vector-set! required inlining a bit of context normalization}
 
-All impure computations, those that end in @tt{!}, should only return
-@exprs-unique-lang-v8[(void)] or an @exprs-unique-lang-v8[error].
-
-@defproc[(implement-safe-primops [p exprs-unique-lang-v8])
-         exprs-unsafe-data-lang-v8]{
+@defproc[(implement-safe-primops [p exprs-unique-lang-v8?])
+         exprs-unsafe-data-lang-v8?]{
 Implement safe primitive operations by inserting procedure definitions for each
-primitive operation which perform dynamic tag checking, to ensure type and memory safety.
+primitive operation which perform dynamic tag checking, to ensure type and
+memory safety.
 }
 
-@subsection{uniquify}
-Finally, we define the source language.
-Below we define @deftech{Exprs-lang v8}.
+Finally, we must extend @racket[specify-representation] to implement the new
+data structures and primitives.
+We design the target @deftech{Exprs-bits-lang v8} below.
 
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v7 (excerpts)" "Diff vs Source" "Exprs-bits-lang v8")
+(#:exclude (triv binop aloc label relop int64)
+ exprs-bits-lang-v7 exprs-bits-lang-v8)
+(#:exclude (triv binop aloc label relop int64)
+ exprs-unsafe-data-lang-v8 exprs-bits-lang-v8)
+(exprs-bits-lang-v8)
+]
+
+We implement the new data structures using the approach described earlier,
+combining tagging with the new allocation and memory abstractions.
+We compile each constructor, namely @exprs-unsafe-data-lang-v8[cons] and
+@exprs-unsafe-data-lang-v8[unsafe-make-vector], to @exprs-bits-lang-v8[alloc]
+plus tagging, producing the tagged pointer as the value.
+We compile each destructor to @exprs-bits-lang-v8[mref], detagging or statically
+adjusting the index to the pointer first.
+Initliazation, done by @exprs-unsafe-data-lang-v8[cons], and mutation, done by
+@exprs-unsafe-data-lang-v8[unsafe-vector-set!], are both compiled to
+@exprs-bits-lang-v8[mset!].
+
+@defproc[(specify-representation [p exprs-unsafe-data-lang-v8?])
+          exprs-bits-lang-v8?]{
+Compiles data types and primitive operations into their implementations as
+@v7-tech{ptrs} and primitive bitwise operations on @v7-tech{ptrs}.
+
+@examples[#:eval sb
+(specify-representation '(module (cons 5 6)))
+(specify-representation '(module (unsafe-car (cons 5 6))))
+(specify-representation '(module (unsafe-vector-ref (unsafe-make-vector 3) 6)))
+]
+}
+
+@section{Front-end Extensions}
+We've added effect context and a new effect higher in the compiler pipeline than
+previously.
+This requires some attention to a few of our front-end passes.
+
+Our next pass, @racket[remove-complex-opera*], is responsible for imposing
+left-to right evaluation for operands and arguments, and explicitly binding all
+algebraic expressions.
+We design @deftech{Values-bits-lang v8} below.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v7 (excerpts)" "Diff vs Source" "Values-bits-lang v8")
+(#:exclude (triv binop aloc label relop int64)
+ values-bits-lang-v7 values-bits-lang-v8)
+(#:exclude (triv binop aloc label relop int64)
+ values-bits-lang-v7 exprs-bits-lang-v8)
+(values-bits-lang-v8)
+]
+
+We add an @values-bits-lang-v8[effect] context to support
+@values-bits-lang-v8[mset!], and a @values-bits-lang-v8[begin] expression for
+convenience.
+Previously, all expressions in the Values-lang languages were @emph{pure}---they
+evaluated and produced the same value regardless of in which order expressions
+were evaluated.
+We could freely reorder expressions, as long as we respected scope.
+Now, however, @values-bits-lang-v8[mset!] modifies memory during its execution.
+It not safe to reorder expressions after an @values-bits-lang-v8[mset!].
+Furthermore, @values-bits-lang-v8[mset!] does not return a useful value.
+
+To deal with this, we introduce a contextual distinction in the language.
+We add the non-terminal @values-bits-lang-v8[effect] to represent an impure computation.
+A @values-bits-lang-v8[effect] represents an expression that does not have a value, and is
+executed only for its effect.
+We can use @values-bits-lang-v8[effect] in certain expression contexts using
+@values-bits-lang-v8[begin].
+If we're already in an impure context, that is, in a
+@values-bits-lang-v8[effect], then we can freely nest other
+@values-bits-lang-v8[effect]s.
+
+This contextual distinction is similar to the one we introduce to distinguish
+tail calls from non-tail calls.
+
+Supporting @exprs-bits-lang-v8[effect] context requires paying attention to
+order when designing @racket[remove-complex-opera*], but does not significantly
+complicate anything.
+
+@nested[#:style 'inset
+@defproc[(remove-complex-opera* [p exprs-bits-lang-v8?])
+          values-bits-lang-v8?]{
+Performs the monadic form transformation, unnesting all non-trivial operators
+and operands, making data flow explicit and and simple to implement imperatively.
+}]
+
+Next, we transform into imperative instructions.
+Now that effects can appear on the right-hand side of a
+@values-bits-lang-v8[let] expression, it MAY not longer be safe to reorder them.
+This is a design choice: we could make it clear to the programmer that
+@values-bits-lang-v8[let] does not guarantee a particular order of evaluation
+for its bindings, but then effects on the right-hand side lead to undefined
+behaviour.
+Or, we could impose a particular order, such as left-to-right, forbidding
+possible optimizations.
+A middle ground is to impose such an order only if any effects are detected in
+the right-hand side of a @values-bits-lang-v8[let] (or rather, if we can
+guarantee no effects are present, because Rice still does not let us know for
+sure).
+
+As usual, we choose to forbid exposing undefined behaviour to the source
+language, so design @racket[sequentialize-let] to impose left-to-right (unless
+we know its safe to reorder).
+
+We design the target language, @deftech{Imp-mf-lang v8}, below.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v7 (excerpts)" "Diff vs Source (Excerpts)" "Imp-mf-lang v8")
+(#:exclude (opand triv binop relop int64 aloc label)
+ imp-mf-lang-v7 imp-mf-lang-v8)
+(#:exclude (opand triv binop relop int64 aloc label)
+ values-bits-lang-v8 imp-mf-lang-v8)
+(imp-mf-lang-v8)
+]
+
+@nested[#:style 'inset
+@defproc[(sequentialize-let [s values-bits-lang-v8?])
+          imp-mf-lang-v8?]{
+Picks a particular order to implement @values-bits-lang-v8[let] expressions
+using @imp-mf-lang-v8[set!].
+}]
+
+With the addition of an @imp-meffect in @tech{Imp-mf-lang v8}, @racket[normalize-bind]
+must be updated 
+
+Next we design @deftech{Imp-mf-lang v8} with support for @tech{mops}.
+
+@bettergrammar*-ndiff[
+#:labels ("v7 Diff (excerpts)" "Full")
+(#:exclude (opand triv loc trg binop relop int64 aloc label rloc) imp-mf-lang-v7 imp-mf-lang-v8)
+(imp-mf-lang-v8)
+]
+
+We introduce the @imp-mf-lang-v8[value] context, but notice that the index
+position for an @imp-mf-lang-v8[mset!] instruction is still restricted.
+
+@question{Why can't (or shouldn't) we allow the index position to also be a
+@imp-mf-lang-v8[value]?}
+
+@defproc[(normalize-bind [p imp-mf-lang-v8?])
+         imp-cmf-lang-v8?]{
+Pushes @imp-mf-lang-v8[set!] and @imp-mf-lang-v8[mset!] under @imp-mf-lang-v8[begin] and
+@imp-mf-lang-v8[if] so that the right-hand-side of each is simple
+value-producing operand.
+
+This normalizes @tech{Imp-mf-lang v8} with respect to the equations
+@tabular[
+(list
+ (list
+  @imp-mf-lang-v8[(set! loc (begin effect_1 ... value))]
+  "="
+  @imp-mf-lang-v8[(begin effect_1 ... (set! loc value))])
+ (list
+  @imp-mf-lang-v8[(set! loc (if pred value_1 value_2))]
+  "="
+  @imp-mf-lang-v8[(if pred (set! loc value_1) (set! loc value_2))])
+ (list
+  @imp-mf-lang-v8[(mset! loc opand (begin effect_1 ... value))]
+  "="
+  @imp-mf-lang-v8[(begin effect_1 ... (mset! loc opand value))])
+ (list
+  @imp-mf-lang-v8[(mset! loc opand (if pred value_1 value_2))]
+  "="
+  @imp-mf-lang-v8[(if pred (mset! loc opand value_1) (mset! loc opand value_2))])
+ )
+]
+}
+
+
+
+
+
+
+Before we implement structured data, we expose our @tech{mops} through a few
+layers of abstractions.
+Below we design @deftech{Imp-cmf-lang v8} with support for
+@tech{mops}.
+We typeset the differences compared to @v7-tech{Imp-cmf-lang v7}.
+
+@bettergrammar*-ndiff[
+#:labels ("v7 Diff (excerpts)" "Source/Target Diff" "Full")
+(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc) imp-cmf-lang-v7 imp-cmf-lang-v8)
+(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc)
+imp-cmf-lang-v8 asm-alloc-lang-v8)
+(imp-cmf-lang-v8)
+]
+
+We add value forms of @imp-cmf-lang-v8[mref] and @imp-cmf-lang-v8[alloc].
+We require these forms are used in a well-typed way.
+This is a simple extension.
+
+@defproc[(select-instructions [p imp-cmf-lang-v8?])
+         asm-alloc-lang-v8?]{
+Selects appropriate sequences of abstract assembly instructions to implement the
+operations of the source language.
+}
+
+The @racket[impose-calling-conventions] pass requires only minor changes.
+
+@section{Exposing @tech{mops} down the pipeline}
+The new @tech{mops} require minor changes to most of the pipeline between
+@tech{Exprs-bits-lang v8}to @tech{Asm-alloc-lang v8}, where we will start
+implementing these abstractions in the low-level languages.
+
+@exercise{Redesign and extend the implementation of
+@itemlist[
+@item{@racket[uncover-locals], should require minor changes.}
+@item{@racket[undead-analysis], should require minor changes.
+Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
+@item{@racket[conflict-analysis], should require minor changes.
+Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
+@item{@racket[assign-call-undead-variables], should require no changes.}
+@item{@racket[allocate-frames], should require no changes.}
+@item{@racket[assign-registers], should require no changes.}
+@item{@racket[assign-frame-variables], should require no changes.}
+@item{@racket[replace-locations], should require minor changes to support
+@tech{mops}.}
+@item{@racket[optimize-predicates], could require minor changes.}
+@item{@racket[implement-fvars], should require minor changes to support
+@tech{mops}.
+Note that we assume the @object-code{fbp} is not modified by @tech{mops}.}
+@item{@racket[expose-basic-blocks], should require no changes}
+@item{@racket[resolve-predicates], should require no changes}
+@item{@racket[flatten-program], should require no changes}
+]}
 
 @section{Exposing Heap Pointers in the Back-end}
 @subsection{generate-x64}
@@ -609,32 +926,6 @@ instructions and an auxiliary register from
 @racket[current-patch-instructions-registers].
 }
 
-@subsection{Exposing @tech{mops} up the pipeline}
-The new @tech{mops} require minor changes to most of the pipeline up to
-@tech{Asm-alloc-lang v8}, where we will use them to implement data structures.
-
-@exercise{Redesign and extend the implementation of
-@itemlist[
-@item{@racket[flatten-program], should require no changes}
-@item{@racket[resolve-predicates], should require no changes}
-@item{@racket[expose-basic-blocks], should require no changes}
-@item{@racket[implement-fvars], should require minor changes to support
-@tech{mops}.
-Note that we assume the @object-code{fbp} is not modified by @tech{mops}.}
-@item{@racket[optimize-predicates], could require minor changes.}
-@item{@racket[replace-locations], should require minor changes to support
-@tech{mops}.}
-@item{@racket[assign-frame-variables], should require no changes.}
-@item{@racket[assign-registers], should require no changes.}
-@item{@racket[allocate-frames], should require no changes.}
-@item{@racket[assign-call-undead-variables], should require no changes.}
-@item{@racket[conflict-analysis], should require minor changes.
-Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
-@item{@racket[undead-analysis], should require minor changes.
-Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
-@item{@racket[uncover-locals], should require minor changes.}
-]}
-
 @subsection{Implementing Allocation}
 Before we introduce structured data, we implement the @asm-alloc-lang-v8[alloc]
 instruction to allow programs to allocate a bunch of bytes and not worry about
@@ -702,155 +993,6 @@ Intuitively, we will transform each @racket[`(set! ,loc (alloc ,index))] into
          asm-pred-lang-v8?]{
 Implements the allocation primitive in terms of pointer arithmetic on the
 @racket[current-heap-base-pointer-register].
-}
-
-@subsection{Abstracting Mops}
-Before we implement structured data, we expose our @tech{mops} through a few
-layers of abstractions.
-Below we design @deftech{Imp-cmf-lang v8} with support for
-@tech{mops}.
-We typeset the differences compared to @v7-tech{Imp-cmf-lang v7}.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Source/Target Diff" "Full")
-(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc) imp-cmf-lang-v7 imp-cmf-lang-v8)
-(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc)
-imp-cmf-lang-v8 asm-alloc-lang-v8)
-(imp-cmf-lang-v8)
-]
-
-We add value forms of @imp-cmf-lang-v8[mref] and @imp-cmf-lang-v8[alloc].
-We require these forms are used in a well-typed way.
-This is a simple extension.
-
-@defproc[(select-instructions [p imp-cmf-lang-v8?])
-         asm-alloc-lang-v8?]{
-Selects appropriate sequences of abstract assembly instructions to implement the
-operations of the source language.
-}
-
-Next we design @deftech{Imp-mf-lang v8} with support for @tech{mops}.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Full")
-(#:exclude (opand triv loc trg binop relop int64 aloc label rloc) imp-mf-lang-v7 imp-mf-lang-v8)
-(imp-mf-lang-v8)
-]
-
-We introduce the @imp-mf-lang-v8[value] context, but notice that the index
-position for an @imp-mf-lang-v8[mset!] instruction is still restricted.
-
-@question{Why can't (or shouldn't) we allow the index position to also be a
-@imp-mf-lang-v8[value]?}
-
-@defproc[(normalize-bind [p imp-mf-lang-v8?])
-         imp-cmf-lang-v8?]{
-Pushes @imp-mf-lang-v8[set!] and @imp-mf-lang-v8[mset!] under @imp-mf-lang-v8[begin] and
-@imp-mf-lang-v8[if] so that the right-hand-side of each is simple
-value-producing operand.
-
-This normalizes @tech{Imp-mf-lang v8} with respect to the equations
-@tabular[
-(list
- (list
-  @imp-mf-lang-v8[(set! loc (begin effect_1 ... value))]
-  "="
-  @imp-mf-lang-v8[(begin effect_1 ... (set! loc value))])
- (list
-  @imp-mf-lang-v8[(set! loc (if pred value_1 value_2))]
-  "="
-  @imp-mf-lang-v8[(if pred (set! loc value_1) (set! loc value_2))])
- (list
-  @imp-mf-lang-v8[(mset! loc opand (begin effect_1 ... value))]
-  "="
-  @imp-mf-lang-v8[(begin effect_1 ... (mset! loc opand value))])
- (list
-  @imp-mf-lang-v8[(mset! loc opand (if pred value_1 value_2))]
-  "="
-  @imp-mf-lang-v8[(if pred (mset! loc opand value_1) (mset! loc opand value_2))])
- )
-]
-}
-
-The @racket[impose-calling-conventions] pass requires only minor changes.
-
-For @racket[sequentialize-let], we need to design an
-@values-bits-lang-v8[effect] context in order to expose
-@values-bits-lang-v8[mset!].
-We design @deftech{Values-bits-lang v8} to include a few imperative features.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Source/Target Diff (Excerpts)" "Full")
-(#:exclude (opand triv binop relop int64 aloc label) values-bits-lang-v7 values-bits-lang-v8)
-(#:exclude (opand triv binop relop int64 aloc label) values-bits-lang-v8 proc-imp-cmf-lang-v8)
-(values-bits-lang-v8)
-]
-
-We add an @values-bits-lang-v8[effect] context to support
-@values-bits-lang-v8[mset!], and a @values-bits-lang-v8[begin] expression for
-convenience.
-Previously, all expressions in the Values-lang languages were @emph{pure}---they
-evaluated and produced the same value regardless of in which order expressions
-were evaluated.
-We could freely reorder expressions, as long as we respected scope.
-Now, however, @values-bits-lang-v8[mset!] modifies memory during its execution.
-It not safe to reorder expressions after an @values-bits-lang-v8[mset!].
-Furthermore, @values-bits-lang-v8[mset!] does not return a useful value.
-
-To deal with this, we introduce a contextual distinction in the language.
-We add the non-terminal @values-bits-lang-v8[effect] to represent an impure computation.
-A @values-bits-lang-v8[effect] represents an expression that does not have a value, and is
-executed only for its effect.
-We can use @values-bits-lang-v8[effect] in certain expression contexts using
-@values-bits-lang-v8[begin].
-If we're already in an impure context, that is, in a
-@values-bits-lang-v8[effect], then we can freely nest other
-@values-bits-lang-v8[effect]s.
-
-This contextual distinction is similar to the one we introduce to distinguish
-tail calls from non-tail calls.
-
-Despite the conceptually complex change to the language, the transformation is
-still straightforward.
-
-@digression{Now that effects can appear on the right-hand side of a
-@values-bits-lang-v8[let] expression, it MAY not longer be safe to reorder them.
-This is a design choice: we could make it clear to the programmer that
-@values-bits-lang-v8[let] does not guarantee a particular order of evaluation
-for its bindings, but then effects on the right-hand side lead to undefined
-behaviour.
-Or, we could impose a particular order, such as left-to-right, forbidding an
-optimization.
-A middle ground is to impose such an order only if any effects are detected in
-the right-hand side of a @values-bits-lang-v8[let] (or rather, if we can
-guarantee no effects are present, because Rice still does not let us know for
-sure).
-}
-
-@defproc[(sequentialize-let [s values-bits-lang-v8?])
-          proc-imp-cmf-lang-v8?]{
-Picks a particular order to implement @values-bits-lang-v8[let] expressions
-using @imp-mf-lang-v8[set!].
-}
-
-Finally, we enable arbitrary nesting in value position.
-We design @deftech{Exprs-bits-lang v8/contexts} below.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Full")
-(#:exclude (triv binop aloc label relop int64)
- exprs-bits-lang-v7/contexts exprs-bits-lang-v8/contexts)
-(exprs-bits-lang-v8/contexts)
-]
-
-Supporting @exprs-bits-lang-v8/contexts[effect] context requires paying
-attention to order when designing @racket[remove-complex-opera*], but does not
-significantly complicate anything.
-
-@defproc[(remove-complex-opera* [p exprs-bits-lang-v8/contexts?])
-         values-bits-lang-v8?]{
-Performs the monadic form transformation, unnesting all non-trivial operators
-and operands, making data flow explicit and and simple to implement imperatively.
 }
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
