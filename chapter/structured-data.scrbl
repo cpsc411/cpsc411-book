@@ -7,7 +7,8 @@
   (for-label (except-in cpsc411/compiler-lib compile))
   cpsc411/langs/v7
   cpsc411/langs/v8
-  (for-label cpsc411/langs/v8))
+  (for-label cpsc411/langs/v8)
+  (for-label cpsc411/langs/v7))
 
 @(provide (all-defined-out))
 
@@ -691,31 +692,32 @@ We design the target language, @deftech{Imp-mf-lang v8}, below.
 ]
 
 @nested[#:style 'inset
-@defproc[(sequentialize-let [s values-bits-lang-v8?])
+@defproc[(sequentialize-let [p values-bits-lang-v8?])
           imp-mf-lang-v8?]{
 Picks a particular order to implement @values-bits-lang-v8[let] expressions
 using @imp-mf-lang-v8[set!].
 }]
 
-With the addition of an @imp-meffect in @tech{Imp-mf-lang v8}, @racket[normalize-bind]
-must be updated 
 
-Next we design @deftech{Imp-mf-lang v8} with support for @tech{mops}.
+With the addition of an @imp-mf-lang-v8[mset!], @racket[normalize-bind] must be
+updated.
+This operator is enables the same kind of nesting as @imp-mf-lang-v8[set!], and
+like @imp-mf-lang-v8[set!], its operand needs to be normalized.
+
+Next we design @deftech{Proc-imp-cmf-lang v8}
 
 @bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Full")
-(#:exclude (opand triv loc trg binop relop int64 aloc label rloc) imp-mf-lang-v7 imp-mf-lang-v8)
-(imp-mf-lang-v8)
+#:labels ("Diff vs v7" "Diff vs Source" "Proc-imp-cmf-lang v8")
+(proc-imp-cmf-lang-v7 proc-imp-cmf-lang-v8)
+(imp-mf-lang-v8 proc-imp-cmf-lang-v8)
+(proc-imp-cmf-lang-v8)
 ]
-
-We introduce the @imp-mf-lang-v8[value] context, but notice that the index
-position for an @imp-mf-lang-v8[mset!] instruction is still restricted.
 
 @question{Why can't (or shouldn't) we allow the index position to also be a
 @imp-mf-lang-v8[value]?}
 
 @defproc[(normalize-bind [p imp-mf-lang-v8?])
-         imp-cmf-lang-v8?]{
+         proc-imp-cmf-lang-v8?]{
 Pushes @imp-mf-lang-v8[set!] and @imp-mf-lang-v8[mset!] under @imp-mf-lang-v8[begin] and
 @imp-mf-lang-v8[if] so that the right-hand-side of each is simple
 value-producing operand.
@@ -743,28 +745,16 @@ This normalizes @tech{Imp-mf-lang v8} with respect to the equations
 ]
 }
 
+@racket[impose-calling-conventions] and @racket[select-instructions] require
+only minor changes, so we leave those changes as an exercise for the reader.
 
-
-
-
-
-Before we implement structured data, we expose our @tech{mops} through a few
-layers of abstractions.
-Below we design @deftech{Imp-cmf-lang v8} with support for
-@tech{mops}.
-We typeset the differences compared to @v7-tech{Imp-cmf-lang v7}.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Source/Target Diff" "Full")
-(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc) imp-cmf-lang-v7 imp-cmf-lang-v8)
-(#:exclude (opand triv loc trg info frame binop relop int64 aloc label rloc)
-imp-cmf-lang-v8 asm-alloc-lang-v8)
-(imp-cmf-lang-v8)
-]
-
-We add value forms of @imp-cmf-lang-v8[mref] and @imp-cmf-lang-v8[alloc].
-We require these forms are used in a well-typed way.
-This is a simple extension.
+@nested[#:style 'inset
+@defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v8?])
+          imp-cmf-lang-v8?]{
+Compiles @tech{Proc-imp-cmf-lang v8} to @tech{Imp-cmf-lang v8} by imposing calling
+conventions on all calls (both tail and non-tail calls), and @tech{entry
+points}.
+}]
 
 @defproc[(select-instructions [p imp-cmf-lang-v8?])
          asm-alloc-lang-v8?]{
@@ -772,179 +762,25 @@ Selects appropriate sequences of abstract assembly instructions to implement the
 operations of the source language.
 }
 
-The @racket[impose-calling-conventions] pass requires only minor changes.
-
-@section{Exposing @tech{mops} down the pipeline}
-The new @tech{mops} require minor changes to most of the pipeline between
-@tech{Exprs-bits-lang v8}to @tech{Asm-alloc-lang v8}, where we will start
-implementing these abstractions in the low-level languages.
-
-@exercise{Redesign and extend the implementation of
-@itemlist[
-@item{@racket[uncover-locals], should require minor changes.}
-@item{@racket[undead-analysis], should require minor changes.
-Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
-@item{@racket[conflict-analysis], should require minor changes.
-Note that @tech{mops} do not @emph{assign} any registers or frame variables.}
-@item{@racket[assign-call-undead-variables], should require no changes.}
-@item{@racket[allocate-frames], should require no changes.}
-@item{@racket[assign-registers], should require no changes.}
-@item{@racket[assign-frame-variables], should require no changes.}
-@item{@racket[replace-locations], should require minor changes to support
-@tech{mops}.}
-@item{@racket[optimize-predicates], could require minor changes.}
-@item{@racket[implement-fvars], should require minor changes to support
-@tech{mops}.
-Note that we assume the @object-code{fbp} is not modified by @tech{mops}.}
-@item{@racket[expose-basic-blocks], should require no changes}
-@item{@racket[resolve-predicates], should require no changes}
-@item{@racket[flatten-program], should require no changes}
-]}
-
-@section{Exposing Heap Pointers in the Back-end}
-@subsection{generate-x64}
-We start by exposing a generalized @paren-x64-v8[addr] form in
-@deftech{Paren-x64 v8} below, which will allow us to access arbitrary memory
-locations.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpt)" "v8 Full")
-(#:exclude (reg binop relop fbp int32 int64 label dispoffset) paren-x64-v7 paren-x64-v8)
-(paren-x64-v8)
-]
-
-The language contains a new @paren-x64-v8[addr] representing the @ch1-tech{x64}
-index-mode operand @paren-x64-v8[(reg + reg)].
-This supports accessing a memory location by the index stored in another
-register.
-For example, in @ch1-tech{x64}, we represent loading the @emph{n}th element of an
-array into @paren-x64-v8[r10] using @tt{mov r10 [r11 + r12]}, where the base of the
-array is stored at @tt{r11} and the value of @emph{n} is stored in @tt{r12}.
-
-The index-mode operand is not restricted to use a particular register, unlike
-the displacement-mode operand from @v7-tech{Paren-x64 v7}.
-We will use this feature to store pointers to structured data, and the register
-allocator will move those pointers into whichever registers it chooses.
-
-We also allow a generalized form of displacement-mode operand.
-We can access the value pointed to by a base register @paren-x64-v8[reg] at
-offset @paren-x64-v8[int32]. by @paren-x64-v8[(reg + int32)].
-This allows optimizing heap accesses when a constant offset is known, which is
-often the case for some data structures.
-The index is not restricted to be a multiple of 8, but it should be the case in
-our compiler that the value of the base plus the value of the offset is a
-multiple of 8.
-
-All languages with direct access to registers, including @tech{Paren-x64 v8},
-are now parameterized by a new register,
-@racket[current-heap-base-pointer-register] (abbreviated
-@object-code{hbp}).
-The run-time system initializes this register to point to the base of the heap.
-Allocation is implemented by copying the current value of this pointer, and
-incrementing it by the number of bytes we wish to allocate.
-The pointer must only be incremented by word-size multiples of bytes.
-Any other access to this register is now undefined behvaiour, similar to accesses
-to @object-code{fbp} that do not obey the stack of frames discipline.
-
-@digression{
-A real language implementation might abstract access to the @tt{mmap}
-system call for allocation, and implement a strategy (such as garbage
-collection) to deallocate memory that is no longer used.
-Garbage collection is tricky to implement and requires too much time for this
-course, so we use a different strategy.
-Our implementation of allocation is trivial, and does not support de-allocation.
-We rely on the operating system to clean up memory after our process exits.
-
-For a quick introduction to garbage collection, see this short video @url{https://twitter.com/TartanLlama/status/1296413612907663361?s=20}.
-}
-
-@defproc[(generate-x64 [s paren-x64-v8])
-         string?]{
-Compile the @tech{Paren-x64 v8} program into a valid sequence of @ch1-tech{x64}
-instructions, represented as a string.
-}
-
-@subsection{Em-Ops: Abstracting Memory Operations}
-Like when we implemented @object-code{fvar}s to support working with frame
-locations, we implement primitive memory operations, @tech{mops} , to simplify
-working with heap addresses.
-We should do this before @racket[patch-instructions] to avoid complicating the
-already complex logic for rewriting @object-code{set!} instructions.
-
-Below, we define @deftech{Paren-x64-mops v8}, with differences compared to @tech{Paren-x64-v8}.
-
-@bettergrammar*-ndiff[
-#:labels ("v8 Diff (excerpts)" "Full")
-(#:include (p s addr index) paren-x64-v7 paren-x64-mops-v8)
-(paren-x64-mops-v8)
-]
-
-We add two new instructions that directly map to operations on heap addresses,
-either as index- or displacement-mode operands.
-@margin-note{We could encode the restricted form of @paren-x64-mops-v8[addr],
-used for frame variables, as an @paren-x64-mops-v8[mref], but the rest of our
-compiler already knows about @paren-x64-mops-v8[addr]s, and it represents a
-semantically different concept, so we leave it alone.}
-
-@defproc[(implement-mops [p paren-x64-mops-v8?])
-          paren-x64-v8?]{
-Compiles @tech{mops} to instructions on pointers with index- and
-displacement-mode operands.
-}
-
-Next we design @deftech{Para-asm-lang v8}.
-Below, we give a definition.
-@;However, your design may differ slightly since you've been responsible for the
-@;design of @a6-tech{Paren-asm v6} and @a7-tech{Paren-asm v7}.
-
-@bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "source/target Diff" "Full")
-(#:exclude (reg relop binop trg opand label int64) para-asm-lang-v7 para-asm-lang-v8)
-(paren-x64-mops-v8 para-asm-lang-v8)
-(para-asm-lang-v8)
-]
-
-By introducing @tech{mops}, we implicitly restrict how heap addresses appear in
-the language and simplify the job of @racket[patch-instructions].
-The @tech{mops} implicitly restrict heap addresses to being part of a move
-instruction, so we do not have to patch binary operation instructions despite
-apparently adding a new form of physical location.
-By making them separate forms, we only need to patch the new instructions, and
-leave old code untouched.
-
-In @racket[patch-instructions], we also lift the restriction on
-@para-asm-lang-v8[index], so @para-asm-lang-v8[int64]s can appear as an
-@para-asm-lang-v8[index].
-This makes @para-asm-lang-v8[index] and @para-asm-lang-v8[opand] coincide,
-syntactically, but they are conceptually different so we maintain separate
-non-terminal definitions.
-
-@defproc[(patch-instructions [s para-asm-lang-v8])
-         paren-x64-mops-v8]{
-Patches instructions that have no @ch1-tech{x64} analogue into to a sequence of
-instructions and an auxiliary register from
-@racket[current-patch-instructions-registers].
-}
-
-@subsection{Implementing Allocation}
-Before we introduce structured data, we implement the @asm-alloc-lang-v8[alloc]
-instruction to allow programs to allocate a bunch of bytes and not worry about
-the details of the allocation pointer.
-We want to do this @emph{after} the passes that analyze physical locations,
-since then we do not have to update those passes to know that
+@section{Implementing Allocation}
+As previously discussed, our allocation strategy is to simply grab the current
+heap base pointer, and increment beyond the bytes we want to use for our data
+structure.
+The question is where to implement this operation.
+We want to do this @emph{after} we have access to physical locations, so so
+after @racket[impose-calling-conventions], but @emph{before} the register
+allocator passes, so we do not have to update those passes to know that
 @asm-alloc-lang-v8[alloc] introduces a reference to a register.
-However, we want to do this @emph{before} we abstract away from all machine
-details so we do not need to expose registers beyond @tech{Asm-alloc-lang v8}.
-
-We choose to insert this pass between @racket[uncover-locals] and
-@racket[select-instructions].
+This puts the pass right between @racket[select-instructions] and
+@racket[uncover-locals].
 
 Below, we design @deftech{Asm-alloc-lang v8}, the source language for this pass.
-We typeset the differences compared to @v7-tech{Asm-pred-lang v7}.
+We typeset the differences compared to @racket[asm-pred-lang-v7].
 
 @bettergrammar*-ndiff[
-#:labels ("v7 Diff (excerpts)" "Full")
-(#:exclude (binop relop int64 opand triv loc trg aloc label rloc) asm-pred-lang-v7 asm-alloc-lang-v8)
+#:labels ("Diff vs v7 (excerpts)" "Full")
+(#:exclude (binop relop int64 opand triv loc trg aloc label rloc)
+ asm-pred-lang-v7 asm-alloc-lang-v8)
 (asm-alloc-lang-v8)
 ]
 
@@ -954,18 +790,9 @@ different concept, which happens to have the same representation.
 @;Should probably abstract dispoffset to word-aligned bytes or something, then
 @;reuse that.
 
-We expose the earlier @tech{mops}, and add a new one, @asm-alloc-lang-v8[(set! loc
-(alloc index))].
-This is the low-level form of our allocation operation, which we will abstract
-into an expression in @tech{Exprs-lang v8}.
-In @asm-alloc-lang-v8[(set! loc (alloc index))], the @asm-alloc-lang-v8[index] is restricted
-to be an @asm-alloc-lang-v8[int32] if it is an integer literal, for the same reasons
-as the restriction on @asm-alloc-lang-v8[binop]s.
-It must also be a multiple of a word size.
-This requirement is partly from the operating system's @tt{mmap} (which will
-usually ignore us if we violate the restriction and give us page-aligned memory
-anyway), but mostly to ensure every pointer we get has @code{#b000} as its final
-three bits so we can tag all pointers.
+This language contains our intermediate @tech{mops}, including
+@asm-alloc-lang-v8[(set! loc (alloc index))].
+This is the low-level form of our allocation operation.
 
 We design the target language, @deftech{Asm-pred-lang v8}, below.
 This language removes the @asm-alloc-lang-v8[(alloc index)] form and is the
@@ -976,9 +803,11 @@ accesses to @paren-x64-v8[hbp] obey the restrictions described in
 @tech{Paren-x64 v8}.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "v7 Diff (excerpts)" "Full")
-(#:exclude (opand triv loc trg binop relop int64 int32 aloc label rloc) asm-alloc-lang-v8 asm-pred-lang-v8)
-(#:exclude (opand triv loc trg binop relop int64 int32 aloc label rloc) asm-pred-lang-v7 asm-pred-lang-v8)
+#:labels ("Diff vs Source (excerpts)" "Diff vs v7 (excerpts)" "Asm-pred-lang v8")
+(#:exclude (opand triv loc trg binop relop int64 int32 aloc label rloc)
+ asm-alloc-lang-v8 asm-pred-lang-v8 )
+(#:exclude (opand triv loc trg binop relop int64 int32 aloc label rloc)
+ asm-pred-lang-v7 asm-pred-lang-v8)
 (asm-pred-lang-v8)
 ]
 
@@ -994,6 +823,119 @@ Intuitively, we will transform each @racket[`(set! ,loc (alloc ,index))] into
 Implements the allocation primitive in terms of pointer arithmetic on the
 @racket[current-heap-base-pointer-register].
 }
+
+@section{Implementing @tech{mops}}
+The new @tech{mops} require minor changes to most of the pipeline between
+@tech{Imp-cmf-lang-v8}to @tech{Para-asm-lang v8}, where we will start
+implementing these abstractions in the low-level languages.
+
+Like when we implemented @para-asm-lang-v8[fvar]s to support working with frame
+locations, we added @tech{mops} to simplify working with heap addresses.
+We want to keep that simplification around as long as possible, to avoid
+complicating the already complex logic for rewriting @paren-x64-v8[set!]
+instructions.
+
+The last pass that needs to do non-trivial rewriting of @paren-x64-v8[set!] is
+@racket[patch-instructions], and it would benefit from that simplification.
+So we decide to leave @tech{mops} in place and implement them @emph{after}
+@racket[patch-instruction].
+
+Below, we design @deftech{Para-asm-lang v8}, the new source language for
+@racket[patch-instructions].
+@;However, your design may differ slightly since you've been responsible for the
+@;design of @a6-tech{Paren-asm v6} and @a7-tech{Paren-asm v7}.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs v7 (excerpts)" "Para-asm-lang v8")
+(#:exclude (reg relop binop trg opand label int64)
+ para-asm-lang-v7 para-asm-lang-v8)
+(para-asm-lang-v8)
+]
+
+The target language, @deftech{Paren-x64-mops v8}, is given below.
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source (excerpts)" "Diff vs Paren-x64 v7" "Paren-x64-mops v8")
+(#:exclude (reg relop binop trg opand label int64)
+ para-asm-lang-v7 paren-x64-mops-v8)
+(#:exclude (reg relop binop trg opand label int64)
+ paren-x64-v7 paren-x64-mops-v8)
+(paren-x64-mops-v8)
+]
+
+As usual, @racket[patch-instructions] makes a lot of changes to the operands of
+each instructions.
+
+By leaving @tech{mops} separate forms, we only need to patch the new
+instructions, and leave patching of old instructions untouched.
+We do not need to pay attention to and patch a new kind of operand.
+
+The main restrictions on @tech{mops} are that the operands must be registers,
+and that the index must be a 32-bit integer.
+The operands for @tech{mops} have to be registers since they are compiled to
+low-level instructions where one operand is implicitly an index-mode operand.
+Similar to patching @ch2-tech{displacement-mode operands}, both operands cannot
+be reference to memory.
+The @para-asm-lang-v8[index] must be patches to 32-bit literals only for the
+same reason that binary operations must only contain 32-bit literals.
+This makes @para-asm-lang-v8[index] and @para-asm-lang-v8[opand] coincide,
+syntactically, but they are conceptually different so we maintain separate
+non-terminal definitions.
+
+@defproc[(patch-instructions [p para-asm-lang-v8])
+         paren-x64-mops-v8]{
+Patches instructions that have no @ch1-tech{x64} analogue into to a sequence of
+instructions and an auxiliary register from
+@racket[current-patch-instructions-registers].
+}
+
+Finally, we can translate @tech{mops} into @tech{index-mode operands} and
+@ch2-tech{displacement-mode operands}.
+Note that the compiler pass doesn't need to know which it is generating; their
+syntax is the same except for type of the second operand.
+The target language is @deftech{Paren-x64 v8}, which we define below.
+
+@bettergrammar*-ndiff[
+#:labels ("Diff vs Source" "Diff vs v7" "Paren-x64 v8")
+(#:include (p s addr index)
+ paren-x64-mops-v8 paren-x64-v8)
+(#:include (p s addr index)
+ paren-x64-v7 paren-x64-v8)
+(paren-x64-v8)
+]
+
+The language contains a new @paren-x64-v8[addr] representing the @ch1-tech{x64}
+@tech{index-mode operand} @paren-x64-v8[(reg + reg)].
+This supports accessing a memory location by the index stored in another
+register.
+For example, in @ch1-tech{x64}, we represent loading the @emph{n}th element of an
+array into @paren-x64-v8[r10] using @tt{mov r10 [r11 + r12]}, where the base of the
+array is stored at @tt{r11} and the value of @emph{n} is stored in @tt{r12}.
+
+The index-mode operand is not restricted to use a particular register, unlike
+the displacement-mode operand from @ch7-tech{Paren-x64 v7}.
+
+@;@margin-note{We could encode the restricted form of @paren-x64-mops-v8[addr],
+@;used for frame variables, as an @paren-x64-mops-v8[mref], but the rest of our
+@;compiler already knows about @paren-x64-mops-v8[addr]s, and it represents a
+@;semantically different concept, so we leave it alone.}
+
+@nested[#:style 'inset
+@defproc[(implement-mops [p paren-x64-mops-v8?])
+          paren-x64-v8?]{
+Compiles @tech{mops} to instructions on pointers with index- and
+displacement-mode operands.
+}]
+
+Finally, we update @racket[generate-x64] to emit the string representation of
+the @tech{index-mode operand}.
+
+@nested[#:style 'inset
+@defproc[(generate-x64 [p paren-x64-v8?])
+         string?]{
+Compile the @tech{Paren-x64 v8} program into a valid sequence of @ch1-tech{x64}
+instructions, represented as a string.
+}]
+
 
 @section[#:tag "sec:overview"]{Appendix: Overview}
 
