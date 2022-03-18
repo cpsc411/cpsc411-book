@@ -166,12 +166,3 @@ support index-mode operands.
 
 This could be a one-line change depending on the design of your compiler.
 }
-
-@;  LocalWords:  lang rkt TODO eg eval behaviour pm url subsubsub tt ids Exprs
-@;  LocalWords:  GitHub secref expressivity deftech itemlist alloc mref mset
-@;  LocalWords:  ie addr Paren racketgrammar loc triv reg binop int trg opand
-@;  LocalWords:  cmp unsyntax bnf fbp dispoffset ior xor neq eq emph mov hbp
-@;  LocalWords:  mmap de fvar em ops reimpose rloc asm todo fvars pre undead
-@;  LocalWords:  aloc racketblock effectful primop fixnum uint ascii fx cdr
-@;  LocalWords:  ref arity primops fixnums immediates ptr ptrs init inlining
-@;  LocalWords:  uniquify
