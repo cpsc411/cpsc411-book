@@ -2,7 +2,23 @@
 @(require
   cpsc411/compiler-lib
   cpsc411/langs/v7
-  (for-label cpsc411/reference/a7-solution))
+  (for-label
+   (except-in cpsc411/reference/a7-solution
+              flatten-program
+              expose-basic-blocks
+              implement-fvars
+              replace-locations
+              assign-frame-variables
+              assign-registers
+              allocate-frames
+              assign-call-undead-variables
+              conflict-analysis
+              undead-analysis
+              uncover-locals
+              select-instructions
+              normalize-bind
+              impose-calling-conventions
+              sequentialize-let)))
 
 @(reset-exercise-counter!)
 @(reset-challenge-counter!)
