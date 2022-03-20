@@ -4,9 +4,11 @@
   cpsc411/langs/v7
   (for-label
    (except-in cpsc411/reference/a7-solution
+              patch-instructions
               flatten-program
               expose-basic-blocks
               implement-fvars
+              optimize-predicates
               replace-locations
               assign-frame-variables
               assign-registers
@@ -107,22 +109,22 @@ enforce left-to-right evaluation order.
 @exercise{
 Redesign and extend the implementations of all the following passes:
 @itemlist[
-@item{@racket[flatten-program]}
-@item{@racket[expose-basic-blocks]}
-@item{@racket[implement-fvars]}
-@item{@racket[optimize-predicates]}
-@item{@racket[replace-locations]}
-@item{@racket[assign-frame-variables]}
-@item{@racket[assign-registers]}
-@item{@racket[allocate-frames]}
-@item{@racket[assign-call-undead-variables]}
-@item{@racket[conflict-analysis]}
-@item{@racket[undead-analysis]}
-@item{@racket[uncover-locals]}
-@item{@racket[select-instructions]}
-@item{@racket[normalize-bind]}
-@item{@racket[impose-calling-conventions]}
 @item{@racket[sequentialize-let]}
+@item{@racket[impose-calling-conventions]}
+@item{@racket[normalize-bind]}
+@item{@racket[select-instructions]}
+@item{@racket[uncover-locals]}
+@item{@racket[undead-analysis]}
+@item{@racket[conflict-analysis]}
+@item{@racket[assign-call-undead-variables]}
+@item{@racket[allocate-frames]}
+@item{@racket[assign-registers]}
+@item{@racket[assign-frame-variables]}
+@item{@racket[replace-locations]}
+@item{@racket[optimize-predicates]}
+@item{@racket[implement-fvars]}
+@item{@racket[expose-basic-blocks]}
+@item{@racket[flatten-program]}
 ]
 
 This should involve a change to a single function if your compiler has been
