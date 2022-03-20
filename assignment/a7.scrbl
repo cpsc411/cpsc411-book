@@ -110,6 +110,7 @@ Redesign and extend the implementations of all the following passes:
 @item{@racket[flatten-program]}
 @item{@racket[expose-basic-blocks]}
 @item{@racket[implement-fvars]}
+@item{@racket[optimize-predicates]}
 @item{@racket[replace-locations]}
 @item{@racket[assign-frame-variables]}
 @item{@racket[assign-registers]}
