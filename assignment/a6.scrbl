@@ -3,7 +3,8 @@
 @(require
   (except-in "../chapter/return.scrbl" doc)
   (for-label cpsc411/compiler-lib)
-  (for-label cpsc411/reference/a6-solution)
+  (for-label (except-in cpsc411/reference/a6-solution
+                        optimize-predicates))
   cpsc411/langs/v6)
 
 @(reset-exercise-counter!)
