@@ -387,7 +387,7 @@ We must look bottom-up at how we would expose jump from the lower level language
 
 We will need to expose @block-pred-lang-v5[jump] from @tech{Block-pred-lang v5},
 all the way up to whatever this transformation targets.
-This means at least exposing @block-pred-lang-v5[jump] through the regsiter
+This means at least exposing @block-pred-lang-v5[jump] through the register
 allocator.
 In @racket[undead-analysis], we will need to decide what set of locations is
 @ch-ra-tech{undead} after a @block-pred-lang-v5[jump].

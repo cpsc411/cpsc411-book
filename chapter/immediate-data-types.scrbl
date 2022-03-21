@@ -543,7 +543,7 @@ The compiler will do this for us, and allow us to write the code we want to
 write.
 
 @section{Specifying Data Type Representation}
-First we design we design @deftech{Exprs-unsafe-data-lang v7}.
+First we design @deftech{Exprs-unsafe-data-lang v7}.
 In this language, we compile our dynamically typed safe primitive procedures
 into lower level primitive operations on data types.
 
