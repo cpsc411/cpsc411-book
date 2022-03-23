@@ -466,9 +466,10 @@ As usual, we first task is to @racket[uniquify].
 Below we define the target language, @deftech{Exprs-unique-lang v8}.
 
 @bettergrammar*-ndiff[
-#:labels ("Diff vs v7 (excerpts)" "Exprs-unique-lang v8")
+#:labels ("Diff vs v7 (excerpts)" "Diff vs Source" "Exprs-unique-lang v8")
 (#:exclude (aloc label fixnum uint8 ascii-char-literal)
  exprs-unique-lang-v7 exprs-unique-lang-v8)
+(exprs-lang-v8 exprs-unique-lang-v8)
 (exprs-unique-lang-v8)
 ]
 
