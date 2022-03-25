@@ -1,6 +1,7 @@
 #lang reader "assignment-lang.rkt"
 @(require
   cpsc411/compiler-lib
+  (for-label cpsc411/compiler-lib)
   cpsc411/langs/v9
   (for-label cpsc411/reference/a9-solution))
 
@@ -20,8 +21,7 @@ can create a procedure at any point in the program.
 This assignment is due @(due 'a9).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://williamjbowman.com:8081/servlets/standalone.rkt?an=a9} (faster) or
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a9}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a9}.
 
 @subsubsub*section{Checklist}
 
@@ -57,6 +57,7 @@ reading the entire chapter.
 
 @section{Exercises}
 
+@exercise[#:optional #t]{Redesign and extend the implementation of @racket[check-exprs-lang].}
 @exercise{Redesign and extend the implementation of @racket[uniquify].}
 @exercise{Redesign and extend the implementation of @racket[implement-safe-primops].}
 @exercise{Design and implement @racket[implement-safe-call].}

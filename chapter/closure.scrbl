@@ -25,15 +25,19 @@ Actually, not much.
 With structured data types, @ch8-tech{Exprs-lang v8} is a pretty good language
 now.
 
-@ch8-tech{Exprs-bits-lang v8/contexts} is sufficiently expressive to act as a reasonable
+@ch8-tech{Exprs-bits-lang v8} is sufficiently expressive to act as a reasonable
 compiler backend for many languages.
-It's roughly equivalent to C, although with more curvy parens.
+It's roughly at the abstraction level of C.
+It provides raw access to memory, pointers, labels (function pointers) and
+bitwise operations, but also non-tail calls and some nice syntactic properties
+like algebraic expressions.
 
 @ch8-tech{Exprs-lang v8} adds safety on top of that language, although this
 safety does come at a cost.
-The main limitation in @ch8-tech{Exprs-lang v8} is the lack of abstractions over computation.
+One major limitation in @ch8-tech{Exprs-lang v8} is the lack of abstractions
+over computation.
 We have lots of abstraction over data, but it's common to want to abstract
-over computation---first class functions, objects, function pointers, etc.
+over computation---first-class procedures, objects, function pointers, etc.
 @ch8-tech{Exprs-lang v8} prevents even passing function pointers to ensure safety.
 
 In this chapter, we add the ability to easily abstract over computations at any point
@@ -43,33 +47,34 @@ Scheme, Java, and many more.
 They enable the programmer to create a suspended computation, and pass it around
 as a value.
 The procedure closes over the environment in which it was created, capturing any
-free variables and essentially
-creating an object with private fields.
-They can be used as the foundations for object systems, and provide a safe,
-lexically scoped alternative to function pointers.
+free variables and essentially creating an object with private fields.
+They can be used as the foundations for object systems, to represent call backs
+or continuations, and provide a safe, lexically scoped alternative to function
+pointers.
 
 In @deftech{Exprs-lang v9}, we add first-class procedures as values:
 @bettergrammar*-ndiff[
-#:labels ("v8 Diff (excerpts)" "Full")
+#:labels ("Diff vs v8 (excerpts)" "Exprs-lang v9")
 (#:exclude (fixnum uint8 ascii-char-literal) exprs-lang-v8 exprs-lang-v9)
 (exprs-lang-v9)
 ]
 
 Now, @exprs-lang-v9[lambda] can appear in any expression.
 We can still define procedures at the top-level using @exprs-lang-v9[define],
-although the semantics will change slightly.
+although the semantics will change.
 
 We add a new data structure to the language as well: @exprs-lang-v9[procedure]s.
 These are implicitly constructed by @exprs-lang-v9[lambda].
-They support two additional operations: @exprs-lang-v9[procedure?] and
-@exprs-lang-v9[procedure-arity], for inspecting how many formal paramters they
-take.
+They support two operations, in addition to @exprs-lang-v9[call]: the
+tag-checking predicate @exprs-lang-v9[procedure?] and
+@exprs-lang-v9[procedure-arity], for inspecting how many parameters the
+procedure expects take.
 
 This is a syntactically small change, but it has massive implications.
 
 @section{Procedures, Closures and Closure Conversion}
 So far, procedures in our language have been compiled directly to labeled
-@deftech{code}---a suspended computation that is closed except for it's declared
+@deftech{code}---a suspended computation that is closed except for its declared
 parameters.
 We have not treated procedures as values, nor considered what happens if a
 procedure appears in value context.
@@ -78,7 +83,7 @@ its @tech{code}.
 In earlier source languages, we disallowed passing procedures as values, to
 ensure safety.
 
-@subsection{The Procedure}
+@subsection{The First-class Procedure}
 To support first-class procedures, we need to compile procedures to a
 data structure.
 This data structure allows us to construct a procedure value, pass it around and
@@ -93,7 +98,7 @@ Here is our updated list of tags:
 @itemlist[
 @item{@code{#b000}, @deftech{fixnums}, fixed-sized integers}
 @item{@code{#b001}, @ch8-tech{pairs}}
-@item{@code{#b010}, @tech{procedures}}
+@item{@code{#b010}, (first-class) @tech{procedures}}
 @item{@code{#b011}, @ch8-tech{vectors}}
 @item{@code{#b100}, @emph{unused}}
 @item{@code{#b101}, @emph{unused}}
@@ -103,7 +108,7 @@ Here is our updated list of tags:
 
 In the source language, we expose the primitive operations @exprs-lang-v9[procedure?] and
 @exprs-lang-v9[procedure-arity].
-However, the compiler intermediate languages will expose a few more operations
+However, the compiler intermediate languages expose a few more operations
 that the compiler needs to make use of to implement procedure calls.
 
 Every instance of @exprs-lang-v9[lambda] compiles to a procedure.
@@ -117,13 +122,13 @@ Essentially, the procedure is an object, and receives itself as an argument.
 Each "free variable" @tt{x} is a field of that object, and are compiled to
 references to @tt{self.x}.
 
-The procedure interface is described below:
+The low-level first-class @deftech{procedure} interface is described below:
 @itemlist[
-@item{@proc-exposed-lang-v9[(make-procedure e_label e_arity e_size)]
+@item{@proc-exposed-lang-v9[(make-procedure value_label value_arity value_size)]
 
-Creates a procedure whose label is @proc-exposed-lang-v9[e_label], which expects
-@proc-exposed-lang-v9[e_arity] number of arguments, and has an environment of size
-@proc-exposed-lang-v9[e_size].
+Creates a procedure whose label is @proc-exposed-lang-v9[value_label], which expects
+@proc-exposed-lang-v9[value_arity] number of arguments, and has an environment of size
+@proc-exposed-lang-v9[value_size].
 
 @proc-exposed-lang-v9[make-procedure] does not perform any error checking; it must be
 applied to a label and two fixnum @ch7-tech{ptrs}.
@@ -135,10 +140,10 @@ it correctly.
 In the source language, @proc-exposed-lang-v9[make-procedure] is not exposed
 directly; instead, @exprs-lang-v9[lambda] is compiled down to this primitive.
 }
-@item{@proc-exposed-lang-v9[(unsafe-procedure-ref e_proc e_index)]
+@item{@proc-exposed-lang-v9[(unsafe-procedure-ref value_proc value_index)]
 
-Return the value at index @proc-exposed-lang-v9[e_index] in the environment of the
-procedure @proc-exposed-lang-v9[e_proc].
+Return the value at index @proc-exposed-lang-v9[value_index] in the environment of the
+procedure @proc-exposed-lang-v9[value_proc].
 
 As with all unsafe operators, this does not perform any checking.
 
@@ -150,20 +155,20 @@ We use this to implement @tech{closures}, which we describe shortly.
 }
 @item{@proc-exposed-lang-v9[(unsafe-procedure-set! e_proc e_index e_val)]
 
-Set the value at index @proc-exposed-lang-v9[e_index] in the environment of the
-procedure @proc-exposed-lang-v9[e_proc] to be @proc-exposed-lang-v9[e_val].
+Set the value at index @proc-exposed-lang-v9[value_index] in the environment of the
+procedure @proc-exposed-lang-v9[value_proc] to be @proc-exposed-lang-v9[value_val].
 
 In the source language, @proc-exposed-lang-v9[unsafe-procedure-set!] is not
 exposed directly.
 }
-@item{@proc-exposed-lang-v9[(unsafe-procedure-label e_proc)]
+@item{@proc-exposed-lang-v9[(unsafe-procedure-label value_proc)]
 
-Returns the label to the @tech{code} for the procedure @proc-exposed-lang-v9[e_proc].
+Returns the label to the @tech{code} for the procedure @proc-exposed-lang-v9[value_proc].
 }
-@item{@proc-exposed-lang-v9[(call e_label es ...)]
+@item{@proc-exposed-lang-v9[(call value_label value ...)]
 
-Call the @tech{code} whose label is @proc-exposed-lang-v9[e_label] with the
-arguments @proc-exposed-lang-v9[es].
+Call the @tech{code} whose label is @proc-exposed-lang-v9[value_label] with the
+arguments @proc-exposed-lang-v9[value].
 
 This is essentially the same as the @exprs-lang-v9[call] primitive in previous
 chapters, although we now allow labels to be computes and passed as values.
@@ -175,7 +180,7 @@ dynamic checks to ensure safety.
 Our procedure data structure is essentially a vector containing a label to the
 @tech{code} and the values of each free variable in its @tech{environment}.
 
-The challenge in implement procedures is primarily in compiling
+The challenge in implementing procedures is primarily in compiling
 @exprs-lang-v9[lambda] down to the procedure primitives, then specifying the
 representation of these procedure primitives in terms of calls to labelled
 @tech{code}.
@@ -211,8 +216,8 @@ First, you can call a @tech{closure} with @closure-lang-v9[(closure-call e es ..
 essentially extracts the label from the @tech{closure} @closure-lang-v9[e]
 and calls the procedure at that label with the argument @closure-lang-v9[(es ...)].
 Second, you can dereference an @tech{environment} variable from the
-@tech{closure} with @closure-lang-v9[(closure-ref e e_i)], extracting the value
-at index @closure-lang-v9[e_i] from the @tech{environment} of the @tech{closure}
+@tech{closure} with @closure-lang-v9[(closure-ref e value_i)], extracting the value
+at index @closure-lang-v9[value_i] from the @tech{environment} of the @tech{closure}
 @closure-lang-v9[e].
 
 Because we want to implement safe procedure application, we add a third field to
@@ -221,20 +226,20 @@ the @tech{code} of the @tech{closure}.
 
 The @tech{closure} interface is described below:
 @itemlist[
-@item{@closure-lang-v9[(make-closure e_label e_arity e_i ...)]
+@item{@closure-lang-v9[(make-closure value_label value_arity value_i ...)]
 
-Creates a @tech{closure} whose @tech{code} is at label @closure-lang-v9[e_label],
-which expects @closure-lang-v9[e_arity] number of arguments, and has the values
-@closure-lang-v9[e_i] in its @tech{environment}.
+Creates a @tech{closure} whose @tech{code} is at label @closure-lang-v9[value_label],
+which expects @closure-lang-v9[value_arity] number of arguments, and has the values
+@closure-lang-v9[value_i] in its @tech{environment}.
 }
-@item{@closure-lang-v9[(closure-call e_c es ...)]
+@item{@closure-lang-v9[(closure-call value_c value ...)]
 
-Safely call the @tech{closure} @closure-lang-v9[e_c], invoking its @tech{code}, with
-the arguments @closure-lang-v9[(es ...)].}
-@item{@closure-lang-v9[(closure-ref e_c e_i)]
+Safely call the @tech{closure} @closure-lang-v9[value_c], invoking its @tech{code}, with
+the arguments @closure-lang-v9[(value ...)].}
+@item{@closure-lang-v9[(closure-ref value_c value_i)]
 
-Deference the value at index @closure-lang-v9[e_i] in the @tech{environment} of the
-@tech{closure} @closure-lang-v9[e_c].
+Deference the value at index @closure-lang-v9[value_i] in the @tech{environment} of the
+@tech{closure} @closure-lang-v9[value_c].
 Since this dereference is only generated by the compiler, it always succeeds and
 performs no dynamic checks.
 The environment is 0-indexed.
@@ -262,10 +267,10 @@ Before we can perform @tech{closure conversion}, we must discover which variable
 @closure-lang-v9[lambda] are @tech{free} with respect to the procedure's scope.
 We first annotation all @closure-lang-v9[lambda] with their free variable sets.
 @racketblock[
-`(lambda (,alocs ...) ,e)
+`(lambda (,alocs ...) ,value)
 =>
-`(lambda ,(info-set '() 'free (set-subtract (free-var e) alocs))
-         (,alocs ...) ,e)
+`(lambda ,(info-set '() 'free (set-subtract (free-var value) alocs))
+         (,alocs ...) ,value)
 ]
 We add a pass to perform this just prior to @tech{closure conversion}.
 
@@ -302,14 +307,14 @@ The final @tt{n} fields are references to the lexical variables in the
 
 In essence, we transform
 @racketblock[
-`(letrec ([,x (lambda ((free (,ys ...))) (,xs ...)  ,es)] ...)
-   ,e)
+`(letrec ([,x (lambda ((free (,ys ...))) (,xs ...)  ,values)] ...)
+   ,value)
 _=>
 `(letrec ([,l (lambda (,c ,xs ...)
                 (let ([,ys (closure-ref ,c ,i)] ...)
-                  ,es))] ...)
+                  ,value))] ...)
     (cletrec ([,x (make-closure ,l ,(length xs) ,ys ...)] ...)
-      ,e))
+      ,value))
 ]
 where @racket[l] is a fresh label and @racket[c] is a fresh abstract location.
 The @closure-lang-v9[cletrec] form is like @closure-lang-v9[letrec]
@@ -322,20 +327,16 @@ Every procedure now takes an extra argument, its closure, so we have to expand
 each @closure-lang-v9[call].
 The essence of the translation is:
 @racketblock[
-`(call ,e ,es ...)
+`(call ,value ,values ...)
 _=>
-`(let ([,x ,e])
-   (closure-call ,x ,x ,es ...))
+`(let ([,x ,value])
+   (closure-call ,x ,x ,values ...))
 ]
 We use @closure-lang-v9[closure-call] to call the (label of the) @tech{closure}
 to the @tech{closure} itself and its usual arguments.
 We need to bind the operator to avoid duplicating code.
-
 }
 ]
-
-We already have the low-level abstractions in place to deal with
-@tech{closures}, so we design this assignment top-down.
 
 @section{Administrative Passes}
 Allowing procedures to be bound in two different ways is great for programmer
@@ -372,7 +373,7 @@ Below we define @deftech{Exprs-unique-lang v9}.
 We typeset the changes with respect to @tech{Exprs-lang v9}.
 
 @bettergrammar*-ndiff[
-#:labels ("v8 Diff (excerpts)" "Source/Target Diff (excerpts)" "Full")
+#:labels ("Diff vs v8 (excerpts)" "Diff vs Source Diff (excerpts)" "Exprs-unique-lang v9")
 (#:exclude (prim-f aloc label fixnum uint8 ascii-char-literal)
   exprs-unique-lang-v8 exprs-unique-lang-v9)
 (#:exclude (prim-f aloc label fixnum uint8 ascii-char-literal)
@@ -382,17 +383,16 @@ We typeset the changes with respect to @tech{Exprs-lang v9}.
 
 @nested[#:style 'inset
 @defproc[(uniquify [p exprs-lang-v9]) exprs-unique-lang-v9]{
-Resolves top-level @ch2-tech{lexical identifiers} into unique @ch2-tech{abstract
+Resolves all @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract
 locations}.
 }]
 
 Not much changes in @racket[implement-safe-primops].
-
 The target language of the pass, @deftech{Exprs-unsafe-data-lang v9}, is defined
 below.
 
 @bettergrammar*-ndiff[
-#:labels ("v8 Diff (excerpts)" "Source/Target Diff (excerpts)" "Full")
+#:labels ("Diff vs v8 (excerpts)" "Diff vs Source (excerpts)" "Exprs-unsafe-data-lang v9")
 (#:exclude (aloc label fixnum uint8 ascii-char-literal)
   exprs-unsafe-data-lang-v8 exprs-unsafe-data-lang-v9)
 (#:exclude (aloc label fixnum uint8 ascii-char-literal)
@@ -419,10 +419,12 @@ Note that we cannot simply define @exprs-unsafe-data-lang-v9[call] as a procedur
 like we did with other safe wrappers, since it must count its arguments, and we
 must support a variable number of arguments to the procedure.
 
+Next, we implement safe @exprs-unsafe-data-lang-v9[call].
 Below we define @deftech{Exprs-unsafe-lang v9}.
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
-(exprs-unsafe-data-lang-v9 exprs-unsafe-lang-v9)
+#:labels ("Diff vs Source (excerpts)" "Exprs-unsafe-lang v9")
+(#:exclude (primop triv pred aloc fixnum uint8 ascii-char-literal)
+ exprs-unsafe-data-lang-v9 exprs-unsafe-lang-v9)
 (exprs-unsafe-lang-v9)
 ]
 
@@ -439,8 +441,8 @@ _=>
      ,bad-proc-error)
 ]
 
-@margin-note{If you keep track of the arity of procedures, you can optimize this
-transformation in some cases.}
+@margin-note{If we statically track the arity of @tech{procedures}, we can
+optimize this transformation in some cases.}
 
 @;We subtract one from the length of the parameter list to account for the closure
 @;parameter.
@@ -481,8 +483,9 @@ First, our compiler later assumes that all @emph{data} (as opposed to code) is
 @emph{locally} defined---we have no way to define top-level, labelled data.
 Since procedures are data, we need to transform top-level bindings of procedures
 into local bindings, so the rest of the compiler will "just work".
-Second, we have to look for procedures in two different places to transform them:
-that's annoying.
+Second, our compiler later assumes that all @emph{code} (as opposed to data) is
+@emph{globally} defined---we expect code to appear only at the top-level.
+That's not true when @exprs-lang-v9[lambda] is used in a local expression.
 
 To deal with these, we introduce two small administrative passes:
 @racket[define->letrec] and @racket[dox-lambdas].
@@ -510,8 +513,8 @@ We continue to ignore separate compilation and linking, so we treat
 Below we define @deftech{Just-Exprs-lang v9}.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
-(#:exclude (prim-f aloc label fixnum uint8 ascii-char-literal)
+#:labels ("Diff vs Source (excerpts)" "Just-exprs-lang v9")
+(#:exclude (primop aloc label fixnum uint8 ascii-char-literal)
  exprs-unsafe-lang-v9 just-exprs-lang-v9)
 (just-exprs-lang-v9)
 ]
@@ -519,7 +522,7 @@ Below we define @deftech{Just-Exprs-lang v9}.
 @nested[#:style 'inset
 @defproc[(define->letrec [p exprs-unsafe-lang-v9?])
          just-exprs-lang-v9?]{
-Explicitly binds all procedures to @ch2-tech{abstract locations}.
+Transform all top-level bindings into local bindings.
 }]
 
 Before we start compiling @just-exprs-lang-v9[lambda]s, we should try to get rid of
@@ -534,8 +537,8 @@ programs.
 
 @digression{
 This optimization is a special case of procedure inlining.
-A direct call to a procedure value guarantees the procedure occurs exactly
-once, and is therefore completely safe to inline.
+A direct call to a @tech{procedure} guarantees the @tech{procedure} occurs
+exactly once, and is therefore completely safe to inline.
 This pass could be replaced by a more general inlining optimization.
 }
 
@@ -546,18 +549,18 @@ Inline all direct calls to first-class procedures.
 }
 ]
 
-Next, we explicitly name all lambdas to names in @racket[dox-lambdas].
+Next, we explicitly name all lambdas in @racket[dox-lambdas].
 The source language supports anonymous procedures, that is, first-class
 procedure values that are not necessarily bound to names.
 For example, we can write the following in Racket, creating and using procedures
-without ever binding them to names in a @object-code{letrec} or
-@object-code{let} form.
+without ever binding them to names in a @just-exprs-lang-v9[letrec] or
+@just-exprs-lang-v9[let] form.
 @examples[
 ((lambda (x f) (f x x)) 1 (lambda (x y) (+ x y)))
 ]
 
 The equivalent in @tech{Exprs-lang v9} is:
-@racketblock[
+@exprs-lang-v9-block[
 (call (lambda (x f) (call f x x)) 1 (lambda (x y) (call + x y)))
 ]
 
@@ -575,8 +578,9 @@ We define @deftech{Lam-opticon-lang v9}, in which we know the name of every
 procedure.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
-(just-exprs-lang-v9 lam-opticon-lang-v9)
+#:labels ("Diff vs Source (excerpts)" "Full")
+(#:exclude (primop pred aloc fixnum uint8 ascii-char-literal)
+ just-exprs-lang-v9 lam-opticon-lang-v9)
 (lam-opticon-lang-v9)
 ]
 
@@ -586,17 +590,17 @@ procedure.
 Explicitly binds all procedures to @ch2-tech{abstract locations}.
 }]
 
-@section{Closure Conversion}
+@section{Implementing Closure Conversion}
 The rest of our compiler expects procedures to be little more than labeled
 blocks of code.
-Unfortunately, now our procedures can contain references to free-variables
-in their lexical scope.
-This means we cannot simply lift procedure definitions to the top-level, stick
-on a label, and generate a labelled procedure.
+Unfortunately, now our first-class procedures can contain references to
+@tech{free} variables in their lexical scope.
+This means we cannot simply lift first-class @tech{procedure} definitions to the
+top-level, stick on a label, and generate a labeled @ch6-tech{procedure}.
 
 First, we uncover the @tech{free} variables in each @lam-free-lang-v9[lambda].
 We add these as an annotation on the @lam-free-lang-v9[lambda], which the next
-pass will use to generate @tech{closures}.
+pass usees to generate @tech{closures}.
 
 Below we define @deftech{Lambda-free-lang v9}.
 @bettergrammar*-ndiff[
@@ -642,21 +646,21 @@ contribute to the free variable set for the context surrounding the
       f.1)))
 ]
 
-Now, we make @tech{closures} explicit.
+After we know the @tech{free} variables, we make @tech{closures} explicit.
 
 Strictly speaking, all the previous languages had
 @deftech{closures}---procedures that (implicitly) close over their lexical
 environment.
 However, our earlier languages forbid us from ever creating procedures that had
-a non-empty set environment, so all our @tech{closures} were trivial to compile
+a non-empty environment, so all our @tech{closures} were trivial to compile
 to labelled code.
-Closure conversion is the process of compiling first-class procedures into an
-explicit data type.
+@tech{Closure conversion} is the process of compiling first-class procedures
+into an explicit @tech{closure} data type.
 
 Below, we define @deftech{Closure-lang v9}.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
+#:labels ("Diff vs Source (excerpts)" "Closure-lang v9")
 (#:exclude (primop pred effect aloc fixnum uint8 ascii-char-literal)
  lam-free-lang-v9 closure-lang-v9)
 (closure-lang-v9)
@@ -664,28 +668,26 @@ Below, we define @deftech{Closure-lang v9}.
 
 @tech{Closure conversion} changes @closure-lang-v9[letrec] to bind labels to procedure
 code.
-After this pass, the body of @closure-lang-v9[lambda] will not contain any free
-variables, and will not be a procedure data type---it is just like a procedure
-from @ch6-tech{Values-lang v6}.
+After this pass, the body of @closure-lang-v9[lambda] does not contain any
+@tech{free} variables, and will not be a procedure data type---it is just like a
+@ch5-tech{procedure} from @ch6-tech{Values-lang v6}.
 
-To encode @tech{closures}, we temporarily add a new data type for closures,
-which we compile to a lower-level data structure later.
-We add a new form, @closure-lang-v9[cletrec], which only binds closures.
-Closures can, in general, have recursive self-references, so this is a variant
-of the @closure-lang-v9[letrec] form.
-We also add a new form for dereferencing the value of lexical variables
-from the closure @closure-lang-v9[(closure-ref e e)].
-The next pass implements closures using the procedure data type.
+To encode @tech{closures}, we temporarily add a new data type for
+@tech{closures}, which we compile to a lower-level data type.
+We add a new form, @closure-lang-v9[cletrec], which only binds @tech{closures}.
+@tech{Closures} can, in general, have mutually recursive references, so this is
+a variant of the @closure-lang-v9[letrec] form.
+We also add a new form for dereferencing the value of @tech{free} variables from
+the @tech{closure} @closure-lang-v9[(closure-ref e e)].
 
-We assume that the @closure-lang-v9[cletrec] form only ever appears as the body of a
-@closure-lang-v9[letrec] form, but we do not make this explicit in the syntax for
-readability.
+We assume that the @closure-lang-v9[cletrec] form only ever appears as the body
+of a @closure-lang-v9[letrec] form, but we do not make this explicit in the
+syntax for readability.
 This assumption is not necessary for correctness, but simplifies an
-optimization presented later as a challenge exercise.
+optimization presented later.
 
 We add @closure-lang-v9[call], the primitive operation for calling a label
-directly, to enable optimizing closures, an important optimization in functional
-languages.
+directly, to enable optimizing @tech{closures}, an important optimization.
 
 @nested[#:style 'inset
 @defproc[(convert-closures [p lam-free-lang-v9?])
@@ -695,18 +697,17 @@ Performs @tech{closure conversion}, converting all procedures into explicit
 }]
 
 @margin-note{
-If the operator is already a @closure-lang-v9[aloc], avoid introducing an extra
-@closure-lang-v9[let]:
+If the operator is already an @closure-lang-v9[aloc], we can avoid introducing
+an extra @closure-lang-v9[let]:
 @racketblock[
-`(unsafe-procedure-call ,aloc ,es ...)
+`(unsafe-procedure-call ,_aloc ,_values ...)
 _=>
-`(closure-call ,aloc ,aloc ,es ...)
+`(closure-call ,_aloc ,_aloc ,_values ...)
 ]
 This also simplifies the optimization @racket[optimize-known-calls].
 }
 
-Closures can cause a lot of indirection, and thus performance penalty, in a
-functional language.
+Closures can cause a lot of indirection, and thus performance penalty.
 We essentially transform all calls into @emph{indirect calls}.
 This causes an extra memory dereference and indirect jump, both of which can
 have performance penalties.
@@ -715,33 +716,35 @@ Many calls, particularly to named functions, can be optimized to direct calls.
 We essentially perform the following transformation on all calls where we can
 determine the label of the operator:
 @racketblock[
-`(closure-call ,e ,es ...)
+`(closure-call ,_value ,_values ...)
 _=>
-`(call ,l ,es ...)
+`(call ,_label ,_values ...)
 ]
-where @racket[l] is known to be the label of the closure @racket[e].
-Because @racket[e] is already an @closure-lang-v9[aloc], we can safely discard it;
-we do not need to force evaluation to preserve any side effects.
+where @closure-lang-v9[label] is known to be the label of the closure
+@closure-lang-v9[value].
+Because @closure-lang-v9[value] is already an @closure-lang-v9[aloc], we can
+safely discard it; we do not need to force evaluation to preserve any side
+effects.
 
 We perform this optimization by recognizing @closure-lang-v9[letrec] and
 @closure-lang-v9[cletrec] as a single composite form:
 @racketblock[
-`(letrec ([,label_l ,lam])
-   (cletrec ([,aloc_c (make-closure ,label_c ,es ...)])
-     ,e))
+`(letrec ([,_label_c ,_lam])
+   (cletrec ([,_aloc_c (make-closure ,_label_c ,_values ...)])
+     ,_value))
 ]
-All uses of @closure-lang-v9[(closure-call aloc_c es ...)] in
-@racket[e] and @racket[lam] can be transformed into @closure-lang-v9[(call
-label_c es ...)].
+All uses of @closure-lang-v9[(closure-call aloc_c values ...)] in
+@closure-lang-v9[value] and @closure-lang-v9[lam] can be transformed into
+@closure-lang-v9[(call label_c values ...)].
 We have to recognize these as a single composite form to optimize recursive
-calls inside @racket[lam], which will benefit the most from the optimization.
+calls inside @closure-lang-v9[lam], which will benefit the most from the optimization.
 This relies on the name @closure-lang-v9[aloc_c] binding in two places: once to
 define the @tech{closure}, and once when dereferenced in a recursive closure.
 
 @nested[#:style 'inset
 @defproc[(optimize-known-calls [p closure-lang-v9?])
          closure-lang-v9?]{
-Optimizes calls to known closures.
+Optimizes calls to known @tech{closures}.
 }
 ]
 
@@ -751,7 +754,7 @@ top-level @hoisted-lang-v9[define]s.
 We define @deftech{Hoisted-lang v9} below.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
+#:labels ("Diff vs Source (excerpts)" "Hoisted-lang v9")
 (#:exclude (pred effect primop v aloc label fixnum uint8 ascii-char-literal)
  closure-lang-v9 hoisted-lang-v9)
 (hoisted-lang-v9)
@@ -767,22 +770,10 @@ Hoists @tech{code} to the top-level definitions.
 }
 ]
 
-Now we implement @tech{closures} as the procedure data structure.
-
-A @deftech{procedure} is a data structure representing a value that can be
-called.
-Essentially, it is a wrapper around labels so we can check applications.
-We construct a procedure using @proc-exposed-lang-v9[(make-procedure e_1 e_2)], where
-@proc-exposed-lang-v9[e_1] must evaluate to a label and @proc-exposed-lang-v9[e_2] is the number
-of expected arguments.
-The predicate @proc-exposed-lang-v9[procedure?] should return @proc-exposed-lang-v9[#t] for any
-value constructed this way, and #f for any other value---@proc-exposed-lang-v9[(eq?
-(procedure? (make-procedure e_1 e_2)) #t)].
-
-We extract the label of a procedure with @proc-exposed-lang-v9[(unsafe-procedure-label
-e_1)], where @proc-exposed-lang-v9[e_1] is a procedure.
-We get the arity of a procedure with @proc-exposed-lang-v9[(unsafe-procedure-arity e_1)],
-where @proc-exposed-lang-v9[e_1] is a procedure.
+Now we implement @tech{closures} as the procedure data structure described
+earlier.
+Our procedure data structure represents a value that can be called, and has some
+associated information useful for dynamic type checking.
 
 A procedure looks like an extension of a vector.
 It has at least three fields: the label, the arity, and a size.
@@ -791,7 +782,7 @@ The environment will be uninitialized after @proc-exposed-lang-v9[make-procedure
 instead the environment will be initialized manually using
 @proc-exposed-lang-v9[unsafe-procedure-set!], similar to vector initialization.
 As with @tech{closures}, @proc-exposed-lang-v9[unsafe-procedure-label]
-dereference the label and @proc-exposed-lang-v9[unsafe-procedure-ref] dereferences a
+dereferences the label and @proc-exposed-lang-v9[unsafe-procedure-ref] dereferences a
 value from the procedure's environment, given an index into the environment.
 However, we also have @proc-exposed-lang-v9[unsafe-procedure-arity] to dereference
 the arity of a procedure.
@@ -799,7 +790,7 @@ the arity of a procedure.
 
 The language @deftech{Proc-exposed-lang v9} is defined below.
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
+#:labels ("Diff vs Source (excerpts)" "Proc-exposed-lang v9")
 (#:exclude (pred effect aloc fixnum uint8 ascii-char-literal)
  hoisted-lang-v9 proc-exposed-lang-v9)
 (proc-exposed-lang-v9)
@@ -809,33 +800,33 @@ To transform closures into procedures, we do a three simple translations:
 @itemlist[
 @item{Transform @hoisted-lang-v9[make-closure]
 @racketblock[
-`(cletrec ([,aloc (make-closure ,label ,arity ,es ...)] ...)
-   ,e)
+`(cletrec ([,_aloc (make-closure ,_label ,_arity ,_values ...)] ...)
+   ,_value)
 _=>
-`(let ([,aloc (make-procedure ,label ,arity ,n)] ...)
+`(let ([,_aloc (make-procedure ,_label ,_arity ,_n)] ...)
    (begin
-     (unsafe-procedure-set! ,aloc 0 ,(list-ref es 0))
+     (unsafe-procedure-set! ,_aloc 0 ,(list-ref _values 0))
      ...
-     (unsafe-procedure-set! ,aloc ,n ,(list-ref es n))
-     ,e))
+     (unsafe-procedure-set! ,_aloc ,_n ,(list-ref _values n))
+     ,_value))
 ]
-where @racket[n] is @racket[(length es)], the number of values in the
+where @racket[_n] is @racket[(length _values)], the number of values in the
 environment.
 }
 @item{Transform @hoisted-lang-v9[closure-ref].
 @racketblock[
-`(closure-ref ,c ,i)
+`(closure-ref ,_c ,_i)
 _=>
-`(unsafe-procedure-ref ,c ,i)
+`(unsafe-procedure-ref ,c_ ,_i)
 ]
 We can use @proc-exposed-lang-v9[unsafe-procedure-ref] since we generate all uses of
 @hoisted-lang-v9[closure-ref].
 }
 @item{Transform @hoisted-lang-v9[closure-call].
 @racketblock[
-`(closure-call ,c ,es ...)
+`(closure-call ,_c ,_values ...)
 _=>
-`(call (unsafe-procedure-label ,c) ,es ...)
+`(call (unsafe-procedure-label ,_c) ,_values ...)
 ]
 Recall that @hoisted-lang-v9[closure-call] is generated from an
 @lam-free-lang-v9[unsafe-procedure-call], so it is equally safe to call
@@ -846,20 +837,20 @@ Recall that @hoisted-lang-v9[closure-call] is generated from an
 @nested[#:style 'inset]{
 @defproc[(implement-closures [p hoisted-lang-v9])
          proc-exposed-lang-v9]{
-Implement @tech{closures} in terms of the @tech{procedure} data structure.
+Implement @tech{closures} in terms of the procedure data structure.
 }
 }
 
 Finally, we need to implement procedure data type.
 It is intentionally designed to be similar to the vector data type.
 
-The target language is @tech{Exprs-bits-lang v8/contexts}, which is unchanged
+The target language is @tech{Exprs-bits-lang v8}, which is unchanged
 from the previous chapter.
 
 @bettergrammar*-ndiff[
-#:labels ("Source/Target Diff (excerpts)" "Full")
-(proc-exposed-lang-v9 exprs-bits-lang-v8/contexts)
-(exprs-bits-lang-v8/contexts)
+#:labels ("Diff vs Source (excerpts)" "Full")
+(proc-exposed-lang-v9 exprs-bits-lang-v8)
+(exprs-bits-lang-v8)
 ]
 
 When implementing @proc-exposed-lang-v9[make-procedure], we assume the size of the
@@ -868,7 +859,7 @@ generates @proc-exposed-lang-v9[make-procedure]
 
 @nested[#:style 'inset
 @defproc[(specify-representation [p proc-exposed-lang-v9?])
-         exprs-bits-lang-v8/contexts?]{
+         exprs-bits-lang-v8?]{
 Compiles data types and primitive operations into their implementations as
 @ch7-tech{ptrs} and primitive bitwise operations on @ch7-tech{ptrs}.
 }
@@ -897,8 +888,8 @@ Lz6 [label="Hoisted-lang v9"];
 Lz7 [label="Proc-exposed-lang v9"];
 L0 [label="Exprs-bits-lang v8"];
 L1 [label="Values-bits-lang v8"];
-L2 [label="Proc-imp-mf-lang v8"];
 L3 [label="Imp-mf-lang v8"];
+L2 [label="Proc-imp-cmf-lang v8"];
 L4 [label="Imp-cmf-lang v8"];
 L5_1 [label="Asm-alloc-lang v8"];
 L5 [label="Asm-pred-lang v8"];
@@ -944,9 +935,9 @@ Lz5 -> Lz6 [label=" hoist-lambdas"];
 Lz6 -> Lz7 [label=" implement-closures"];
 Lz7 -> L0 [label=" specify-representation"];
 L0 -> L1 [label=" remove-complex-opera*"];
-L1 -> L2 [label=" sequentialize-let"];
-L2 -> L3 [label=" impose-calling-conventions"]
-L3 -> L4 [label=" normalize-bind"];
+L1 -> L3 [label=" sequentialize-let"];
+L3 -> L2 [label=" normalize-bind"];
+L2 -> L4 [label=" impose-calling-conventions"]
 L4 -> L5_1 [label=" select-instructions"];
 L5_1 -> L5 [label= " expose-allocation-pointer"];
 
@@ -982,20 +973,3 @@ subgraph DoNotcluster1 {
 }
 ]
 @figure["fig:v9-graph" "Overview of Compiler Version 0" v9-graph]
-
-@section{Appendix: Languages}
-
-@declare-exporting[cpsc411/langs/v9]
-
-@deflangs[
-exprs-lang-v9
-exprs-unique-lang-v9
-exprs-unsafe-data-lang-v9
-exprs-unsafe-lang-v9
-just-exprs-lang-v9
-lam-opticon-lang-v9
-lam-free-lang-v9
-closure-lang-v9
-hoisted-lang-v9
-proc-exposed-lang-v9
-]
