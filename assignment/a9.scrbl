@@ -20,8 +20,7 @@ can create a procedure at any point in the program.
 This assignment is due @(due 'a9).
 
 You can use the interrogator to get limited access to the reference solution:
-@url{https://williamjbowman.com:8081/servlets/standalone.rkt?an=a9} (faster) or
-@url{https://www.students.cs.ubc.ca/~cs-411/2020w2/interrogator.cgi?an=a9}.
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a9}.
 
 @subsubsub*section{Checklist}
 
