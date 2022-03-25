@@ -725,24 +725,40 @@ value-producing operand.
 
 This normalizes @tech{Imp-mf-lang v8} with respect to the equations
 @tabular[
+#:sep @hspace[3]
 (list
  (list
-  @imp-mf-lang-v8[(set! loc (begin effect_1 ... value))]
+  @imp-mf-lang-v8-block0[(set! loc
+                               (begin effect_1 ...
+                                      value))]
   "="
-  @imp-mf-lang-v8[(begin effect_1 ... (set! loc value))])
+  @imp-mf-lang-v8-block0[(begin effect_1 ...
+                                (set! loc value))])
  (list
-  @imp-mf-lang-v8[(set! loc (if pred value_1 value_2))]
+  @imp-mf-lang-v8-block0[(set! loc
+                               (if pred
+                                   value_1
+                                   value_2))]
   "="
-  @imp-mf-lang-v8[(if pred (set! loc value_1) (set! loc value_2))])
+  @imp-mf-lang-v8-block0[(if pred
+                            (set! loc value_1)
+                            (set! loc value_2))])
  (list
-  @imp-mf-lang-v8[(mset! loc opand (begin effect_1 ... value))]
+  @imp-mf-lang-v8-block0[(mset! loc opand
+                                (begin effect_1 ...
+                                       value))]
   "="
-  @imp-mf-lang-v8[(begin effect_1 ... (mset! loc opand value))])
+  @imp-mf-lang-v8-block0[(begin effect_1 ...
+                                (mset! loc opand value))])
  (list
-  @imp-mf-lang-v8[(mset! loc opand (if pred value_1 value_2))]
+  @imp-mf-lang-v8-block0[(mset! loc opand
+                                (if pred
+                                    value_1
+                                    value_2))]
   "="
-  @imp-mf-lang-v8[(if pred (mset! loc opand value_1) (mset! loc opand value_2))])
- )
+  @imp-mf-lang-v8-block0[(if pred
+                             (mset! loc opand value_1)
+                             (mset! loc opand value_2))]))
 ]
 }
 
@@ -752,16 +768,17 @@ only minor changes, so we leave those changes as an exercise for the reader.
 @nested[#:style 'inset
 @defproc[(impose-calling-conventions [p proc-imp-cmf-lang-v8?])
           imp-cmf-lang-v8?]{
-Compiles @tech{Proc-imp-cmf-lang v8} to @tech{Imp-cmf-lang v8} by imposing calling
-conventions on all calls (both tail and non-tail calls), and @tech{entry
+Compiles @tech{Proc-imp-cmf-lang v8} to Imp-cmf-lang v8 by imposing calling
+conventions on all calls (both tail and non-tail calls), and @ch6-tech{entry
 points}.
 }]
 
+@nested[#:style 'inset
 @defproc[(select-instructions [p imp-cmf-lang-v8?])
          asm-alloc-lang-v8?]{
 Selects appropriate sequences of abstract assembly instructions to implement the
 operations of the source language.
-}
+}]
 
 @section{Implementing Allocation}
 As previously discussed, our allocation strategy is to simply grab the current
@@ -819,15 +836,16 @@ Intuitively, we will transform each @racket[`(set! ,loc (alloc ,index))] into
    (set! ,hbp (+ ,hbp ,index)))
 ]
 
+@nested[#:style 'inset
 @defproc[(expose-allocation-pointer [p asm-alloc-lang-v8?])
          asm-pred-lang-v8?]{
 Implements the allocation primitive in terms of pointer arithmetic on the
 @racket[current-heap-base-pointer-register].
-}
+}]
 
 @section{Implementing @tech{mops}}
 The new @tech{mops} require minor changes to most of the pipeline between
-@tech{Imp-cmf-lang-v8}to @tech{Para-asm-lang v8}, where we will start
+Imp-cmf-lang-v8 to @tech{Para-asm-lang v8}, where we will start
 implementing these abstractions in the low-level languages.
 
 Like when we implemented @para-asm-lang-v8[fvar]s to support working with frame
@@ -882,12 +900,13 @@ This makes @para-asm-lang-v8[index] and @para-asm-lang-v8[opand] coincide,
 syntactically, but they are conceptually different so we maintain separate
 non-terminal definitions.
 
+@nested[#:style 'inset
 @defproc[(patch-instructions [p para-asm-lang-v8])
          paren-x64-mops-v8]{
 Patches instructions that have no @ch1-tech{x64} analogue into to a sequence of
 instructions and an auxiliary register from
 @racket[current-patch-instructions-registers].
-}
+}]
 
 Finally, we can translate @tech{mops} into @tech{index-mode operands} and
 @ch2-tech{displacement-mode operands}.
