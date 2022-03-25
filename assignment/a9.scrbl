@@ -1,6 +1,7 @@
 #lang reader "assignment-lang.rkt"
 @(require
   cpsc411/compiler-lib
+  (for-label cpsc411/compiler-lib)
   cpsc411/langs/v9
   (for-label cpsc411/reference/a9-solution))
 
@@ -56,6 +57,7 @@ reading the entire chapter.
 
 @section{Exercises}
 
+@exercise[#:optional #t]{Redesign and extend the implementation of @racket[check-exprs-lang].}
 @exercise{Redesign and extend the implementation of @racket[uniquify].}
 @exercise{Redesign and extend the implementation of @racket[implement-safe-primops].}
 @exercise{Design and implement @racket[implement-safe-call].}
