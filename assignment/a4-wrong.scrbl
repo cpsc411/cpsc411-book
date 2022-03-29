@@ -283,7 +283,7 @@ In @tech{Paren-x64 v3}, we model labels with the @object-code{(define label s)}
 instruction, which defines a label @object-code{label} at the instruction
 @object-code{s} in the instruction sequence.  This corresponds to the
 @a0-tech{x64} string @object-code{label:\n s}.  Note that they can be nested,
-allowing the same behvaiour as chaining labels in @a0-tech{x64}.  For
+allowing the same behaviour as chaining labels in @a0-tech{x64}.  For
 convenience, we assume all labels are symbols of the form
 @object-code{L.<name>.<number>}, and are unique.
 

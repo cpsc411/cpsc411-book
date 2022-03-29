@@ -131,7 +131,7 @@ sequence.
 It should use @racket[link-paren-x64] to resolve all labels, and should use a
 program counter to loop over the instruction sequence instead of folding over
 the sequence.
-It will help to struture the main loop to match the interface of something like
+It will help to structure the main loop to match the interface of something like
 @racket[interp-loop], although you are not required to define it this way.
 }
 
@@ -249,7 +249,7 @@ Redesign and extend the implementation of @racket[uniquify].
 
 You may find this implementation of alpha equivalence for
 @ch4-tech{Values-lang v4} helpful: @share{a4-alpha-equal.rkt}.
-The code is annotated to demonstrate idiomatic Racket style, and explain feature
+The code is annotated to demonstrate idiomatic Racket style, and explain features
 you may be unfamiliar with.
 }
 

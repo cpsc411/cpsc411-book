@@ -418,7 +418,7 @@ This way, the language is responsible for managing these annoying details
 instead of the programmer.
 
 We do this by defining @deftech{Para-asm-lang v2} (@racket[para-asm-lang-v2]), a kind of
-less finiky assembly language.
+less finicky assembly language.
 We can think of this language as @emph{para}meterized by the set of locations,
 hence the name.
 

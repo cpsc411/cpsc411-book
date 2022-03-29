@@ -120,7 +120,7 @@ different location, now add the contents of the two locations".
 @todo{Do some example Paren-x64 v1 programming}
 
 We want to move towards a @deftech{value-oriented} language, @ie a language
-where operations consume and produce values directly, and away from
+where operations consume and produce values directly, and away from an
 @deftech{imperative language} that manipulates some underlying machine state.
 This would free the programmer from keeping the state of the machine in mind at
 all times.
@@ -400,7 +400,7 @@ Writing transformations and optimizations over @tech{canonical forms} is often
 easier since we do not have to manually consider two equal programs as they
 have the same representation.
 Unfortunately, transformations over @tech{canonical forms} are often tricky
-because the a transformation may not preserve canonicity.
+because the transformation may not preserve canonicity.
 In the case of of @tech{MF} and @tech{ANF}, it is often easier to write the same
 optimization over @tech{MF}, since @tech{MF} frees the optimization from
 attempting to unnest operations.
@@ -481,7 +481,7 @@ This is a move toward @emph{declarative} programming.
 @tech{Values-lang v3} is the final source language for this week.
 It abstracts away from operations on locations and instead has operations on
 values.
-It also include a feature for binding values to names for reuse.
+It also includes a feature for binding values to names for reuse.
 The value of a @tech{Values-lang v3} program is the final value of an
 expression.
 

@@ -407,7 +407,7 @@ other @tech{secondary tag} bits are 0.
 
 To extract the payload for booleans, all we really need to know is whether the
 boolean is false.
-We can perform this test without untagged, merely by comparing to @code{#b110}
+We can perform this test without untagging, merely by comparing to @code{#b110}
 (with all other bits 0, implicitly).
 This gives us the same result as explicitly untagging, and compares to 0.
 @examples[
@@ -417,8 +417,8 @@ This gives us the same result as explicitly untagging, and compares to 0.
 (eq? #b00001110 #b110)
 ]
 To implement branching on booleans in terms of predicates, we can compile a
-boolean @exprs-lang-v7[value] to the predicate @exprs-lang-v7[(not (!= value
-#b110))].
+boolean @exprs-lang-v7[value] to the predicate @exprs-lang-v7[(!= value
+#b110)].
 
 The representation of @exprs-lang-v7[error], which represents an exit code, is
 inefficient.
@@ -440,11 +440,11 @@ untagging.
 This means we need to expose bitwise operations from @ch1-tech{x64}, all the way
 through the compiler pipeline.
 This is not very interesting, so we begin by implementing tagged objects in
-terms of these, and then extending the rest of the compiler to expost bitwise
+terms of these, and then extending the rest of the compiler to expose bitwise
 operations.
 
 @section{Extending the source and front-end passes}
-We start by deiscussing the design of @deftech{Exprs-lang v7}.
+We start by discussing the design of @deftech{Exprs-lang v7}.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs v6.5" "Exprs-lang v7")
@@ -586,7 +586,7 @@ with different error codes).
 ]
 
 Each safe procedure should produce some error code indicating that kind of error
-that ocurred.
+that occurred.
 Be sure to document your error codes.
 For now, we have enough error codes that we can encode which operation and which
 argument caused the error.
@@ -621,7 +621,7 @@ predicate sublanguage.
 ]
 
 This is the hard part of adding data types---translating our data types and
-their operations into bits and primitive opertions on bits.
+their operations into bits and primitive operations on bits.
 
 First, we translate each value literal to a @tech{ptr}.
 
@@ -721,7 +721,7 @@ using @exprs-bits-lang-v7[bitwise-and], and comparing the result to the tag usin
 But the target language @exprs-bits-lang-v7[=] is a relop, not a boolean operation,
 so we translate @exprs-unsafe-data-lang-v7[(fixnum? value)] to
 @;@exprs-bits-lang{(if (eq? (bitwise-and e #b111) #b000) ##b00001110 #b00000110)}.
-@exprs-bits-lang-v7[(if (= (bitwise-and value #b111) #b000) #b00001110 #t #f)]
+@exprs-bits-lang-v7[(if (= (bitwise-and value #b111) #b000) #t #f)]
 (although, of course, @exprs-bits-lang-v7[#t] and @exprs-bits-lang-v7[#f] must
 be compiled to @tech{ptrs} too).
 @;Our representation of booleans supports optimizing this, as described earlier,
@@ -735,7 +735,7 @@ Compiles immediate data and primitive operations into their implementations as
 
 @section{Exposing Bitwise Operations}
 Specifying the tagged representation happens very close to our source language.
-We need to expose these bitewise operations all the way up to what was
+We need to expose these bitwise operations all the way up to what was
 previously @ch6-tech{Values-unique-lang-v6}.
 Below, we design the new @deftech{Values-bits-lang v7}, typeset with differences
 compared to @ch6-tech{Values-unique-lang-v6}.

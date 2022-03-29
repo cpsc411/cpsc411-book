@@ -516,7 +516,7 @@ program, and (as usual) possibly other non-required but useful information.
 
 To implement conflict analysis, we simultaneously traverse a program with its
 @tech{undead-set tree}, and analyze each instruction according to the
-approxiate conflict definition above.
+approximate conflict definition above.
 We start with a graph that initially contains a node for every
 @ch2-tech{abstract location} in the @asm-lang-v2/conflicts[locals] set, and
 extend the graph with conflicts as we discover them.

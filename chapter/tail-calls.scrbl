@@ -148,7 +148,7 @@ Normally, @tech{procedures} are thought about as composed of two features:
 However, these are two separate abstractions.
 In this chapter, we introduce only the @tech{call} abstraction.
 @tech{Procedures} can be called, but never @ch6-tech{return}.
-We limit where such as call can happen so we do not have to answer
+We limit where such a call can happen so we do not have to answer
 inconvenient questions.
 
 @section{Designing a source language with call}
@@ -195,7 +195,6 @@ The call instruction needs to know in which locations to store the
 @tech{arguments}, and the called @tech{procedure} needs to know from which
 locations to read its @tech{parameters}.
 The problem is deciding how to ensure the locations end up the same.
-imp
 To solve this, we introduce a @tech{calling convention}.
 
 @todo{Be careful with arguments vs parameters}
@@ -237,7 +236,7 @@ through every layer of abstraction up to the point where we implement the
 calling convention.
 @;That's every language from @a4-tech{Para-asm v2} to @a4-tech{Block-lang}.
 This makes all our abstractions only partial abstractions, and injects undefined
-behvaiour back into our intermediate languages.
+behaviour back into our intermediate languages.
 
 We could also use the stack to implement the calling convention.
 This is simpler, as we can keep registers abstract and need to expose
@@ -369,7 +368,7 @@ where:
 
 Again, the order of the @imp-mf-lang-v5[set!]s is not important for correctness,
 but can enable better use of registers and optimizations.
-This time, we move values into the registers last, to keep there lives as short
+This time, we move values into the registers last, to keep their lives as short
 as possible.
 
 Here, we decorate the @imp-mf-lang-v5[jump] instruction with its
@@ -643,7 +642,7 @@ particular order to implement @values-unique-lang-v5[let] expressions using
 
 Finally, we need to normalize assignment statements so the right-hand side is a
 "trivial" value.
-Below, design @deftech{Proc-imp-cmf-lang-v5} the target language of
+Below, we design @deftech{Proc-imp-cmf-lang-v5} the target language of
 @racket[normalize-bind].
 
 
@@ -759,7 +758,7 @@ difference, we typeset the differences compared to @ch4-tech{Asm-pred-lang v4}.
 ]
 
 The main difference is in the addition of the @racket[jump] instruction.
-Note that the "arguments" to the jump are not part of meaning of the
+Note that the "arguments" to the jump are not part of the meaning of the
 instruction; they are just metadata used later by the compiler.
 We also must handle @ch2-tech{physical locations} in the source language, but
 this does not cause many changes.
@@ -836,8 +835,8 @@ metadata.
 @defproc[(uncover-locals (p asm-pred-lang-v5?))
           asm-pred-lang-v5/locals?]{
 Compiles @tech{Asm-pred-lang v5} to @tech{Asm-pred-lang v5/locals}, analysing
-which @ch2-tech{abstract locations} are used in each block, and each block and the
-module with the set of variables in an @racket[info?] fields.
+which @ch2-tech{abstract locations} are used in each block, and updating each
+block and the module with the set of variables in an @racket[info?] fields.
 }
 ]
 

@@ -171,7 +171,7 @@ Call the @tech{code} whose label is @proc-exposed-lang-v9[value_label] with the
 arguments @proc-exposed-lang-v9[value].
 
 This is essentially the same as the @exprs-lang-v9[call] primitive in previous
-chapters, although we now allow labels to be computes and passed as values.
+chapters, although we now allow labels to be computed and passed as values.
 It is unsafe and with no dynamic checks, so some earlier pass must insert
 dynamic checks to ensure safety.
 }
@@ -208,7 +208,7 @@ passed to a different scope.
 
 As an intermediate step in compiling first-class procedures, we introduce
 explicit @tech{closure} primitives which compile to the procedure primitives.
-There is no primary tag for this data strucure, since it will be implemented by
+There is no primary tag for this data structure, since it will be implemented by
 the lower-level procedure data type.
 
 @tech{Closures} support two operations.
@@ -277,12 +277,12 @@ We add a pass to perform this just prior to @tech{closure conversion}.
 A variable is considered @deftech{free} in a scope if it is not in the set
 of variables bound by that scope, if it is referenced in any expression in
 which the scope binds variables, and if the reference is not @tech{bound}.
-A variable is @deftech{bound} if it is refernced inside a scope for which it is
+A variable is @deftech{bound} if it is referenced inside a scope for which it is
 declared in the set of variables bound by that scope.
 
 In our languages, @closure-lang-v9[lambda], @closure-lang-v9[let], and
 @closure-lang-v9[letrec] introduce new scopes.
-Calcuating the free variables of an expression is relatively straightforward,
+Calculating the free variables of an expression is relatively straightforward,
 but we have to be careful with the binding structures of
 @closure-lang-v9[letrec] and @closure-lang-v9[let].
 @margin-note{Note that all variables are @tech{bound}, which is enforced by
@@ -347,7 +347,7 @@ regularize how procedures appear in our language.
 The first big benefit to the programmer comes in @racket[check-exprs-lang].
 Since we finally have a procedure data type, and procedure primitives to enable
 dynamic checking, we can finally stop type checking programs.
-Now, it is valid and does not cause undefined behaviour to pass procedures are
+Now, it is valid and does not cause undefined behaviour to pass procedures as
 arguments, return procedures, or call an arbitrary variables with an arbitrary
 number of arguments.
 The language will dynamically check whether any of those expressions is safe

@@ -149,7 +149,7 @@ Note that a similarly named function exists in the support library, but will not
 correctly implement the boilerplate this milestone.
 }
 
-@exercise[#:optional #t]{Test your compiler compiler correctness statement by
+@exercise[#:optional #t]{Test your compiler correctness statement by
 running the same programs through your interpreter and through your compiler and
 comparing the results.
 

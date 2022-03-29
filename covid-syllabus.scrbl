@@ -7,7 +7,7 @@
 @; TODO tag this properly
 @title{COVID Syllabus Addendum}
 This page includes changes to the syllabus specifically to deal with the
-COVID-19 panedmic.
+COVID-19 pandemic.
 
 @section{Goal}
 My primary goal this semester is to teach you all some cool, hard stuff about
