@@ -135,7 +135,7 @@ somewhere, and arrange for the caller to jump back to that label.
 We might think we could pre-process @tech{Values-lang v6} to lift all non-tail
 calls into new procedures and rewrite the program to have only tail calls.
 This is possible, but would correspond to a CPS transformation.
-Thisand would be difficult to implement with without the @ch9-tech{closure}
+It would also be difficult to implement without the @ch9-tech{closure}
 abstraction, which we do not have yet, and difficult to optimize, particularly
 at this level of abstraction.
 Each non-tail call would introduce an entire procedure call setup to the "rest"
@@ -226,7 +226,7 @@ The allocator always starts indexing new @ch2-tech{frame variables} from 0 at
 @paren-x64-v6[(rbp - 0)]; if we hide the values that are live across a
 @tech{non-tail calls} at, say, @paren-x64-v6[(rbp + 8)], @paren-x64-v6[(rbp +
 16)], and so on, they would be safe.
-(Recall the stack grows downwards, decremeneting from the base pointer, so
+(Recall the stack grows downwards, decrementing from the base pointer, so
 accessing prior values is implementing by incrementing from the base pointer.)
 
 @tabular[
@@ -247,7 +247,7 @@ our @ch2-tech{frame variables} use natural indexes, and even if we could, this
 alone does not handle the general case, where the callee has further
 @tech{non-tail calls}.
 But it gives us the core of the idea: we want to hide our values on the stack,
-but at a location before to the 0-index from which the callee will start
+but at a location before the 0-index from which the callee will start
 counting.
 
 We do this by @emph{pushing} the callers's @tech{frame} onto the stack prior to
@@ -285,7 +285,7 @@ callee's @tech{frame}, since it may need to pass some arguments on the stack as
 part of the callee's @tech{frame}.
 We will also need to determine how large the caller's @tech{frame} is at a
 @tech{non-tail call}, so we know how many words to increment the frame base
-pointer in order to implement pushing and poping a @tech{frame} to and from the
+pointer in order to implement pushing and popping a @tech{frame} to and from the
 stack.
 
 @section{Extending our Calling Convention}
@@ -398,7 +398,7 @@ are placed on the callee's @tech{frame} instead of the caller's @tech{frame}.
 Recall that our @ch5-tech{calling convention} passes @ch5-tech{parameters} in
 @ch2-tech{frame variables} when they don't fit in registers.
 
-Making this all concreate, we implement our new calling convention with the
+Making this all concrete, we implement our new calling convention with the
 following transformations:
 
 @itemlist[
@@ -562,7 +562,7 @@ We would need to at least use @imp-cmf-lang-v6[fv1], which we know will be
 Figuring how exactly where the end of the caller's @tech{frame} is, and thus
 which index to start using for passing arguments on the callee's @tech{frame},
 is tricky.
-Thus we leave it for a seperate pass.
+Thus we leave it for a separate pass.
 For now, we simply record the fact that @imp-cmf-lang-v6[nfv.2] is a
 @deftech{new frame variable}, which must be allocated not on the current
 caller's @tech{frame}, but on the new @tech{frame} created for the callee.
@@ -752,7 +752,7 @@ the @ch5-tech{calling convention} to implement @tech{return}.
 We further assume that a @imp-cmf-lang-v6[return-point] cannot appear inside
 another @imp-cmf-lang-v6[return-point], @ie there are no nested
 @imp-cmf-lang-v6[return-point]s.
-Our compiler can never generate this code, and there is no reason to support.
+Our compiler can never generate this code, and there is no reason to support it.
 
 The implicit return value, @imp-cmf-lang-v6[value] in @imp-cmf-lang-v6[tail]
 position, is no longer valid.
@@ -834,7 +834,7 @@ allocate that much space.
 To compute the size of each caller's @tech{frame}, we need to know how many
 variables might be live across a @tech{non-tail call}, so this must wait until
 after @racket[undead-analysis].
-Second, to minimize the space requires, we want to make sure we wait to allocate
+Second, to minimize the space required, we want to make sure we wait to allocate
 until @racket[conflict-analysis].
 Otherwise, we might have to assume that all live @ch2-tech{abstract locations}
 are unique @ch2-tech{frame variables}, increasing the size of the @tech{frame}.
@@ -884,7 +884,7 @@ We typeset changes compared to @ch5-tech{Asm-pred-lang v5/locals}.
 Updating this analysis is not complicated.
 We simply add a case to handle @asm-pred-lang-v6[return-point]s.
 Remember that the "arguments" to @asm-pred-lang-v6[jump] are only used for later
-analyses and not consider locals for this analysis.
+analyses and not considered locals for this analysis.
 
 The @tech{new frame variables} are considered locals, so will be part of the
 analysis.
@@ -920,9 +920,9 @@ The @asm-pred-lang-v6/undead[undead-out] field continues to store the
 @asm-pred-lang-v6[return-point]s.
 We also record information about what is undead across a @tech{non-tail call},
 the @asm-pred-lang-v6/undead[call-undead] set.
-This is the set all variables that are undead after @emph{any} @tech{non-tail
+This is the set of all variables that are undead after @emph{any} @tech{non-tail
 call} in a block; there is a single set for the entire block, even when there
-are multiple @tech{non-tail calls}
+are multiple @tech{non-tail calls}.
 
 The @asm-pred-lang-v6/undead[call-undead] field stores @emph{every}
 @ch2-tech{abstract location} or @ch2-tech{frame variable} that is in the
@@ -1177,12 +1177,12 @@ Second, some or all the moves might be unnecessary.
 We don't know whether those variables @racket[x_0 ... x_n-1] need to be in
 registers, so it would be potentially more efficient to assign them to
 @ch2-tech{frame variables} in the first place and leave some other pass to move
-them into registers when necessary, rathern than @emph{definitely} generate a
+them into registers when necessary, rather than @emph{definitely} generate a
 ton of memory accesses.
 
 Instead, we perform this transformation in two steps.
 First, a new pass @racket[assign-call-undead-variables] assigns each variable
-that is live across a call to @ch2-tech{frame variable}, instead of producing
+that is live across a call to a @ch2-tech{frame variable}, instead of producing
 new moves.
 This produces a partial assignment of @ch2-tech{abstract locations} to
 @ch2-tech{frame variables}, which the register allocator will work from.
@@ -1241,7 +1241,7 @@ variable} @asm-pred-lang-v6[fv0].
 Compiles @tech{Asm-pred-lang-v6/conflicts} to @tech{Asm-pred-lang-v6/pre-framed}
 by pre-assigning all variables in the
 @asm-pred-lang-v6/conflicts[call-undead] sets to
-to @ch2-tech{frame variables}.
+@ch2-tech{frame variables}.
 }]
 
 @todo{Change locals to homeless? Then when introducing the fixed point
@@ -1635,7 +1635,7 @@ We must now implement this abstraction.
 To implement @tech{return points}, we need to compile all the instructions
 following the @tech{return points} into labelled blocks, since that is our
 low-level implementation of labels.
-We lift all the instructions following the @tech{return point} in to a new
+We lift all the instructions following the @tech{return point} into a new
 block, and merge the tail implementing the call into the
 @block-asm-lang-v6[begin] of the caller.
 Essentially, we transform:

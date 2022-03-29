@@ -164,7 +164,7 @@ value---@exprs-lang-v8[(eq? (pair? (cons e_1 e_2)) #t)].
 @exprs-lang-v8[(car e)] returns the value of the first element of the pair,
 and @exprs-lang-v8[(cdr e)] returns the value of the second element.
 
-As usual, want to ensure safety in our source language.
+As usual, we want to ensure safety in our source language.
 That is, @exprs-lang-v8[(eq? (car (cons e_1 e_2)) e_1)] and
 @exprs-lang-v8[(eq? (cdr (cons e_1 e_2)) e_2)], while
 @exprs-lang-v8[(if (not (pair? e)) (eq? (cdr e) (error uint8)) #t)].
@@ -199,7 +199,7 @@ We could add more, but these two are enough to demonstrate the general approach
 to compiling structured data.
 
 As we're adding new data types, we need new tags.
-These are two very commonly uses data types, so we assign them @ch7-tech{primary
+These are two very commonly used data types, so we assign them @ch7-tech{primary
 tags}.
 Here is our updated list of @ch7-tech{primary tags}:
 @itemlist[
@@ -221,10 +221,10 @@ but we also need three additional operations: memory allocation, dynamically
 computed memory assignment, and dynamically computed memory dereference.
 
 First, to implement constructors, we need the ability to allocate memory.
-For now, we'll assume the existance of some abstraction
+For now, we'll assume the existence of some abstraction
 @exprs-bits-lang-v8/contexts[alloc] that can do this (which we become
 responsible for implementing later).
-@exprs-lang-v8[cons] create a pair, so it should allocate two words of space by
+@exprs-lang-v8[cons] creates a pair, so it should allocate two words of space by
 producing @racket[`(alloc ,(current-pair-size))].
 @exprs-lang-v8[make-vector] allocates one word for the length, and then one
 word for every element of the vector.
@@ -322,7 +322,7 @@ Performing this optimization for pairs, we would instead implement
 ]
 The same optimization holds for vectors with different constants.
 
-Finally, we need some way to actually acess memory locations to implement the
+Finally, we need some way to actually access memory locations to implement the
 destructors for our data types.
 This requires similar functionality to @exprs-bits-lang-v8[mset!]---it needs to
 take dynamically computed pointers and offsets in order to access a dynamically
@@ -406,7 +406,7 @@ We formalize these restrictions in our definition of @tech{Paren-x64 v8}.
 To implement allocation, we need some strategy for managing memory.
 Our run-time system or compiler needs to know what memory is in use, how to
 allocate (mark free memory as in use), and how to deallocate memory (return
-in-use memory to the pool of free memory and ultialtey to the system).
+in-use memory to the pool of free memory and ultimately to the system).
 There are many strategies for this, such as "let the user deal with it",
 "add a process to the run-time system that dynamically manages memory", or "make
 the type system so complex that the compiler can statically manage memory".
@@ -420,7 +420,7 @@ when it finishes running, then this approach will work and save us a lot of
 effort.
 This isn't as unrealistic a strategy as it might as first appear; it's used in
 practice by short-lived programs, such as some Unix command line tools and the
-control systems for some missles.
+control systems for some missiles.
 @digression{
 In general, a language implementation might abstract access to the @tt{mmap}
 system call for allocation, and implement a strategy (such as garbage
@@ -442,7 +442,7 @@ Allocation is implemented by copying the current value of this pointer, and
 incrementing it by the number of bytes we wish to allocate.
 The pointer must only be incremented by word-size multiples of bytes, to ensure
 the 3 low-order bits are 0 and the pointer can be tagged.
-Any other access to this register is now undefined behvaiour, similar to
+Any other access to this register is now undefined behaviour, similar to
 accesses to @paren-x64-v8[fbp] that do not obey the stack of frames discipline.
 
 
@@ -481,13 +481,13 @@ other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }]
 
 @; Don't know how to do this without closures.
-@;Last week, the last piece of undefined behvaiour in our language was in procedure
+@;Last week, the last piece of undefined behaviour in our language was in procedure
 @;calls.
 @;We were not checking that procedures were correctly applied to the number of
 @;expected arguments.
 @;Lower down, when procedure calls are implemented in terms of register and frame
 @;variables, this could result in dereferencing uninitialized locations.
-@;We can use the procedure data type to eliminate this undefined behvaiour.
+@;We can use the procedure data type to eliminate this undefined behaviour.
 @;
 @;This week, this pass is optional, as current events mean I haven't been able to
 @;write up the design in time.
@@ -593,7 +593,7 @@ We compile each constructor, namely @exprs-unsafe-data-lang-v8[cons] and
 plus tagging, producing the tagged pointer as the value.
 We compile each destructor to @exprs-bits-lang-v8[mref], detagging or statically
 adjusting the index to the pointer first.
-Initliazation, done by @exprs-unsafe-data-lang-v8[cons], and mutation, done by
+Initialization, done by @exprs-unsafe-data-lang-v8[cons], and mutation, done by
 @exprs-unsafe-data-lang-v8[unsafe-vector-set!], are both compiled to
 @exprs-bits-lang-v8[mset!].
 
@@ -702,7 +702,7 @@ using @imp-mf-lang-v8[set!].
 
 With the addition of an @imp-mf-lang-v8[mset!], @racket[normalize-bind] must be
 updated.
-This operator is enables the same kind of nesting as @imp-mf-lang-v8[set!], and
+This operator enables the same kind of nesting as @imp-mf-lang-v8[set!], and
 like @imp-mf-lang-v8[set!], its operand needs to be normalized.
 
 Next we design @deftech{Proc-imp-cmf-lang v8}
@@ -785,7 +785,7 @@ As previously discussed, our allocation strategy is to simply grab the current
 heap base pointer, and increment beyond the bytes we want to use for our data
 structure.
 The question is where to implement this operation.
-We want to do this @emph{after} we have access to physical locations, so so
+We want to do this @emph{after} we have access to physical locations, so
 after @racket[impose-calling-conventions], but @emph{before} the register
 allocator passes, so we do not have to update those passes to know that
 @asm-alloc-lang-v8[alloc] introduces a reference to a register.

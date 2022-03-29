@@ -172,7 +172,7 @@ giving an arbitrary interpretation to any values in the predicate position.
 For example, we could interpret @racket[0] as true and @racket[1] as false, or
 vice versa.
 Unfortunately, this would expose our source language to undefined
-behvaiour---what happens when an @values-lang-v4[if] expression branches on any
+behaviour---what happens when an @values-lang-v4[if] expression branches on any
 other value?
 We could remedy this slightly by making any non-zero integer true, for example.
 However, it also means we become unable to distinguish booleans from integers,
@@ -248,20 +248,20 @@ In this model, all labels are 32-bits, so can be moved into memory directly.
 }
 @item{The only valid characters in labels are letters, numbers, _, $, #, @"@",
 ~, ., and ?. The only characters which may be used as the first character of an
-identifier are letters, . (with has a special meaning and shouldn't be used), _
+identifier are letters, . (which has a special meaning and shouldn't be used), _
 and ?.
 }
 @item{Labels cannot be longer than 4095 characters.}
 ]
 
-The library function @racket[sanitize-label] turning a @racket[label?] into a
+The library function @racket[sanitize-label] turns a @racket[label?] into a
 string that NASM will accept, as long as it is not too long.
 
 In @tech{Paren-x64 v4}, we model labels with the @paren-x64-v4[(with-label label s)]
 instruction, which defines a label @paren-x64-v4[label] at the instruction
 @paren-x64-v4[s] in the instruction sequence.
 This corresponds to the @ch1-tech{x64} string @tt{label:\n s}.
-Note that they can be nested, allowing the same behvaiour as chaining labels in
+Note that they can be nested, allowing the same behaviour as chaining labels in
 @ch1-tech{x64}.
 For convenience, we assume all labels are symbols of the form
 @paren-x64-v4[L.<name>.<number>], and are globally unique.

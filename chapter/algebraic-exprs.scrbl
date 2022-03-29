@@ -141,7 +141,7 @@ As compiler designers, any tedious, systematic transformation should scream to
 us "this is a job for a compiler!".
 
 In this chapter, we add @deftech{algebraic expressions}---the ability to nest
-expressions arbitrarily, rather than manually sequence and names their values.
+expressions arbitrarily, rather than manually sequence and name their values.
 We exclude predicate position, since predicates are still their own sub-language
 until we have a boolean data type.
 @margin-note{
@@ -178,7 +178,7 @@ can dynamically distinguish procedures from machine integers.
 ]
 
 we can see a significant change in the syntax.
-In essense, previously, @values-lang-v6[value] had to be explicitly bound by a
+In essence, previously, @values-lang-v6[value] had to be explicitly bound by a
 @values-lang-v6[let], and operands to our primitive operations had to be
 trivial.
 Now, operands can be arbitrarily nested expressions that appeared in
@@ -310,7 +310,7 @@ produces fewer unnecessary expressions if we follow the template for the target.
          values-unique-lang-v6?]{
 Performs the monadic form transformation, unnesting all non-trivial operators
 and operands to @exprs-unique-lang-v6.5[binop]s, and
-@exprs-unique-lang-v6.5[call]s making data flow explicit and and simple to
+@exprs-unique-lang-v6.5[call]s making data flow explicit and simple to
 implement imperatively.
 }
 }

@@ -356,7 +356,7 @@ Using these two features, we define the final grammar of @deftech{Paren-x64 v1} 
 with all @ch1-tech{x64} restrictions as follows.
 
 @margin-note{Since we are frequently extending and comparing languages, we
-typeset them in a tabbed interface with a one or more diffs comparing two
+typeset them in a tabbed interface with one or more diffs comparing two
 languages, and usually a tab containing the language definition on its own.
 The diff emphasize what has been @bnf:add{added} to the language, and what has been
 @bnf:sub{removed} from the language.
@@ -401,7 +401,7 @@ the design of an interpreter explicitly.
 @;other-doc['(lib "cpsc411/cpsc411.scrbl")]
 @;FRAGILE LINK
 @margin-note{
-Reference implementations of all our languages are availble the
+Reference implementations of all our languages are available the
 @hyperlink["cpsc411/ref-langs.html"]{Language Reference Implementations}
 }
 
@@ -442,7 +442,7 @@ behaviour that has no specified definition in the language specification.
 Since we don't want to insert code to check every register is initialized (if
 that's even possible, it would be expensive), or insert extra code to initialize
 registers to arbitrary values (how would we distinguish them from real values?),
-we simplfy restrict the language.
+we simply restrict the language.
 
 @tech{Undefined behaviour} is common in low-level languages that lack a strong
 enough enforcement mechanism for checking assumptions.
@@ -788,8 +788,8 @@ string representing an @ch1-tech{x64} @tech{instruction sequence}.
 The run-time system is composed with the input as a second @tech{instruction
 sequence}.
 
-Note that in the string representation, string concatination implement
-@tech{instruction sequence} comosition.
+Note that in the string representation, string concatenation implements
+@tech{instruction sequence} composition.
 }]
 
 @subsection{Implementing Instruction Sequences}
@@ -848,7 +848,7 @@ See @racket[current-pass-list], @racket[compile], and @racket[execute].
 
 @section{Is the Compiler Correct?}
 Now that we have a compiler the meaning of all our languages is fully defined.
-We have an interpreter for the source language to define its mean.
+We have an interpreter for the source language to define its meaning.
 We have an "interpreter" for the target language (the CPU).
 So we can define what it means for a compiler to be correct.
 
@@ -870,7 +870,7 @@ have instead defined its meaning as the final value of @paren-x64-v1[rax], and
 then defined @emph{equivalence} between @tech{Paren-x64 v1} and @ch1-tech{x64}
 differently.
 In that case, the interpreter and compiled programs would produce different
-results for some programs, but they would always be equivalence modulo 256.
+results for some programs, but they would always be equivalent modulo 256.
 
 This gives us yet another design choice in our compiler: do we restrict the
 definition of our source language to ensure the compiler is correct, or design a

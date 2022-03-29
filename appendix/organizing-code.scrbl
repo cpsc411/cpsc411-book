@@ -23,7 +23,7 @@ We might gather all functions related to register allocation into a single file.
 But maybe that file is @emph{too big} (a subjective experience, not a clear
 dividing line), so we divide further: all functions related to conflict analysis
 in one file, all functions related to undead analysis in another.
-Often, we have a few functions that are needed in various placed, but don't fit
+Often, we have a few functions that are needed in various places, but don't fit
 in any conceptual group.
 It's common to stick these functions in a miscellaneous file, perhaps named
 @tt{utils.rkt}.

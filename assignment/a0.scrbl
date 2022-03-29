@@ -71,7 +71,7 @@ For the source language, we pick @ch1-tech{x64}.
 For the target, we choose @ch1-tech{bin64}.
 Thankfully, someone has already written a compiler, called @tt{nasm}, from
 @ch1-tech{x64} to @ch1-tech{bin64} for most machines.
-You can read more about these languages in in @Secref[#:tag-prefixes
+You can read more about these languages in @Secref[#:tag-prefixes
 '("book:" "chp1:")]{top}.
 
 @section{Setup a CSID}

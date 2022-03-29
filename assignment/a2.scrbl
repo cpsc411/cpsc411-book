@@ -198,7 +198,7 @@ run-time system is getting more complicated.
 }
 
 @exercise{
-Which passes were simplified by the abiltiy to nest @asm-lang-v2[tail]s?
+Which passes were simplified by the ability to nest @asm-lang-v2[tail]s?
 }
 
 @subsection{Optional Exercises}
