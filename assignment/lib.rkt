@@ -83,6 +83,8 @@
 (define ch7-tech (curry tech #:tag-prefixes '("book:" "chp-immediates:")))
 (define ch8-tech (curry tech #:tag-prefixes '("book:" "chp-structured-data:")))
 (define ch9-tech (curry tech #:tag-prefixes '("book:" "chp-closures:")))
+(define ch10-tech (curry tech #:tag-prefixes '("book:" "chp-letrec:")))
+(define ch11-tech (curry tech #:tag-prefixes '("book:" "chp-macros:")))
 
 (define ch-ra-tech (curry tech #:tag-prefixes '("book:" "chp-reg-alloc:")))
 

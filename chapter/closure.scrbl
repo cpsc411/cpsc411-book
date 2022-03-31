@@ -1,14 +1,14 @@
 #lang scribble/base
 
 @(require
-"../assignment/assignment-mlang.rkt"
-scriblib/figure
-(for-label cpsc411/reference/a9-solution)
-(for-label (except-in cpsc411/compiler-lib compile))
-cpsc411/langs/v8
-(for-label cpsc411/langs/v8)
-cpsc411/langs/v9
-(for-label cpsc411/langs/v9))
+  "../assignment/assignment-mlang.rkt"
+  scriblib/figure
+  (for-label cpsc411/reference/a9-solution)
+  (for-label (except-in cpsc411/compiler-lib compile))
+  cpsc411/langs/v8
+  (for-label cpsc411/langs/v8)
+  cpsc411/langs/v9
+  (for-label cpsc411/langs/v9))
 
 @(provide (all-defined-out))
 
@@ -382,7 +382,7 @@ We typeset the changes with respect to @tech{Exprs-lang v9}.
 ]
 
 @nested[#:style 'inset
-@defproc[(uniquify [p exprs-lang-v9]) exprs-unique-lang-v9]{
+@defproc[(uniquify [p exprs-lang-v9?]) exprs-unique-lang-v9?]{
 Resolves all @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract
 locations}.
 }]

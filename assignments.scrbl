@@ -13,10 +13,6 @@ The project proceeds bottom-up.
 We start with the "lowest" level of abstraction, assembly language, and
 gradually design and implement new layers of abstraction as languages.
 
-The milestones have not been updated for this semester yet; you can view the
-prior terms milestone at @url{https://www.students.cs.ubc.ca/~cs-411/2020w2/milestone_top.html}.
-There will be some changes this semester.
-
 @(local-table-of-contents #:style 'immediate-only)
 
 @include-section{assignment/a0.scrbl}
@@ -31,5 +27,5 @@ There will be some changes this semester.
 @include-section{assignment/a7.scrbl}
 @include-section{assignment/a8.scrbl}
 @include-section{assignment/a9.scrbl}
-@;include-section{assignment/a10.scrbl}
+@include-section{assignment/a10.scrbl}
 @;include-section{assignment/a11.scrbl}
