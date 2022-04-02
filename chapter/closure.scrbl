@@ -600,7 +600,7 @@ top-level, stick on a label, and generate a labeled @ch6-tech{procedure}.
 
 First, we uncover the @tech{free} variables in each @lam-free-lang-v9[lambda].
 We add these as an annotation on the @lam-free-lang-v9[lambda], which the next
-pass usees to generate @tech{closures}.
+pass uses to generate @tech{closures}.
 
 Below we define @deftech{Lambda-free-lang v9}.
 @bettergrammar*-ndiff[
