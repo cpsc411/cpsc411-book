@@ -23,7 +23,7 @@ The goal of this milestone is to add syntactic sugar to our language.
 This assignment is due @(due 'a10).
 
 You can use the reference solution here:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/a10-interrogator.cgi}
+@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a10}
 
 @subsubsub*section{Assignment Checklist}
 @subsubsub*section{Checklist}
