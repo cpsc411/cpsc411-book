@@ -18,4 +18,7 @@
           "deftech" "GitHub" "nb" "unspillables" "ie" "racketblock" "lang"
           "uniquify" "regexp" "eval" "nasm" "sar" "eg" "undead" "fx" "eq" "CPS"
           "fp" "fb" "loc" "fv" "secref" "ctx" "rsi" "foldr" "aloc" "rsp"
-          "opands"))))
+          "opands" "letrec" "Racketish" "cdr" "ref" "arity" "cletrec" "ary"
+          "Landin" "xs" "es" "cc" "xt" "curryr" "unbox" "vec" "dox" "expr"
+          "huzzah" "REPL" "DrRacket" "racketvarfont" "uniquified" "exprs"
+          "sexpr"))))
