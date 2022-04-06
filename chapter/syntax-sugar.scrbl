@@ -19,7 +19,8 @@
 @(define sb
    (make-cached-eval
     "ch11-eval"
-    '(require racket/match racket/pretty cpsc411/reference/a10-solution cpsc411/compiler-lib)))
+    '(require racket/list racket/match racket/pretty
+    cpsc411/reference/a10-solution cpsc411/compiler-lib)))
 
 @title[#:tag "top" #:tag-prefix "chp-macros:"]{Syntactic Sugar}
 
@@ -56,10 +57,10 @@ We also add two reader notations to the surface language.
 @object-code{'s-expr} is a reader macro in Racket and is implicitly elaborated
 to @racketish-surface[(quote s-expr)].
 @object-code{#(value ...)} is the notation for vector literals, and is equivalent to
-@racketish-surface[(vector value ...)], but not syntactically identical in the same way
+@racketish-surface[(vector 'value ...)], but not syntactically identical in the same way
 @object-code{'s-expr} and @racketish-surface[(quote s-expr)] are.
 
-Because Racket's reader supports them, we do not have to do anything to
+Because Racket's reader supports them, we do not have to do much to
 add them!
 We avoid implementing a parser once more (huzzah!).
 This is one interesting feature of @deftech{bootstrapping}---defining a language
@@ -148,7 +149,20 @@ All macros are elaborated to existing features.
 We also elaborate implicit procedure call into explicit
 @object-code{call}.
 
-The transformation we want to define are given below:
+Notice that the vector literal notation embeds an actual Racket vector in our
+AST.
+@examples[#:eval sb
+(vector-ref (second '(module #(1 2 3))) 0)
+]
+
+And the the quoted literal notation actually expands to the symbol @code{quote},
+although it always gets printed as a tick:
+@examples[#:eval sb
+'(module '(#t #f))
+(first (second '(module '(#t #f))))
+]
+
+The transformations we want to define are given below:
 @itemlist[
 @item{@object-code{(and v ...)}
 @racketblock[
