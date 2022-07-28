@@ -1139,9 +1139,9 @@ To allocate a frame, intuitively, we want to transform @racket[`(return-point
    ...
    (set! ,fv_n-1 ,x_n-1)
 
-   (set! ,fbp (+ ,fbp ,nb))
-   (return-point ,rp ,tail)
    (set! ,fbp (- ,fbp ,nb))
+   (return-point ,rp ,tail)
+   (set! ,fbp (+ ,fbp ,nb))
 
    (set! ,x_0 ,fv_0 )
    ...
