@@ -154,6 +154,7 @@ AST.
 @examples[#:eval sb
 (vector-ref (second '(module #(1 2 3))) 0)
 ]
+This vector is required to only contain values from @tech{Racketish-Surface}.
 
 And the the quoted literal notation actually expands to the symbol @code{quote},
 although it always gets printed as a tick:
