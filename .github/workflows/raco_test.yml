@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo apt-get install nasm graphviz
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v1.7
+      uses: Bogdanp/setup-racket@v1.8.1
       with:
         architecture: 'x64'
         distribution: 'full'
