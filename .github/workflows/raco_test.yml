@@ -40,8 +40,8 @@ jobs:
     - name: Install dependencies
       run: |
         raco pkg install --batch --auto \
-          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib \
-          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc \
+          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#main \
+          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc#main \
           ./cpsc411-priv/cpsc411-reference-tests \
           ./cpsc411-priv/cpsc411-reference-lib \
     - name: Build lib
