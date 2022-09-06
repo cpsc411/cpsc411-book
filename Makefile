@@ -30,7 +30,7 @@ clean:
 	rm -rf compiled/
 
 sync: build/*.html build/*.cgi
-	rsync -avzl --delete --delete-excluded --chmod=Dg+x,g+r build/ cs-411@remote.students.cs.ubc.ca:public_html/2021w2/
+	rsync -avzl --delete --delete-excluded --chmod=Dg+x,g+r build/ cs-411@remote.students.cs.ubc.ca:public_html/2022w2/
 
 serve: build/index.html
 	racket -t serve.rkt
