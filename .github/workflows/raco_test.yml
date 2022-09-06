@@ -30,7 +30,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: cpsc411/cpsc411-priv
-        ref: 2021w2
+        ref: main
         ssh-key: ${{ secrets.PRIV_SSH_KEY }}
         path: cpsc411-priv
     - name: Checkout
@@ -40,8 +40,8 @@ jobs:
     - name: Install dependencies
       run: |
         raco pkg install --batch --auto \
-          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2021w2 \
-          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc#2021w2 \
+          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib \
+          https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-doc \
           ./cpsc411-priv/cpsc411-reference-tests \
           ./cpsc411-priv/cpsc411-reference-lib \
     - name: Build lib
