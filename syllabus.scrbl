@@ -39,14 +39,26 @@ some simple imperative programming in assembly.
 ]
 
 @section{Prerequisites}
-A passing grade in CPSC 311.
+This semester, the CPSC 311 prerequisite has been waived.
+As a result, the course will not assume background in programming languages and
+implementation of interpreters, and will move somewhat slower as a result.
+We will cover some of the necessary 311 background as it comes up in the course.
+@;A passing grade in CPSC 311.
 
+I've left the description of what is normally expected as background for the
+course, as students have contacted me worried about the lack of 311.
+However, I will not expect students to have the normal background acquired in
+311, and will be adjusting the 411 material and timeline.
+
+
+@;{
 @subsection{What if I want to take it but can't fulfill the prerequisites?}
 Subject to available space in the course for all interested students meeting the prerequisites, I’m
 willing to consider flexibility for students for whom taking CPSC 311 is not practical or possible.
 You should reach out to me well in advance, ideally a semester before hand, if you think you will not
 be able to take CPSC 311 before CPSC 411. If I support your case, we will work with the CPSC advising
 team to ensure they have no objections.
+}
 
 @subsection{Judging your own background}
 This course demands programming in a functional programming languages, learning
@@ -161,8 +173,7 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
   (list @bold{Instructor} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389"
-  "ONLINE Tue/Thu 16:00--17:00"))
+  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "TBD" "TBD"))
 ]
 
 @tabular[
@@ -171,9 +182,7 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
 (list @bold{TA} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-(list "Lily Bryant" @mailto["labryant@cs.ubc.ca"] "ONLINE" "Mon 13:00--14:00;
-Wed 15:00--16:00")
-(list "Paulette Koronkevich" @mailto["pletrec@cs.ubc.ca"] "ONLINE" "Thu/Fri 11:00--12:00")
+(list "TBD" "TBD" "TBD" "TBD")
 )
 ]
 
@@ -184,7 +193,7 @@ In no particular order, these are:
 
 @itemlist[
 @item{Office hours}
-@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22021/cpsc411" "Piazza"]
+@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22022/cpsc411" "Piazza"]
 
     The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about milestones, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza -- pleas of ignorance will not be received.
 
@@ -361,8 +370,7 @@ The following is a tentative grading scheme for the course, although it is
 subject to change at the instructor's discretion.
 
 @itemlist[
-@item{Project -- 50%}
-@item{Midterm -- 20%}
+@item{Project -- 70%}
 @item{Final -- 30%}
 ]
 

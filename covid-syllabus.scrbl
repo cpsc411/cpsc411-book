@@ -23,17 +23,25 @@ You should feel free to contact me if you have concerns about COVID and course
 policy.
 
 @section{Changes to Lecture Delivery}
-Lectures will be delivered online via Zoom until at least Jan. 24th, per UBC policy.
+Lectures will probably be delivered in person, unless UBC policies changes.
+Regardless, I will record (but not stream) lectures.
+Recording will be made available to allk students, with the following caveat:
+research into learn suggests students who rely on recorded lectures, instead of
+attending lecture, tend to do worse.
 
+@;{
 Our scheduled lecture hall, DMP 110, has an occupancy limit of 120.
 At the current enrolment (67 students), 50% occupancy of DMP 110 is @emph{almost} possible.
 This, combined with effective masking and good ventilation, should enable a relatively safe lecture environment.
 However, I may decide to change to exclusively online delivery at any point.
+}
 
 IF YOU ARE SICK, DO NOT COME TO CLASS. Doesn't matter if it's COVID or not.
 
 All lectures will be recorded; this is meant to enable students who are ill or
 exposed to COVID to isolate.
+If you must miss lecture, please watch the recorded lecture ASAP and come to
+office hours with any follow up questions.
 However, you are strongly advised to attend lectures synchronously when it is
 safe for you to do so.
 Students who rely entirely on recorded lectures tend to do worse than students
@@ -46,17 +54,17 @@ I may also post additional lecture notes.
 However, the online book already contains most of what we will cover in the
 course.
 
-If lectures are in person, masks are required (including over your nose), and I
-strongly recommend all students upgrade to respirator-type fitted masks.
+Masks should be worn (including over your nose) during lecture, and I strongly
+recommend all students upgrade to respirator-type fitted masks.
 N95s are orders of magntitude (~1000x) more effective than cloth masks at
-filtration, and can be safely reused for approximately 200 days according to the
-N95 rating.
+filtration, and can be safely reused for approximately 200 days if not
+structurally damaged or wet, according to the N95 rating.
 You can find details here: @url{https://www.acgih.org/covid-19-fact-sheet-worker-resp/}.
 They are composed of both fibers and fiber glass that has been electrically
 charged to attract and trap tiny particles.
 They should not be washed or exposed to high heat, as this can destroy the
 charge, but they should be allowed to dry between uses; I setup a
-rotation of 7 that I reuse weekly.
+rotation of 7 that I reuse weekly, until they wear out.
 They're pretty easy to find online, e.g.,
 @url{https://unitedcanadainc.com/product/3m-aura-disposable-particulate-respirator-9205-n95/}
 or @url{https://shop.vitacore.ca/}.
@@ -64,8 +72,7 @@ I have a few I can hand out.
 You should look up how to put on and fit test such a mask, e.g., @url{https://youtu.be/RcI7vbTzPlk?t=624}.
 
 @section{Changes to Office Hours}
-Office hours will be online via Zoom until at least Jan. 24th.
-Office hours may remain online after that, at the discretion of the TAs and instructors.
+Office hours may remain online at the discretion of the TAs and instructors.
 
 If office hours are in person, masks are required (including over your nose),
 occupancy will be limited, and I strongly recommend students upgrade to
@@ -73,25 +80,13 @@ respirator type masks.
 See above for details.
 
 @section{Changes to Evaluation}
-The midterm and final exam structure and method of delivery (either in-person or
-online) may change, or be canceled entirely, at any point, at the instructor's
-discretion.
-Please don't ask.
-
-The exams may be either coding exams on computer similar in structure to the
-project, or multiple choice exams on paper or delivered via Canvas.
-
-If the midterm is canceled, the weight will be shifted to the final exam.
-If the final exam is canceled, the weight will be shifted to the project.
-If you miss the midterm and it is not canceled, your weight will be shifted to
-the final.
-If you miss the final and it is not canceled, you must apply for a deferred
-standing and you will at a later point be given a different final exam to
-complete, or will you fail the course.
-
 The project deadline is not until the end of the semester, so there are no
 extensions.
 Plan ahead, and expect to get sick at some point during the semester.
+
+The final exam will not be in person and includes a week to complete what ought
+to take no more than a day to complete, so there should be no disruptions due to
+any COVID policy changes.
 
 @section{Accommodations and Accessibility}
 If you require, or think you might require, any accomodations, you should reach
