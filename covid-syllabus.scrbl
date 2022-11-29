@@ -25,8 +25,8 @@ policy.
 @section{Changes to Lecture Delivery}
 Lectures will probably be delivered in person, unless UBC policies changes.
 Regardless, I will record (but not stream) lectures.
-Recording will be made available to allk students, with the following caveat:
-research into learn suggests students who rely on recorded lectures, instead of
+Recording will be made available to all students, with the following caveat:
+research into learning suggests students who rely on recorded lectures, instead of
 attending lecture, tend to do worse.
 
 @;{
@@ -72,12 +72,10 @@ I have a few I can hand out.
 You should look up how to put on and fit test such a mask, e.g., @url{https://youtu.be/RcI7vbTzPlk?t=624}.
 
 @section{Changes to Office Hours}
-Office hours may remain online at the discretion of the TAs and instructors.
+Office hours are expected to be in person, but may move online at the discretion of the TAs and instructors.
 
-If office hours are in person, masks are required (including over your nose),
-occupancy will be limited, and I strongly recommend students upgrade to
-respirator type masks.
-See above for details.
+Students are expected to wear masks (see above) while attending office hours,
+and occupancy may be limited.
 
 @section{Changes to Evaluation}
 The project deadline is not until the end of the semester, so there are no
@@ -87,6 +85,7 @@ Plan ahead, and expect to get sick at some point during the semester.
 The final exam will not be in person and includes a week to complete what ought
 to take no more than a day to complete, so there should be no disruptions due to
 any COVID policy changes.
+There are no extensions for the final exam.
 
 @section{Accommodations and Accessibility}
 If you require, or think you might require, any accomodations, you should reach
