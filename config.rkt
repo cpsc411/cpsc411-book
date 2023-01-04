@@ -18,8 +18,8 @@
   (let ([x (make-hasheq)])
     ;; First Sunday of Term
     (hash-set! x 'a0 (moment 2023 1 15 23 59 59))
-    (hash-set! x 'a1 (+weeks (hash-ref x 'a0) 2))
-    (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 1))
+    (hash-set! x 'a1 (+weeks (hash-ref x 'a0) 1))
+    (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 2))
     (hash-set! x 'a3 (+weeks (hash-ref x 'a2) 1))
     (hash-set! x 'a4 (+weeks (hash-ref x 'a3) 2))
     (hash-set! x 'a5 (+weeks (hash-ref x 'a4) 1))
