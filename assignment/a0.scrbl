@@ -90,11 +90,12 @@ which has the correct version of @code{nasm} and @code{racket}.
 You can connect via SSH using the username setup at
 @url{https://www.cs.ubc.ca/getacct/}.
 
-To access the v8.3 Racket, add @tt{/cs/local/lib/pkg/racket-8.3/bin/} to your path.
+The remote machines have Racket 8.5 and 8.7 installed; I recommend 8.7.
+To access the v8.7 Racket, add @tt{/cs/local/lib/pkg/racket-8.7/bin/} to your path.
 Remember that you must prepend this to the path, in order for this version to
 take precedence.
 For example, type this in a shell or add it to your @tt{.bash_profile}:
-@tt{export PATH="/cs/local/lib/pkg/racket-8.3/bin/:$PATH"}.
+@tt{export PATH="/cs/local/lib/pkg/racket-8.7/bin/:$PATH"}.
 
 If you want a local development environment, you can use the @tt{Dockerfile}
 found in your git repository to setup a development container that mirrors
@@ -117,7 +118,7 @@ First, let's ensure Racket is installed properly and the right version.
 You will need @code{racket} version 8.3 or higher.
 
 @exercise{Run @code{racket --version}, and check that a message like "Welcome to
-Racket v8.3.0.1" is printed, and that the version is at least "v8.3".
+Racket v8.7" is printed, and that the version is at least "v8.3".
 }
 
 Next, we'll test @code{nasm}. We need @code{nasm} version 2.13 or higher.
