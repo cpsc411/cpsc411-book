@@ -2,7 +2,7 @@
 
 (require
   (except-in scribble/manual/lang tech deftech compile racketgrammar* date? date
-             url)
+             url code)
   (for-label racket)
   scribble/example
   "lib.rkt"
