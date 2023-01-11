@@ -195,7 +195,7 @@ Other commits will not be graded.
 We will be attempting to grade using GradeScope, and milestones may include an
 autograder.
 You can manually submit by logging in to GradeScope using the email
-@tt{CSID@"@"students.cs.ubc.ca}, and uploading a ZIP archive created from your
+@tt{CWL@"@"student.ubc.ca}, and uploading a ZIP archive created from your
 git repo using @tt{git archive -o submission.zip assignment-0}.
 You will be able to see some information from the autograder after submitting.
 
