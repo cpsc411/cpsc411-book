@@ -212,14 +212,18 @@
   (list
    ; TODO: Needs an abstraction. Maybe use pygments package?
    (nested #:style 'code-inset
-           (typeset-code str))
+           (paragraph (style #f (list (alt-tag "pre"))) str))
+
    (nested #:style 'code-inset
-           (typeset-code #:indent 0
-                         (nasm-call type name name.o)
-                         "\n"
-                         (ld-call type name.o name.exe)
-                         "\n"
-                         @~a{> ./@|name.exe|} "\n" (displayer result-actual)))))
+           (paragraph (style #f (list (alt-tag "pre")))
+                      (list
+                       (nasm-call type name name.o)
+                       "\n"
+                       (ld-call type name.o name.exe)
+                       @~a{> ./@|name.exe|}
+                       "\n"
+                       (displayer result-actual))))))
+
 ;;@todo{Better abstraction for type setting nasm examples}
 
 ;; TODO HACK shouldn't be this much code in the macro

@@ -16,6 +16,20 @@
     height: unset;
 }
 
+pre {
+    font-size: 1rem;
+    font-family: "Fira-Mono", monospace;
+}
+
+code {
+    font-size: 1rem;
+    font-family: "Fira-Mono", monospace;
+}
+
+.SCodeFlow pre {
+    margin-left: 0;
+}
+
 @media all and (max-width: 720px){
     .navsettop {
         height: 4rem;
