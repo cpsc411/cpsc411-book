@@ -135,7 +135,7 @@ and check that a message like "NASM version 2.14.02" is printed and that the
 version is at least "2.13".
 }
 
-Now you should be able to create and compile the following file @tt{fact.s}.
+Now you should be able to create and compile the following file @hyperlink["fact.s"]{@tt{fact.s}}.
 
 @nasm-example[
 #:file-name "fact.s"
