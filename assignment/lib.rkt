@@ -170,6 +170,10 @@
     (set-box! cached-example-counter (add1 x))
     x))
 
+(define (code . rest)
+  (element (make-style #f (list (alt-tag "code")))
+           rest))
+
 (define (nasm-example #:file-name (name "example.s")
                       #:result (result-expected #f)
                       #:runner (runner nasm-run/print-string)

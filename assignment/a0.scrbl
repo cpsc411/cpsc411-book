@@ -130,7 +130,7 @@ version 2.14.02" is printed and that the version is at least "2.13".
 We also need to be sure @code{racket} can find @racket{nasm}.
 
 @exercise{Run
-@literal{racket -e "(with-output-to-string (thunk (system \"nasm --version\")))"},
+@code{racket -e "(with-output-to-string (thunk (system \"nasm --version\")))"},
 and check that a message like "NASM version 2.14.02" is printed and that the
 version is at least "2.13".
 }
