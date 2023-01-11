@@ -170,7 +170,7 @@
     (set-box! cached-example-counter (add1 x))
     x))
 
-(define (code . rest)
+#;(define (code . rest)
   (element (make-style #f (list (alt-tag "code")))
            rest))
 

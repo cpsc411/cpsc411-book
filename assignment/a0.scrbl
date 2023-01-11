@@ -25,9 +25,9 @@ You should have a git repository created for you at @url{https://github.students
   @item{Setup a 64-bit Linux (virtual) machine for local development}
   ]
 }
-@item{Ensure @code{racket} >= 8.3 is installed.}
-@item{Ensure @code{nasm} >= 2.13 is installed.}
-@item{Ensure @code{nasm} is callable from Racket.}
+@item{Ensure @exec{racket} >= 8.3 is installed.}
+@item{Ensure @exec{nasm} >= 2.13 is installed.}
+@item{Ensure @exec{nasm} is callable from Racket.}
 @item{Compile and execute fact.s from the command line.}
 @item{Compile and execute fact.s from Racket.}
 ]
@@ -83,10 +83,10 @@ This account will be your GradeScope account and your account on
 
 @section{Testing Your Development Machine}
 If you're running your own Linux machine, I trust you can figure out how to
-install @code{racket} and @code{nasm}.
+install @exec{racket} and @exec{nasm}.
 
 If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca},
-which has the correct version of @code{nasm} and @code{racket}.
+which has the correct version of @exec{nasm} and @exec{racket}.
 You can connect via SSH using the username setup at
 @url{https://www.cs.ubc.ca/getacct/}.
 
@@ -115,22 +115,22 @@ Whichever you choose, the following exercises will make sure your machine is
 setup and working properly.
 
 First, let's ensure Racket is installed properly and the right version.
-You will need @code{racket} version 8.3 or higher.
+You will need @exec{racket} version 8.3 or higher.
 
-@exercise{Run @code{racket --version}, and check that a message like "Welcome to
+@exercise{Run @exec{racket --version}, and check that a message like "Welcome to
 Racket v8.7" is printed, and that the version is at least "v8.3".
 }
 
-Next, we'll test @code{nasm}. We need @code{nasm} version 2.13 or higher.
+Next, we'll test @exec{nasm}. We need @exec{nasm} version 2.13 or higher.
 
-@exercise{Run @code{nasm --version}, and check that a message like "NASM
+@exercise{Run @exec{nasm --version}, and check that a message like "NASM
 version 2.14.02" is printed and that the version is at least "2.13".
 }
 
-We also need to be sure @code{racket} can find @racket{nasm}.
+We also need to be sure @exec{racket} can find @racket{nasm}.
 
 @exercise{Run
-@code{racket -e "(with-output-to-string (thunk (system \"nasm --version\")))"},
+@exec{racket -e "(with-output-to-string (thunk (system \"nasm --version\")))"},
 and check that a message like "NASM version 2.14.02" is printed and that the
 version is at least "2.13".
 }
