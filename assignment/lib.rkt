@@ -224,6 +224,7 @@
                        (nasm-call type name name.o)
                        "\n"
                        (ld-call type name.o name.exe)
+                       "\n"
                        @~a{> ./@|name.exe|}
                        "\n"
                        (displayer result-actual))))))
