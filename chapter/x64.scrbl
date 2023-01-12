@@ -177,16 +177,16 @@ section .data ; The data section. This is where we declare initialized memory lo
 dummy: db 0
 }
 
-In this example, we compute the result, which is stored in @code{r9}.
+In this example, we compute the result, which is stored in @exec{r9}.
 Intuitively, the meaning of this program is a transformation over a register machine.
-It expects a machine with at least two registers, @code{r8} and @code{r9}, whose
+It expects a machine with at least two registers, @exec{r8} and @exec{r9}, whose
 initial values are arbitrary.
 It begins executing the first instruction, then executes the next, and so on.
-After running the machine is left with in a state where @code{r9} contains the
+After running the machine is left with in a state where @exec{r9} contains the
 result.
 Unfortunately, that's not what happens if we try to run it.
 
-Instead, after reaching @code{fact_done}, the machine happily tries to
+Instead, after reaching @exec{fact_done}, the machine happily tries to
 execute the next instruction in memory.
 There is no next instruction, so it executes whatever happens to be in that
 memory location.
@@ -210,7 +210,7 @@ of as the "standard library" for @tech{x64}.
 @;The entry label is assumed to be "start" on macOS (at least, on some versions),
 @;"_start" on Linux, and "Start" on Windows (depending on which Windows linker you
 @;use).
-macOS imposes a restrictions: the @code{.data} section, which is used to declare
+macOS imposes a restrictions: the @exec{.data} section, which is used to declare
 initialized memory locations, cannot be empty, and the linker rejects the
 program if it is.
 In the above example, we don't actually use the heap, so we declare a dummy
@@ -358,7 +358,7 @@ For more details, Wikipedia is not a bad place to start:
 @url{https://en.wikipedia.org/wiki/X86_calling_conventions#System_V_AMD64_ABI}.
 But you could also go to the source: @url{https://github.com/hjl-tools/x86-psABI/wiki/x86-64-psABI-1.0.pdf}.
 
-To compile this on Linux, we run @tt{nasm -f elf64 exit-fact-x64-linux.s -o
+To compile this on Linux, we run @exec{nasm -f elf64 exit-fact-x64-linux.s -o
 exit-fact-x64-linux.o}.
 This will generate a binary in the @tech{elf64} target language.
 The @deftech{elf64} is the Linux-flavoured @tech{bin64}, a binary format used on
@@ -366,14 +366,14 @@ Linux.
 It includes the @tech{x64} instructions and additional structure that allows the
 Linux operating system to control the binary.
 
-Next, we link the file by running @tt{ld -e start -o exit-fact-x64-linux.exe
+Next, we link the file by running @exec{ld -e start -o exit-fact-x64-linux.exe
 exit-fact-x64-linux.o}, which essentially connects the binary to the operating
 system and any other external libraries, and specifies the entry point where
 execution should begin (the @tt{start} label).
-Now we can execute the file @tt{exit-fact-x64-linux.exe} on the command line
-in the usual way, @eg set it to executable using @tt{chmod +x exit-fact-x64-linux.exe}
-then execute with @tt{./exit-fact-x64-linux.exe}.
-We can get the result of the exit code using @code{echo $?} or @code{echo
+Now we can execute the file @exec{exit-fact-x64-linux.exe} on the command line
+in the usual way, @eg set it to executable using @exec{chmod +x exit-fact-x64-linux.exe}
+then execute with @exec{./exit-fact-x64-linux.exe}.
+We can get the result of the exit code using @exec{echo $?} or @exec{echo
 $status}, depending on your shell.
 
 Most programming languages communicate their result by printing.
@@ -449,9 +449,9 @@ macOS.
 On macOS, there are 4 @tech{system call} tables, computed by adding the
 @tech{system call} number to a specific prefix.
 The BSD @tech{system call} table, the most generic and Linux-like, uses the hex
-prefix @code{#x2000000}.
+prefix @exec{#x2000000}.
 The @tt{exit} @tech{system call} is system call 1 in the BSD table, so we use
-the @tech{system call} number @code{#x2000001}.
+the @tech{system call} number @exec{#x2000001}.
 The example "exit-fact-x64-linux.s" from above is rewritten for macOS below.
 
 @nasm-example[
@@ -491,19 +491,19 @@ section .data
 dummy: db 0
 }
 
-To compile this file, we run @code{nasm -f macho64 exit-fact-x64-macos.s exit-fact-x64-macos.o}.
-@code{macho64} is the binary formatted used by 64-bit macOS.
-To link, we run @code{ld -macosx_version_min 10.6 -e start -o
+To compile this file, we run @exec{nasm -f macho64 exit-fact-x64-macos.s exit-fact-x64-macos.o}.
+@tt{macho64} is the binary formatted used by 64-bit macOS.
+To link, we run @exec{ld -macosx_version_min 10.6 -e start -o
 exit-fact-x64-macos.exe exit-fact-x64-macos.o}.
 We need to specify a minimum macOS version number of 10.6, otherwise the linker
 will ignore the custom entry label and fail to link.
-We can execute the file @code{exit-fact-x64-macos.exe} on the command line
-in the usual way, and can get the result of the exit code using @code{echo $?}
-or @code{echo $status}, depending on your shell.
+We can execute the file @tt{exit-fact-x64-macos.exe} on the command line
+in the usual way, and can get the result of the exit code using @exec{echo $?}
+or @exec{echo $status}, depending on your shell.
 
 macOS also has a similar @tt{write} @tech{system call}: number 4 in the BSD
 table.
-The file @code{fact-x64-linux.s} is ported to macOS below.
+The file @tt{fact-x64-linux.s} is ported to macOS below.
 
 @nasm-example[
 #:result "x"
@@ -551,7 +551,7 @@ msg:   times len dw 0  ; A `len` length, in bytes, buffer, initialized to be ful
 @subsection{x64-windows}
 Windows does not allow user processes to perform @tech{system calls}.
 Instead, we have to call kernel functions that provide similar functionality.
-The @code{ExitProcess} kernel function provides the same functionality as the
+The @exec{ExitProcess} kernel function provides the same functionality as the
 @tt{exit} @tech{system call} on Linux and macOS.
 However, making a function call is more complex than making a @tech{system call}.
 We have to declare external functions for the linker, and ensure we link with
@@ -591,9 +591,9 @@ exit:
 Windows also doesn't ship with a linker.
 @hyperlink["http://www.godevtool.com/Golink.zip"]{GoLink} is a small, freely
 available linker.
-After downloading @code{nasm} and @code{GoLink}, you can compile using
-@code{nasm -f win64 exit-fact-x64-windows.s -o
-exit-fact-x64-windows.o} and link using @code{golink /entry Start /fo
+After downloading @exec{nasm} and @exec{GoLink}, you can compile using
+@exce{nasm -f win64 exit-fact-x64-windows.s -o
+exit-fact-x64-windows.o} and link using @exec{golink /entry Start /fo
 exit-fact-x64-windows.exe exit-fact-x64-windows.o kernel32.dll}.
 
 @;@section{Setuping a virtual machine}
