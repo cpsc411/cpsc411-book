@@ -195,7 +195,7 @@ were unable to take CPSC 311.
 (list
 (list @bold{TA} @bold{Contact Details} @bold{Office} @bold{Office Hours})
 (list "Paulette Koronkevich" "pletrec@cs.ubc.ca" "ICCS 306 (W); ICCS 238 (F)" "W 11:00--12:00; F 14:00--15:00")
-(list "Lily Bryant" "labryant@cs.ubc.ca" "TBD" "M 13:00--14:00; R 11:30--12:30")
+(list "Lily Bryant" "labryant@cs.ubc.ca" "ICCS 204 (M); ICCS 306 (R)" "M 13:00--14:00; R 11:30--12:30")
 (list "Adam Geller" "atgeller@cs.ubc.ca" "TBD" "T 10:00--11:00; W 14:30--15:30")
 )
 ]
