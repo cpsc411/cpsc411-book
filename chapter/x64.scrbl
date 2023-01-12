@@ -592,7 +592,7 @@ Windows also doesn't ship with a linker.
 @hyperlink["http://www.godevtool.com/Golink.zip"]{GoLink} is a small, freely
 available linker.
 After downloading @exec{nasm} and @exec{GoLink}, you can compile using
-@exce{nasm -f win64 exit-fact-x64-windows.s -o
+@exec{nasm -f win64 exit-fact-x64-windows.s -o
 exit-fact-x64-windows.o} and link using @exec{golink /entry Start /fo
 exit-fact-x64-windows.exe exit-fact-x64-windows.o kernel32.dll}.
 
