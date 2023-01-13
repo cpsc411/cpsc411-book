@@ -178,7 +178,8 @@ Paren-asm-sub.
 
 @codeblock{
 #lang racket
-(define (TODO . rest) (error "Template not yet completed"))
+(define-syntax-rule (TODO . rest)
+  (error "Template not yet completed"))
 
 (define (max-int word-size) (sub1 (expt 2 (sub1 word-size))))
 (define (min-int word-size) (* -1 (expt 2 (sub1 word-size))))
