@@ -220,6 +220,8 @@ In no particular order, these are:
 ]
 
 @section{Course Structure}
+
+@subsection{Project}
 The course is structured around semester-long project in which students design
 implement a programming language by building a compiler to x64.
 The project is divided into weekly milestones designing and implementing an
@@ -232,12 +234,6 @@ details.
 The milestones @emph{a0--a2} will be completed individually, and the rest of
 the project will be in teams of three.
 
-There will be a midterm and final that focus on the concepts covered in lecture
-and in milestones.
-The structure of the exams may be different than the milestones.
-While the milestones focus on implementing a compiler, the exams will test you
-on the concepts and design elements that are discussed in lecture and are
-implicit in the milestones.
 
 @subsection{Working in Groups}
 How you organize work between yourself is ultimately up to you.
@@ -253,6 +249,43 @@ specific code details or implementation decisions.
 See also the section on Project Evaluation below.
 If you cannot answer questions about the solution you submitted you should not
 expect any credit for submitting it.
+
+
+@subsection{Exams}
+There will be a final that focus on the concepts covered in lecture and in
+milestones.
+The structure of the exam may be different than the milestones.
+While the milestones focus on implementing a compiler, the exams will test you
+on the concepts and design elements that are discussed in lecture and are
+implicit in the milestones.
+
+@subsection{Reading}
+All the design and implementation lessons are found in the (free, online) book
+found on this website.
+Studens are expected to read these chapter while working to implement a compiler
+described by the book to reinforce these lessons.
+The course calendar gives a schedule for approximately when students are
+expected to read various chapters.
+
+@subsection{Lecture}
+Lectures will cover some of the material in the book, often in a different
+context to provide a second perspective on the same material.
+Lecture will often involve active-learn components and live-coding, so students
+should bring their laptops to class.
+If you do not have a laptop, please contact the course staff; the CS department
+may have some loaner laptops available.
+
+Attendance is lecture is not required in the sense that no attendance is taken
+and no graded activies are assigned; however, @emph{students are responsible for
+material that is presented during lecture}.
+Some important announcements or supplementary background lessons may be
+presented only in the lecture.
+This material, even if not written down anywhere, is fair-game for graded
+assessments.
+All lecture materials, such as slides, activities, and recordings of lectures,
+will be posted on Piazza following the lecture.
+When you miss a lecture, review this material ASAP and follow-up with staff
+during office hours or on Piazza if you have further questions.
 
 @section{Learning Objectives}
 @itemlist[
