@@ -207,15 +207,25 @@ In no particular order, these are:
 
 @itemlist[
 @item{Office hours}
-@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22022/cpsc411" "Piazza"]
+@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22022/cpsc411/home" "Piazza"]
 
-    The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about milestones, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza -- pleas of ignorance will not be received.
+    The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about milestones, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza---pleas of ignorance will not be received.
 
     Piazza is also a very effective means of communication if used correctly. Questions about the milestones should be posted to the Piazza rather than being emailed to the instructor or a TA, as everyone will see both the question and its answer. All students are encouraged to post answers to questions posed on Piazza as well.
+
+    A couple of important rules for posting to Piazza:
+    @itemlist[
+    @item{Search for similar questions before posting; your question may have already been answering, and repeating a question clutters Piazza and wastes time for everyone.}
+    @item{@emph{Do not} post screenshots of text. Screenshots of code or error messages will be ignored and may be deleted, and course staff will never answer a question about a screenshot of text. Images are a bad representation of text. It is impossible for staff to copy/paste code from a screenshot to assist debugging, and screenshots will not scale or render correctly on all devices, while text will auto scale correctly.}
+]
 }
 @item{Email
 
     Email to the instructor or TAs is effective in limited circumstances. It is the most effective means of scheduling a consulting time when the regular hours are impossible or insufficient. It is an appropriate means of asking questions concerning the grading of milestones and examinations. It is not an appropriate means of asking questions about the milestones - see Piazza.
+}
+@item{Canvas
+
+  Do not contact staff through Canvas; we get no notifications from Canvas, and do not check Canvas. In general, we do not use Canvas, with one exceptions: all grades will be posted to Canvas for students to review before the final grades are submitted.
 }
 ]
 
