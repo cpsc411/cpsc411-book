@@ -58,8 +58,8 @@
     #;(,(moment 2022 2 28) . ,(emph "Midterm! (maybe)"))
 
     (,(moment 2023 1 10) . "First Day of Lecture")
-    (,(moment 2023 1 17) . "Maybe no lecture; out at POPL")
-    (,(moment 2023 1 19) . "Maybe no lecture; out at POPL")
+    (,(moment 2023 1 17) . "No lecture; out at POPL")
+    (,(moment 2023 1 19) . "No lecture; out at POPL")
     (,(moment 2023 1 20) . "Last day to withdraw, without W")
     (,(moment 2023 3 3) . "Last day to withdraw, with W")
     (,(moment 2023 2 20) . "Start of Midterm Break")
