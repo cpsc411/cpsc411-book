@@ -528,7 +528,7 @@ Below, we design @deftech{Nested-asm-lang-v2} (@racket[nested-asm-lang-v2]).
 @todo{This doesn't render correctly due ambiguity in the tree diff}
 @;bettergrammar*-diff[para-asm-lang-v2 nested-asm-lang-v2]
 @bettergrammar*-ndiff[
-#:labels (#;"Diff" "Para-asm-lang-v2" "Nested-asm-lang-v2")
+#:labels ("Diff" "Para-asm-lang-v2" "Nested-asm-lang-v2")
 #;(#:include (p tail effect)
   para-asm-lang-v2 nested-asm-lang-v2)
 ((((unsyntax (bnf:add "p")) tail)
