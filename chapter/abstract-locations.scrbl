@@ -519,13 +519,26 @@ effect context.}
 
 We can easily lift this restriction by designing a language that supports
 nesting, and compiling it using our well-known operations for composing
-@tech{instruction sequences}.
+@ch-bp-tech{instruction sequences}.
 This simplifies the job of later passes that are now free to nest instructions
 if it's helpful.
 
-Below, we design @deftech{nested-asm-lang-v2}.
+Below, we design @deftech{Nested-asm-lang-v2} (@racket[nested-asm-lang-v2]).
 
-@bettergrammar*-diff[para-asm-lang-v2 nested-asm-lang-v2]
+@todo{This doesn't render correctly due ambiguity in the tree diff}
+@;bettergrammar*-diff[para-asm-lang-v2 nested-asm-lang-v2]
+@bettergrammar*-ndiff[
+#:labels (#;"Diff" "Para-asm-lang-v2" "Nested-asm-lang-v2")
+#;(#:include (p tail effect)
+  para-asm-lang-v2 nested-asm-lang-v2)
+((((unsyntax (bnf:add "p")) tail)
+ ((unsyntax (bnf:sub "p"))  (begin effect ... (halt triv)))
+ ((unsyntax (bnf:add "tail"))
+ (halt triv)
+ (begin effect ... tail))))
+(para-asm-lang-v2)
+(nested-asm-lang-v2)
+]
 
 We add a @para-asm-lang-v2[tail] production which loosely corresponds to the
 top-level program from @tech{Para-asm-lang v2}.
