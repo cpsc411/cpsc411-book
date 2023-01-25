@@ -383,7 +383,7 @@ These are written as the symbol @racket[fv] followed by a
 number indicating the slot on the frame.
 For example @paren-x64-fvars-v2[fv1] is the frame variables indicating the
 first slot on the frame.
-Frame variables are distinct from labels, alocs, and rlocs.
+Frame variables are distinct from registers and abstract locations.
 The number represents the index into the frame for the current function.
 
 @todo{
