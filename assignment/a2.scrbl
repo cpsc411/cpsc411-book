@@ -143,6 +143,9 @@ You should read first and work the relevant exercises as you read.
 You may find the functions @racket[name?] and @racket[fresh] helpful.
 }
 
+@margin-note{You can assume that no pass after @racket[uniquify] will receive a
+program containing an abstract location that @racket[fresh] would generate.}
+
 @exercise{Design and implement @racket[sequentialize-let].}
 
 @exercise{Design and implement @racket[normalize-bind].}
