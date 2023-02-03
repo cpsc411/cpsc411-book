@@ -179,7 +179,7 @@ The expression @values-lang-v3[(+ 2 2)] represents and computes to the value
 @values-lang-v3[4], and hides any reference to where these values are located on
 the machine.
 This gives the programmer the ability to compose computations locally, without
-know anything about the state of the machine.
+knowing anything about the state of the machine.
 For the moment, our @tech{expressions} are very limited---we can only compute
 over values, and to compose two @tech{expressions}, we explicitly name the
 value of the @tech{expression} using @values-lang-v3[let].
@@ -205,7 +205,7 @@ Only a @values-lang-v3[value] or a @values-lang-v3[let] whose body is a
 @values-lang-v3[tail] is valid in tail context.
 
 In @tech{Values-lang v3}, the @values-lang-v3[let] expression implements a
-particular kind of lexcial binding.
+particular kind of lexical binding.
 The same @tech{name} can be shadowed by nested @values-lang-v3[let] expressions,
 and nested @values-lang-v3[let] expressions can refer to the bindings of prior
 @values-lang-v3[let] expressions.
