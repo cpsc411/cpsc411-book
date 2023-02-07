@@ -301,7 +301,7 @@ needs only to think about the state of the machine when composing operations.
 
 @margin-note{@tech{Imp-cmf-lang v3} is in a variant of @deftech{A-normal form}
 (@deftech{ANF}), a syntactic form that restricts all operations to trivial
-values, and forbids nesting.
+values, and forbids nesting in our @imp-cmf-lang-v3[value] position.
 It is roughly equivalence to other compiler intermediate forms, such as
 static-single assignment.}
 @todo{Add ANF citation}
