@@ -737,6 +737,7 @@ by assigning each @tech{abstract location} from the @asm-lang-v2/locals[locals]
     (begin
       (set! x.1 0)
       (set! y.1 x.1)
+      (set! w.1 1)
       (set! w.1 (+ w.1 y.1))
       (halt w.1))))
 ]
@@ -767,6 +768,7 @@ location} from the @asm-lang-v2/assignments[assignment] @tech{info field}.
     (begin
       (set! x.1 0)
       (set! y.1 x.1)
+      (set! w.1 1)
       (set! w.1 (+ w.1 y.1))
       (halt w.1))))
 ]
