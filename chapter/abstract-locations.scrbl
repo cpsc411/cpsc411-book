@@ -534,8 +534,12 @@ Below, we design @deftech{Nested-asm-lang-v2} (@racket[nested-asm-lang-v2]).
 ((((unsyntax (bnf:add "p")) tail)
  ((unsyntax (bnf:sub "p"))  (begin effect ... (halt triv)))
  ((unsyntax (bnf:add "tail"))
- (halt triv)
- (begin effect ... tail))))
+  (halt triv)
+  (begin effect ... tail))
+ (effect
+   (set! loc triv)
+   (set! loc_1 (binop loc_1 triv))
+   (unsyntax (bnf:add "(begin effect ... effect)")))))
 (para-asm-lang-v2)
 (nested-asm-lang-v2)
 ]
