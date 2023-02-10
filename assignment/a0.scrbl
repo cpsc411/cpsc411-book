@@ -79,7 +79,7 @@ You almost certainly already have one, but if you don't, make sure you
 sign up for an account at @url{https://www.cs.ubc.ca/getacct/}.
 
 This account will be your GradeScope account and your account on
-@url{https://github.students.cs.ubc.ca/orgs/cpsc411-2021w-t2/}.
+@url{https://github.students.cs.ubc.ca/orgs/@|gh-org|}.
 
 @section{Testing Your Development Machine}
 If you're running your own Linux machine, I trust you can figure out how to
