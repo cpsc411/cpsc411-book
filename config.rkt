@@ -20,7 +20,8 @@
     (hash-set! x 'a0 (moment 2023 1 15 23 59 59))
     (hash-set! x 'a1 (+weeks (hash-ref x 'a0) 1))
     (hash-set! x 'a2 (+weeks (hash-ref x 'a1) 2))
-    (hash-set! x 'a3 (+weeks (hash-ref x 'a2) 1))
+    ;; 1 week extension for 2022w2
+    (hash-set! x 'a3 (+weeks (hash-ref x 'a2) 2))
     (hash-set! x 'a4 (+weeks (hash-ref x 'a3) 2))
     (hash-set! x 'a5 (+weeks (hash-ref x 'a4) 1))
     (hash-set! x 'a6 (+weeks (hash-ref x 'a5) 2))
@@ -28,6 +29,7 @@
     (hash-set! x 'a8 (+weeks (hash-ref x 'a7) 1))
     (hash-set! x 'a9 (+weeks (hash-ref x 'a8) 1))
     #;(hash-set! x 'a9 (+days (+weeks (hash-ref x 'a8) 1) 4))
+    ;; canceled a10 in 2022w2
     (hash-set! x 'a10 (+weeks (hash-ref x 'a9) 1))
     #;(hash-set! x 'a10 (moment 2021 4 16 23 59 59))
     #;(hash-set! x 'a11 (moment 2022 4 16 23 59 59)

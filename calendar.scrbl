@@ -23,3 +23,5 @@ This calendar is subject to change.
                      #:key car)])
       ; render dates
       (list (~t (car als) "E, MMM d") (cdr als))))]
+@margin-note{a10 is not actually due, since it would be assigned after the last
+lecture. I've left it in the calendar for technical reasons.}
