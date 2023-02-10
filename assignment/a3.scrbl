@@ -116,7 +116,7 @@ The source language should be @ch3-tech{Values-lang v3} and the target should be
 @racket[compile-m3] should use @racket[assign-homes-opt] instead.
 You should use @racket[parameterize] and @racket[current-pass-list].
 
-Write a paragraph comparing the two compilers.
+In @tt{text-exercises.md}, write a paragraph comparing the two compilers.
 Consider the following questions:
 @itemlist[
 @item{What are benefits and the disadvantages of each?}
