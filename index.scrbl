@@ -35,4 +35,7 @@ Please report bugs, typos, etc at in the relevant repository:
 @include-section{project-logistics.scrbl}
 @include-section{readings.scrbl}
 @include-section{assignments.scrbl}
+@;other-doc['(lib "cpsc411/cpsc411.scrbl")]
+@;section{@url{cpsc411/index.html}}
+@include-section[(lib "cpsc411/cpsc411.scrbl")]
 @include-section{appendix/credits.scrbl}
