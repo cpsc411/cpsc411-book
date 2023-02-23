@@ -409,14 +409,14 @@ assembly features no nesting, and @tech{ANF} guarantees that no nesting exists.
 
 Strictly speaking, our @tech{Imp-cmf-lang v3} is a variant of @tech{ANF} that is
 not truely canonical, since we can nest @imp-cmf-lang-v3[effects].
-For example, the following two @imp-cmf-lang-v3[tail]s compile to the same
-program: @imp-cmf-lang-v3[(begin (begin (set! x.1 5)) x.1)]
+For example, the following two @imp-cmf-lang-v3[tail]s represent the same
+instruction sequence: @imp-cmf-lang-v3[(begin (begin (set! x.1 5)) x.1)] and
 @imp-cmf-lang-v3[(begin (set! x.1 5) x.1)].
-However, it is canonical for the equation we care about, and this little bit of
-non-canonicity simplifies the work of the compiler in some cases, and only
-complicates a single pass in the short-term---once we add new features, it will
-not complicate anything, since we will be forced to deal with the complication
-anyway.
+However, the language is canonical for the equation we care about, and this
+little bit of non-canonicity simplifies the work of the compiler in some cases,
+and only complicates a single pass in the short-term---once we add new features,
+it will not complicate anything, since we will be forced to deal with the
+complication anyway.
 
 This design choice is an example of where the compiler design, like most
 software design, benefits from @emph{iteration}.
