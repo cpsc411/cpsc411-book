@@ -111,14 +111,7 @@ reading the entire chapter.
 @section{Exercises}
 
 @exercise{Extend @racket[generate-x64] to support control-flow primitives.
-
-To compile @para-asm-lang-v4[halt], it may help if you generate a labeled instruction
-that essentially does nothing.
-This way, you can insert a label at the end of your program.
-Otherwise, you'll need to think carefully about how to arrange and generate
-blocks.
 }
-@todo{Why is halt still in paren-x64?}
 
 @exercise[#:optional #t]{Design and implement @racket[link-paren-x64], which
 resolves all labels into the address of the instruction in the instruction
