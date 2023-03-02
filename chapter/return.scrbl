@@ -705,7 +705,7 @@ We simply extend @ch5-tech{Proc-imp-cmf-lang v5} with our new abstractions, incl
 @nested[#:style 'inset
 @defproc[(normalize-bind (p imp-mf-lang-v6?))
           proc-imp-cmf-lang-v6?]{
-Compiles @tech{Proc-imp-mf-lang v6} to @tech{Proc-imp-cmf-lang v6}, pushing
+Compiles @tech{Imp-mf-lang v6} to @tech{Proc-imp-cmf-lang v6}, pushing
 @imp-mf-lang-v6[set!] under @imp-mf-lang-v6[begin] so that the right-hand-side
 of each @imp-mf-lang-v6[set!] is base value-producing operation.
 
@@ -744,7 +744,7 @@ convention translation.
 @todo{Jump disappears from value context, transformed into effect context.
 Should point that out.. and double check.}
 
-Compared to @tech{Imp-cmf-lang v5}, the main difference is the
+Compared to @ch5-tech{Imp-cmf-lang v5}, the main difference is the
 @imp-cmf-lang-v6[return-point] form in effect context.
 This instruction introduces a new, non-top-level @imp-cmf-lang-v6[label] in the
 middle of an instruction sequence, which is expected to be exclusively used by
