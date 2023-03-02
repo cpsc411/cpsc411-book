@@ -1364,6 +1364,15 @@ to @racket[(execute p)].
 }
 ]
 
+@nested[#:style 'inset
+@defproc[(check-values-lang (p any/c))
+         values-lang-v4?]{
+Takes an arbitrary value and either returns it, if it is a valid
+@tech{Values-lang v4} program, or raises an error with a descriptive
+error message.
+}
+]
+
 @section[#:tag "sec:overview"]{Appendix: Overview}
 
 @figure["fig:v4-graph" "Overview of Compiler Version 4" v4-graph]
