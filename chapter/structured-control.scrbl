@@ -928,8 +928,12 @@ For example, we can express the following rewrites:
                [int64_1 (make-variable-id 'int64_1)]
                [int64_2 (make-variable-id 'int64_2)])
     @racketblock0[(begin (set! reg int64_1) (= reg int64_2))])
-  "⇒" (let-syntax ([false datum-literal-transformer])
-        @racketblock0[(false)])))
+  "⇒" (let-syntax ([false datum-literal-transformer]
+                   [begin datum-literal-transformer]
+                   [set! datum-literal-transformer]
+                   [reg (make-variable-id 'reg)]
+                   [int64_1 (make-variable-id 'int64_1)])
+        @racketblock0[(begin (set! reg int64_1) (false))])))
 ]
 
 The language doesn't allow us to express relational opreations directly on
