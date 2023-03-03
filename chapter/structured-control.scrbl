@@ -661,8 +661,8 @@ What about this: are the following two programs equivalent?
 
 This... should be true, but it's less obvious why we might do this.
 But perhaps there are cases where @block-pred-lang-v4[>=] is faster than
-@block-pred-lang-v4[<], or perhaps for some reason we would like @object-code{(jump
-trg_1)} to be the final jump because another optimization would be able to
+@block-pred-lang-v4[<], or perhaps for some reason we would like @block-pred-lang-v4[(jump
+trg_1)] to be the final jump because another optimization would be able to
 inline that jump.
 
 While it would be straightforward to write an analysis to support these
@@ -671,12 +671,12 @@ abstraction.
 In the first case, what we @emph{really} want to do is transform any expression
 where the predicate is @emph{obviously true}---we'll write this as
 @block-pred-lang-v4[(true)].
-Then we could write a simple optimization to transform @object-code{(if (true)
-(jump trg_1) (jump trg_2))} into @block-pred-lang-v4[(jump trg_1)].
+Then we could write a simple optimization to transform @block-pred-lang-v4[(if (true)
+(jump trg_1) (jump trg_2))] into @block-pred-lang-v4[(jump trg_1)].
 Similarly, if we had a predicate that was obviously false, written
 @block-pred-lang-v4[(false)], we could rewrite
-@block-pred-lang-v4[(if (false) (jump trg_1) (jump trg_2))] into @object-code{(jump
-trg_2)}.
+@block-pred-lang-v4[(if (false) (jump trg_1) (jump trg_2))] into @block-pred-lang-v4[(jump
+trg_2)].
 If we had a language with a @emph{predicate} abstraction, we could separate the
 @emph{analysis} of which comparisons are obvious from the @emph{optimization}
 that rewrites @block-pred-lang-v4[if] statements with obvious predicates.
@@ -705,7 +705,7 @@ Obvious predicates, like @block-pred-lang-v4[(true)] and @block-pred-lang-v4[(fa
 compile by transforming the @block-pred-lang-v4[if] statement into either the first or
 second branch.
 The negation predicate, @block-pred-lang-v4[(not pred)], swaps the branches and
-continues compiling @block-pred-lang-v4[(if pred (jump trg_2) (jump trg_2))].
+continues compiling @block-pred-lang-v4[(if pred (jump trg_2) (jump trg_1))].
 We leave the @block-pred-lang-v4[relop] predicate alone.
 
 We implement @tech{Block-pred-lang v4} with a simple compiler,
