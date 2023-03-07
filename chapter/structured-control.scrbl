@@ -279,6 +279,8 @@ compares @paren-x64-v4[reg] to @paren-x64-v4[opand] and sets some flags in the
 machine describing their relation, such as whether @paren-x64-v4[reg] is less
 than @paren-x64-v4[opand], or whether they are equal.  The flags are used by the
 next conditional jump instruction.
+If the @paren-x64-v4[opand] is an integer literal, it must restricted to
+32-bits.
 
 The conditional jump instructions in @ch1-tech{x64}, in the same order as the
 definition of @paren-x64-v4[relop], are: @tt{jl label},
