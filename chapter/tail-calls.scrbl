@@ -487,15 +487,15 @@ For example, the following is a valid @tech{Values-lang v5} program:
     (lambda (x)
       (if (= x 0)
           0
-          (let ([y (- x 1)])
-            (even? y)))))
+          (let ([y (+ x -1)])
+            (call even? y)))))
   (define even?
     (lambda (x)
       (if (= x 0)
           1
-          (let ([y (- x 1)])
-            (odd? y)))))
-  (even? 5))
+          (let ([y (+ x -1)])
+            (call odd? y)))))
+  (call even? 5))
 ]
 
 We continue to require that the source program is well bound: all @ch3-tech{lexical
