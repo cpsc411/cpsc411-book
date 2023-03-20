@@ -1435,7 +1435,7 @@ We typeset the differences with respect to @tech{Asm-pred-lang-v6/framed}.
 
 @nested[#:style 'inset
 @defproc[(assign-registers (p asm-pred-lang-v6/framed?))
-          asm-pred-lang-v5/spilled?]{
+          asm-pred-lang-v6/spilled?]{
 Performs @ch-ra-tech{graph-colouring register allocation}, compiling
 @tech{Asm-pred-lang v6/framed} to @tech{Asm-pred-lang v6/spilled} by
 decorating programs with their register assignments.
