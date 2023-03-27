@@ -218,7 +218,6 @@ relative to the current value of the
 
 You should use an accumulator representing the current offset from the current
 block's frame.
-You may want to use @racket[fvar->addr].
 
 You shouldn't assume that the @racket[current-frame-base-pointer-register] is
 @paren-x64-v6[rbp], and should use the parameter instead.
