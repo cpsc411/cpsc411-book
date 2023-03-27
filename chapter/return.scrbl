@@ -693,7 +693,7 @@ Below we design the target language @deftech{Proc-imp-cmf-lang v6},
 typeset with differences compared to @ch5-tech{Proc-imp-cmf-lang v5}.
 
 @bettergrammar*-ndiff[
-#:labels ("Diff vs v5" "Diff vs Source" "Imp-cmf-lang v6")
+#:labels ("Diff vs v5" "Diff vs Source" "Proc-imp-cmf-lang v6")
 (proc-imp-cmf-lang-v5 proc-imp-cmf-lang-v6)
 (imp-mf-lang-v5 proc-imp-cmf-lang-v6)
 (imp-mf-lang-v6)
