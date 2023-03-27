@@ -1780,6 +1780,9 @@ instructions and an auxiliary register from
 Ideally, there is a separate helper for generating @paren-x64-v6[binop]s, so
 this is only a minimal change.
 
+The new binary operation, @paren-x64-v6[-], corresponds to the x64 instruction
+@tt{sub}, and has the same restrictions as the @tt{add} and @tt{mul} instructions.
+
 @defproc[(generate-x64 [p paren-x64-v6?])
          (and/c string? x64-instructions?)]{
 Compile the @tech{Paren-x64 v6} program into a valid sequence of @ch1-tech{x64}
