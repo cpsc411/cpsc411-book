@@ -257,14 +257,14 @@ needed after a @tech{non-tail call}.
 We arrange that all values live after a @tech{non-tail call} are stored in
 @ch2-tech{frame variables}, so they are automatically saved by pushing the
 @tech{frame} onto the stack.
-We push the @tech{frame} by incrementing the frame base pointer past the last
+We push the @tech{frame} by decrementing the frame base pointer past the last
 @ch2-tech{frame variable}.
-This resets the 0-index for the caller, hiding the caller's @ch2-tech{frame
+This resets the 0-index for the callee, hiding the caller's @ch2-tech{frame
 variables} from the callee, so from the callee's perspective, all
 @ch2-tech{frame variables} starting at @asm-pred-lang-v6[#:datum-literals (fv0)
 fv0] are unused.
 After returning from a call, we @emph{pop} the caller's @tech{frame} from the
-stack by decrementing the frame base pointer back to its original value.
+stack by incrementing the frame base pointer back to its original value.
 This handles the general case: every @tech{non-tail call} pushes a @tech{frame},
 create a new one for the callee and saving the caller's values on the stack, and
 each @ch5-tech{procedure} accesses its own @tech{frame} starting from
