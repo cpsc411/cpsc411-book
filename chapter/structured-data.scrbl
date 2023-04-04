@@ -523,10 +523,15 @@ The result of an effectful function is either @exprs-unique-lang-v8[void], or an
 @exprs-unique-lang-v8[error].
 The unsafe variant, @exprs-unsafe-data-lang-v8[unsafe-vector-set!], does not need to produce a
 value, so we expose effect context.
-We allow only imperative @exprs-unsafe-data-lang-v8[primops] (only
-@exprs-unsafe-data-lang-v8[unsafe-vector-set!] so far) to be directly called in
-effect context; otherwise, we'd need to supprot values in effect context
-sometime later, which we haven't considered how to do yet.
+
+Introducing this contextual distinction, we requrie primops to respect contexts.
+Only @exprs-unsafe-data-lang-v8[primops] that produce values can appear in
+@exprs-unsafe-data-lang-v8[value] context, while only imperative
+@exprs-unsafe-data-lang-v8[primops] (only
+@exprs-unsafe-data-lang-v8[unsafe-vector-set!] so far) can be directly called in
+effect context.
+Otherwise, we'd need to supprot values in effect context sometime later, which
+we haven't considered how to do yet.
 
 To implement the safe language, we wrap all accessors to perform dynamic tag checking
 before using the unsafe operations.
