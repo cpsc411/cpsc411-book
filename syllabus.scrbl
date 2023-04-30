@@ -445,7 +445,7 @@ This feedback is not graded, but you will be given comments on the design and
 implementation of your project, as well as summary feedback of "NS" (not
 satisfactory), "S" (satsifactory), or "S+" (above satsifactory) on your progress
 so far.
-If you receive an "NS", you should meet with a TA or instructor to get ensure
+If you receive an "NS", you should meet with a TA or instructor to ensure
 you have a plan to get your project back on track.
 If you miss a milestone deadline, you receive no feedback, and it does not
 directly impact your grade.
@@ -457,7 +457,7 @@ At the end of the semester, your entire compiler will be thoroughly tested and
 hand-graded for design elements.
 This will constitute the entire project grade.
 
-@margin-note{This was changed in 2022w2 from 7 require to to only 6 required.}
+@margin-note{This was changed in 2022w2 from 7 required to only 6 required.}
 You are required to complete the first 6 milestones to pass the course project,
 but you may choose to stop any time after completing milestone 6.
 Your maximum grade on the project will be 10% for each milestone you choose to
