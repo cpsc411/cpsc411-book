@@ -663,7 +663,7 @@ Note only the @asm-lang-v2/assignments[info] field changes.
 ]
 
 @nested[#:style 'inset]{
-@defproc[(assign-registers [p asm-lang-v2/conflicts]) asm-lang-v2/assignments?]{
+@defproc[(assign-registers [p asm-lang-v2/conflicts?]) asm-lang-v2/assignments?]{
 Performs graph-colouring register allocation.
 The pass attempts to fit each of the @ch2-tech{abstract location} declared in
 the locals set into a register, and if one cannot be found, assigns it a

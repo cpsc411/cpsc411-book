@@ -8,7 +8,7 @@
 
 ; String -> Integer
 ; or
-; String -> Procedure? -> Integer
+; String -> Procedure -> Integer
 ;
 ; Runs the string as a shell command, and either returns the exit code or fails
 ; with an error message including the command and the non-successful exit code.

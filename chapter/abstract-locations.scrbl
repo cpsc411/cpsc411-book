@@ -556,7 +556,7 @@ This essentially allows us to copy and paste some @ch-bp-tech{instruction
 sequence} into the middle of a program.
 
 @nested[#:style 'inset
-@defproc[(flatten-begins [p nested-asm-lang-v2]) para-asm-lang-v2]{
+@defproc[(flatten-begins [p nested-asm-lang-v2?]) para-asm-lang-v2?]{
 Flatten all nested @nested-asm-lang-v2[begin] expressions.
 }
 ]

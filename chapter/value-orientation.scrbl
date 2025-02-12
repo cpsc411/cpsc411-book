@@ -333,8 +333,8 @@ of the @imp-cmf-lang-v3[tail], and selecting instruction sequences to implement
 primitive operations, and possibly introducing auxiliary @ch2-tech{abstract locations}.
 
 @nested[#:style 'inset
-@defproc[(select-instructions (p imp-cmf-lang-v3))
-         asm-lang-v2]{
+@defproc[(select-instructions (p imp-cmf-lang-v3?))
+         asm-lang-v2?]{
 Compiles @tech{Imp-cmf-lang v3} to @ch2-tech{Asm-lang v2}, selecting appropriate
 sequences of abstract assembly instructions to implement the operations of the
 source language.
@@ -554,7 +554,7 @@ are not possible or are difficult in @tech{Imp-mf-lang v3}, although no such
 optimizations are apparent yet.
 
 @nested[#:style 'inset
-@defproc[(optimize-let-bindings (p Values-unique-lang-v3?))
+@defproc[(optimize-let-bindings (p values-unique-lang-v3?))
           values-unique-lang-v3?]{
 Optimizes @values-unique-lang-v3[let] bindings by reordering them to minimize or
 maximize some metric.

@@ -474,8 +474,8 @@ Below we define the target language, @deftech{Exprs-unique-lang v8}.
 ]
 
 @nested[#:style 'inset
-@defproc[(uniquify [p exprs-lang-v8])
-          exprs-unique-lang-v8]{
+@defproc[(uniquify [p exprs-lang-v8?])
+          exprs-unique-lang-v8?]{
 Resolves top-level @ch3-tech{lexical identifiers} into unique labels, and all
 other @ch3-tech{lexical identifiers} into unique @ch2-tech{abstract locations}.
 }]
@@ -910,8 +910,8 @@ syntactically, but they are conceptually different so we maintain separate
 non-terminal definitions.
 
 @nested[#:style 'inset
-@defproc[(patch-instructions [p para-asm-lang-v8])
-         paren-x64-mops-v8]{
+@defproc[(patch-instructions [p para-asm-lang-v8?])
+         paren-x64-mops-v8?]{
 Patches instructions that have no @ch1-tech{x64} analogue into to a sequence of
 instructions and an auxiliary register from
 @racket[current-patch-instructions-registers].

@@ -501,7 +501,7 @@ but expect this to raise a dynamic error.
 
 @nested[#:style 'inset
 @defproc[(check-exprs-lang [p any/c])
-         exprs-lang-v7]{
+         exprs-lang-v7?]{
 Checks that a @tech{Exprs-lang v7} program is well typed (only that procedures
 are called with the right number of arguments), and well scoped.
 }

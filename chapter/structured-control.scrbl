@@ -401,7 +401,7 @@ Interpret the @tech{Paren-x64 v4} program @racket[p] as a value, returning the
 final value of @paren-x64-v4[rax].
 }
 
-@defproc[(interp-loop (code (listof paren-x64-rt-v4.s))
+@defproc[(interp-loop (code (listof paren-x64-rt-v4?))
                       (env dict?)
                       (pc natural-number/c))
          int64?]{

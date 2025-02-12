@@ -354,7 +354,7 @@ The language will dynamically check whether any of those expressions is safe
 before attempting to execute them.
 
 @nested[#:style 'inset
-@defproc[(check-exprs-lang [p any]) exprs-lang-v9]{
+@defproc[(check-exprs-lang [p any/c]) exprs-lang-v9?]{
 Validates that input is a well-bound @tech{Exprs-lang v9} program.
 There are no other static restrictions.
 }
@@ -835,8 +835,8 @@ Recall that @hoisted-lang-v9[closure-call] is generated from an
 ]
 
 @nested[#:style 'inset]{
-@defproc[(implement-closures [p hoisted-lang-v9])
-         proc-exposed-lang-v9]{
+@defproc[(implement-closures [p hoisted-lang-v9?])
+         proc-exposed-lang-v9?]{
 Implement @tech{closures} in terms of the procedure data structure.
 }
 }
