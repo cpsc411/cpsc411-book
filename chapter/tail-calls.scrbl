@@ -402,7 +402,7 @@ So we provide a hint to the undead analysis, annotating each
 @block-pred-lang-v5[jump] with its @ch-ra-tech{undead-out set}.
 }
 
-@;By loading the return address first, we keep live range of @racket[tmp-rp]
+@;By loading the return address first, we keep the live range of @racket[tmp-rp]
 @;limited.
 }
 ]
@@ -436,7 +436,7 @@ must the @block-pred-lang-v5[jump] that @values-lang-v5[call] compiles to.
 This suggests we could place the new pass either right before or right
 after @racket[normalize-bind].
 
-Third, we try to future proof our design decisions: will the answer to any of
+Third, we try to future-proof our design decisions: will the answer to any of
 the above questions change if we add new features in the future?
 This is hard to predict; the future is vast so the search space is large.
 We can limit our search by focusing on limitations in features we're now adding.
@@ -627,7 +627,7 @@ We typeset the differences compared to @tech{Values-unique-lang v5}.
 ]
 
 There are no interesting changes.
-We simply propagate the new procedure forms form down one more level of abstraction.
+We simply propagate the new procedure forms down one more level of abstraction.
 @todo{Can I omit these languages and passes, for completely boring unchanged
 things, from the main chapter?}
 
@@ -1019,7 +1019,7 @@ v5}, has no changes compared to @ch4-tech{Block-pred-lang v4}.
 @defproc[(expose-basic-blocks (p nested-asm-lang-v5?))
           block-pred-lang-v5?]{
 Compile the @tech{Nested-asm-lang v5} to @tech{Block-pred-lang v5}, eliminating
-all nested expressions by generate fresh basic blocks and jumps.
+all nested expressions by generating fresh basic blocks and jumps.
 }
 ]
 

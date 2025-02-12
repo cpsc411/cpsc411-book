@@ -82,7 +82,7 @@ reading the entire chapter.
 
 @;@todo{Remove all this, write our own material.}
 @;You can find additional reading material on register allocation and undead
-@;analysis at the resources below.  These comes from other courses that use a
+@;analysis at the resources below.  These come from other courses that use a
 @;compiler that is similar to, but different from, your compiler.  Their
 @;intermediate languages are different, and their compiler pipeline is different.
 @;There is no one universal truth of how these passes work for all compilers in

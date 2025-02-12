@@ -51,7 +51,7 @@ A passing grade in CPSC 311.
 @subsection{What if I want to take it but can't fulfill the prerequisites?}
 Subject to available space in the course for all interested students meeting the prerequisites, I’m
 willing to consider flexibility for students for whom taking CPSC 311 is not practical or possible.
-You should reach out to me well in advance, ideally a semester before hand, if you think you will not
+You should reach out to me well in advance, ideally a semester beforehand, if you think you will not
 be able to take CPSC 311 before CPSC 411. If I support your case, we will work with the CPSC advising
 team to ensure they have no objections.
 }
@@ -128,7 +128,7 @@ These cover the following topics:
 @item{Call-by-reference semantics}
 @item{Recursion via boxes}
 @item{Continuations}
-@item{Continuation-passings tyle}
+@item{Continuation-passing style}
 @item{Types}
 @item{Program rewriting}
 @item{Object-oriented languages (encoding objects)}
@@ -216,7 +216,7 @@ In no particular order, these are:
 @section{Course Structure}
 
 @subsection{Project}
-The course is structured around semester-long project in which students design
+The course is structured around a semester-long project in which students design
 implement a programming language by building a compiler to x64.
 The project is divided into weekly milestones designing and implementing an
 extension to the previous week's compiler.
@@ -246,8 +246,8 @@ expect any credit for submitting it.
 
 
 @subsection{Exams}
-There will be a in-person final exam that focus on the concepts covered in lecture and in
-milestones.
+There will be a in-person final exam that focuses on the concepts covered in
+lecture and in milestones.
 The structure of the exam may be different than the milestones.
 While the milestones focus on implementing a compiler, the exams will test you
 on the concepts and design elements that are discussed in lecture and are
@@ -260,7 +260,7 @@ an @bold{in-person oral exam} with the instructors.
 @subsection{Reading}
 All the design and implementation lessons are found in the (free, online) book
 found on this website.
-Studens are expected to read these chapter while working to implement a compiler
+Students are expected to read these chapters while working to implement a compiler
 described by the book to reinforce these lessons.
 The course calendar gives a schedule for approximately when students are
 expected to read various chapters.
@@ -268,14 +268,14 @@ expected to read various chapters.
 @subsection{Lecture}
 Lectures will cover some of the material in the book, often in a different
 context to provide a second perspective on the same material.
-Lecture will often involve active-learn components and live-coding, so students
-should bring their laptops to class.
+Lecture will often involve active-learning components and live-coding, so
+students should bring their laptops to class.
 If you do not have a laptop, please contact the course staff; the CS department
 may have some loaner laptops available.
 
 Attendance is lecture is not required in the sense that no attendance is taken
-and no graded activies are assigned; however, @emph{students are responsible for
-material that is presented during lecture}.
+and no graded activities are assigned; however, @emph{students are responsible
+for material that is presented during lecture}.
 Some important announcements or supplementary background lessons may be
 presented only in the lecture.
 This material, even if not written down anywhere, is fair-game for graded
@@ -393,7 +393,7 @@ during office hours or on Piazza if you have further questions.
 }
 
 @item{
-  Surface language niceities
+  Surface language niceties
   @itemlist[
     @item{implicit casts}
     @item{syntactic sugar}
@@ -431,7 +431,7 @@ We will provide weekly milestone deadlines, and will provide feedback on the
 last commit on the milestone branch made prior to this deadline.
 This feedback is not graded, but you will be given comments on the design and
 implementation of your project, as well as summary feedback of "NS" (not
-satisfactory), "S" (satsifactory), or "S+" (above satsifactory) on your progress
+satisfactory), "S" (satisfactory), or "S+" (above satisfactory) on your progress
 so far.
 If you receive an "NS", you should meet with a TA or instructor to get ensure
 you have a plan to get your project back on track.
@@ -462,17 +462,17 @@ project; if you complete milestone 8 almost perfectly, you get approximately
 80%.
 If you complete milestone 9 perfectly, you will receive 95% on the project, but
 90% or less for an imperfect milestone 9.
-If you complete milestone 10 pefectly, you will receive 105% on the project, but
+If you complete milestone 10 perfectly, you will receive 105% on the project, but
 100% or less for an imperfect milestone 10.
 
 By the end of the course, you must declare which milestone you intend to be your
 final milestone.
 You do not have to declare this to the instructors before the end of the
-semester, but you and your group will need to agree before hand.
+semester, but you and your group will need to agree beforehand.
 This should be clearly communicated in the README in the main branch of your
 project.
-We will grade to rubric and the test suite for the milestone you declare, and
-grade the compiler passes included up to that milestone.
+We will grade to the rubric and the test suite for the milestone you declare,
+and grade the compiler passes included up to that milestone.
 
 We will evaluate more than merely whether or not your code "works".
 We may review your code and/or ask you as a group to demonstrate your compiler
@@ -652,8 +652,8 @@ complete explanation of this fact.}
 Any failure to do so will be considered academic misconduct. Forgetfulness is
 not an excuse.
 
-It is also consider academic misconduct to share your own code outside your
+It is also considered academic misconduct to share your own code outside your
 group, and a violation of copyright to share any code that contains code
 written by course staff.
-Do not share your solutions, either privately or by making them publically
+Do not share your solutions, either privately or by making them publicly
 accessible on code sharing websites such as GitHub.

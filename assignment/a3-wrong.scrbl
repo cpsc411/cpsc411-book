@@ -159,7 +159,7 @@ association list mapping variables to physical locations.
 @itemlist[
 @item{If the list of variables is empty, return the empty assignment.}
 @item{Choose a low-degree variable from the input list of variables, if one
-exists. Otherwise, pick an arbtrary variable (such as the first one in the
+exists. Otherwise, pick an arbitrary variable (such as the first one in the
 list).
 
 A low-degree variable is one with fewer than @object-code{k}
@@ -177,7 +177,7 @@ the recursive call).
 @itemlist[
 @item{If you succeed in assigning a register, then add the assignment for
 the chosen variable to the result of the recursive call.}
-@item{Otherwise, we cannot assign the choosen variable to a register.
+@item{Otherwise, we cannot assign the chosen variable to a register.
 Instead, we @emph{spill it}, i.e., we allocate a fresh frame location using a
 displacement mode operand.}
 ]}
@@ -209,7 +209,7 @@ with the conflict graph.
 
 This algorithm is somewhat tedious to write purely functionally.
 You may use a single mutable variable in your implementation.
-Use @racket[box], @racket[unbox], and @racket[set-box!] for an idomatic way of
+Use @racket[box], @racket[unbox], and @racket[set-box!] for an idiomatic way of
 using mutable variables in Racket.
 
 It will be difficult to keep enough variables live at one time to test spilling.

@@ -107,7 +107,7 @@ In @ch2-tech{Asm-lang v2}, which abstracted away from machine-specific
 @ch2-tech{physical locations} exist and, therefore, instructions that operate on
 @ch2-tech{physical locations}.
 
-However, the source language is still not something we want to program.
+However, the source language is still not something in which we want to program.
 In order to program, we, as @ch2-tech{Asm-lang v2} programmers, can only compose
 operations by moving values in and out of locations.
 We cannot focus on their values, but instead must focus on their locations.
@@ -183,7 +183,7 @@ knowing anything about the state of the machine.
 For the moment, our @tech{expressions} are very limited---we can only compute
 over values, and to compose two @tech{expressions}, we explicitly name the
 value of the @tech{expression} using @values-lang-v3[let].
-This makes dependency between @tech{expressions} explicit in our syntax.
+This makes dependencies between @tech{expressions} explicit in our syntax.
 But, with @tech{names}, we are able to make up a brand new @tech{name} without
 fear that we will erroneously overwrite some existing value; at worst, we
 locally shadow it.
@@ -223,7 +223,7 @@ behaviour}.
 To guard against this @ch-bp-tech{undefined behaviour}, we introduce a validator.
 
 We must also check for reference to unbound @tech{names}, since these may be
-compiled into reference to uninitialized memory, and resulting in
+compiled into reference to uninitialized memory, resulting in
 @ch-bp-tech{undefined behaviour}.
 
 @nested[#:style 'inset
@@ -281,7 +281,7 @@ more registers, no more odd machine-specific restrictions, just a
 location-oriented abstract assembly language.
 
 The language is a still an extremely imperative, non-compositional language.
-We first add the ability to more easily compose imperative expression, before
+We first add the ability to more easily compose imperative expressions, before
 moving to composing non-imperative expressions representing values.
 
 But the assembly language is still an (@emph{extremely}) imperative machine
@@ -294,7 +294,7 @@ This requires the programmer to always remember the values of
 
 We design @deftech{Imp-cmf-lang v3}, an imperative language that allows
 expressing operations on values directly, and composing them by sequencing
-these computation through @ch2-tech{abstract location}.
+these computation through @ch2-tech{abstract locations}.
 This removes some amount of imperativity from the language.
 The programmer can reason about each primitive operation using only values, and
 needs only to think about the state of the machine when composing operations.
@@ -408,7 +408,7 @@ On the other hand, selecting instructions over @tech{ANF} is simpler since
 assembly features no nesting, and @tech{ANF} guarantees that no nesting exists.
 
 Strictly speaking, our @tech{Imp-cmf-lang v3} is a variant of @tech{ANF} that is
-not truely canonical, since we can nest @imp-cmf-lang-v3[effects].
+not truly canonical, since we can nest @imp-cmf-lang-v3[effects].
 For example, the following two @imp-cmf-lang-v3[tail]s represent the same
 instruction sequence: @imp-cmf-lang-v3[(begin (begin (set! x.1 5)) x.1)] and
 @imp-cmf-lang-v3[(begin (set! x.1 5) x.1)].
@@ -430,7 +430,7 @@ beneficial, some design decisions may not be obvious until the software evolves.
           imp-cmf-lang-v3?]{
 Compiles @tech{Imp-mf-lang v3} to @tech{Imp-cmf-lang v3}, pushing
 @imp-mf-lang-v3[set!] under @imp-mf-lang-v3[begin] so that the right-hand-side of each
-@imp-mf-lang-v3[set!] is simple value-producing operation.
+@imp-mf-lang-v3[set!] is a simple value-producing operation.
 This normalizes @tech{Imp-mf-lang v3} with respect to the equations
 @tabular[
 #:sep @hspace[3]
@@ -473,7 +473,7 @@ context, we'll want nested begin.
 
 @section{Be, not Do}
 Now we want to abstract further, away from locations and focus on values and
-coperations on values.
+operations on values.
 This allows us to express computation as something that represents a value, not
 a sequence of operations to compute a value.
 That is, to declare what @emph{is}, not instruct what @emph{to do}.
@@ -561,7 +561,7 @@ maximize some metric.
 }
 ]
 
-To implement @tech{Values-unique-lang v3}, we must sequentalize @values-unique-lang-v3[let].
+To implement @tech{Values-unique-lang v3}, we must sequentialize @values-unique-lang-v3[let].
 
 @nested[#:style 'inset
 @defproc[(sequentialize-let (p values-unique-lang-v3?))
@@ -589,7 +589,7 @@ To ensure transform names into abstract location, it suffices to append a unique
 number to each.
 
 To implement this language, we must resolve all lexical binding and replace
-@tech{names} by @ch2-tech{abstract locations}
+@tech{names} by @ch2-tech{abstract locations}.
 
 @nested[#:style 'inset
 @defproc[(uniquify (p values-lang-v3?))

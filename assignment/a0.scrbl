@@ -175,7 +175,7 @@ exit:
 @code{120} as the exit code.}
 
 
-Instead of compiling manully using shell commands, we can compile and execute a
+Instead of compiling manually using shell commands, we can compile and execute a
 file from Racket using @racket[system] or @racket[system/exit-code] to make
 calls to command line programs from Racket.
 This is how the last pass of the compiler will translate your code into an

@@ -34,8 +34,8 @@ non-recursive local procedures.
 This makes implementing local loops annoying; we had to go through top-level
 definitions instead.
 By adding recursive data, we can implement first-class lexically-scoped
-@emph{recursive} procedures (generalized loops), but also enacode other cyclic
-data such as stream.
+@emph{recursive} procedures (generalized loops), but also encode other cyclic
+data such as streams.
 
 @margin-note{Many languages support cyclic data through imperative mutation, but
 as we'll see in this assignment, that's a low-level implementation technique
@@ -75,7 +75,7 @@ procedures.
 Compiling first-class procedures is complicated for reasons others than
 recursion, and keeping them separated is useful.
 To maintain this separation and avoid extending the closure conversion passes
-unnnecessarily, we can purify @racketish-core-v10[letrec], by compiling all
+unnecessarily, we can purify @racketish-core-v10[letrec], by compiling all
 non-procedure recursive bindings into a lower-level implementation of recursion.
 
 Consider following Racket example:

@@ -26,24 +26,24 @@ Each of our @ch-bp-tech{source languages} will be designed to remove a restricti
 @tech{target language}, or add high-level features to improve usability.
 We also take care to ensure the @ch-bp-tech{source languages} can be compiled
 efficiently.
-For each of these languages, their behaviour is defiend by an interpreter.
+For each of these languages, their behaviour is defined by an interpreter.
 For @tech{x64}, the behaviour is defined by whatever happens when we turn it
 into binary and run it on a CPU (The First Interpreter).
 
 This last step, understanding the behaviour of programs in the language, is a
 key step.
 We will write programs that validate, analyze, and transform programs.
-We will write templates for programs, whole classes of programs.
+We will write templates for programs, and whole classes of programs.
 That is the nature of a compiler.
 So we must understand what a program @emph{means}.
 
-So we begin by picking and studying our choosen @tech{target language}.
+So we begin by picking and studying our chosen @tech{target language}.
 
 @section{Picking the target language}
 The @deftech{target language} of a compiler is the language in which the
 compiler writes programs.
 
-Our first language, and choosen @tech{target language}, is x86-64 plus
+Our first language, and chosen @tech{target language}, is x86-64 plus
 @tech{system calls}, which we call @deftech{x64} for short.
 In fact, we'll only use a subset @tech{x64} of this language, which will expand
 it slightly throughout the course; @tech{x64} will refer to the current subset.
@@ -100,7 +100,7 @@ It is primordial.
 It is not sensible to ask questions like "why"---@tech{x64} @emph{is}.
 And, because we want to talk to the CPU, we must deal with it.
 
-While we have choosen @tech{x64} as our @tech{target language}, @tech{x64}
+While we have chosen @tech{x64} as our @tech{target language}, @tech{x64}
 itself does not run on most hardware.
 Instead, it is the @ch-bp-tech{source language} yet another compiler, which transforms
 @tech{x64} to a binary machine code that I call @tech{bin64} for now.
@@ -238,7 +238,7 @@ system.
 
 @todo{Never introduce the linker}
 
-After compiling our @tech{x64} program with @tt{nasm}, we are left with program
+After compiling our @tech{x64} program with @tt{nasm}, we are left with a program
 in the first target language---a machine code binary, which is just about the
 raw language of the CPU.
 In fact, it is machine code in a binary format described by the @tech{OS}, which
@@ -596,7 +596,7 @@ After downloading @exec{nasm} and @exec{GoLink}, you can compile using
 exit-fact-x64-windows.o} and link using @exec{golink /entry Start /fo
 exit-fact-x64-windows.exe exit-fact-x64-windows.o kernel32.dll}.
 
-@;@section{Setuping a virtual machine}
+@;@section{Setting up a virtual machine}
 @;We're only going to support one flavor of x64 (and thus, one operating system)
 @;in this course.
 
@@ -614,5 +614,5 @@ and execute it (an operating system, @tt{nasm} and a linker such as @tt{ld}, and
 an x86-64 CPU).
 We by no means saw a complete description of everything that language offers
 us, but it is enough that we can start designing a @ch-bp-tech{source language} that
-abstracts aways some of the annoying aspects of the language, and a
+abstracts away some of the annoying aspects of the language, and a
 @tech{compiler} to write programs in @tech{x64} for us.

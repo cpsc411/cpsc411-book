@@ -75,7 +75,7 @@ We do not want to summon dark gods, so we worked directly with data in the host
 language, and it was fine.
 }
 
-You can see the two are equivalent in Racket by trying typing the following in
+You can see the two are equivalent in Racket by typing the following in
 to the REPL or in the interactions frame in DrRacket:
 @codeblock{
 '(1 2 3)
@@ -156,7 +156,7 @@ AST.
 ]
 This vector is required to only contain values from @tech{Racketish-Surface}.
 
-And the the quoted literal notation actually expands to the symbol @code{quote},
+And the quoted literal notation actually expands to the symbol @code{quote},
 although it always gets printed as a tick:
 @examples[#:eval sb
 '(module '(#t #f))
@@ -190,7 +190,7 @@ When @object-code{or} is given no arguments, we expand to #f, since #f is the
 additive identity element on booleans (like 0 is for integers and addition).
 When given a single argument, we return it, since Racket is falsey.
 Otherwise, we bind the first argument to a fresh auxiliary variable, return it
-if its true, and otherwise return the @object-code{or} of the rest of the
+if it's true, and otherwise return the @object-code{or} of the rest of the
 arguments.
 
 Notice that since we introduce an auxiliary variable we could accidentally

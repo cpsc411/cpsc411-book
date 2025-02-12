@@ -166,8 +166,8 @@ For working with sets, you may want to use @secref["sets" #:doc '(lib
 "scribblings/reference/reference.scrbl")].
 }
 
-@exercise{Design and implement @racket[assign-fvars] assign @ch2-tech{abstract
-locations} to @ch2-tech{physical location}.
+@exercise{Design and implement @racket[assign-fvars] to assign
+@ch2-tech{abstract locations} to @ch2-tech{physical locations}.
 }
 
 @exercise{Design and implement @racket[replace-locations] to replace
@@ -211,7 +211,7 @@ them when debugging your compiler, by comparing the results of a compiled
 program to the result of interpreting it.
 
 @todo{Add a separate chapter on validator, interpreters, etc, their use in
-intermediate languages, and source langauges.}
+intermediate languages, and source languages.}
 
 @exercise{Redesign and extend the implementation of @racket[check-paren-x64].
 You should be able to modify your validator for the previous

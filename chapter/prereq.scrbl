@@ -22,7 +22,7 @@ these concepts from scratch.
 
 \todo{Link properly}
 
-This books applies the same approach to the design of compilers.
+This book applies the same approach to the design of compilers.
 We spend the majority of this book discussing the design of the data over which
 a compiler operates, and the design patterns required to transform that data
 effectively.
@@ -30,7 +30,7 @@ In the terms of HtDP, we first design our data, then the @tech{signatures}, then
 @tech{templates}; these are the steps of designing any function, including a
 compiler pass.
 This is where we spend our creative energy.
-After we have and fully understand these aspects of a design, the implementation
+After we have fully understood these aspects of the design, the implementation
 is almost entirely systematic and straight-forward---each function almost writes
 itself.
 

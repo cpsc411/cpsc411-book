@@ -193,7 +193,7 @@ The interpretation of several operations will also change to add dynamic
 type checking.
 This will prevent those operations from being a source of undefined behaviour.
 
-With proper booleans, we can finally allow an arbitrary value in the predicate
+With proper booleans, we can finally allow arbitrary values in the predicate
 position of an @exprs-lang-v7[if] expression in the surface language.
 
 @section[#:tag "intro-to-tags"]{Introduction to Tagged Object Representation}
@@ -249,7 +249,7 @@ properties, and implement each of these operation by expanding them into
 bitwise operations.
 @margin-note{Some of our clever tag choices, and some terminology, is borrowed
 from R. Kent Dybvig.
-You can learn more about it's use in Chez Scheme from this talk by his former
+You can learn more about its use in Chez Scheme from this talk by his former
 PhD student Andy Keep: @url{https://www.youtube.com/watch?v=BcC3KScZ-yA}.
 }
 
@@ -585,7 +585,7 @@ with different error codes).
   (call L.+.1 1 2))
 ]
 
-Each safe procedure should produce some error code indicating that kind of error
+Each safe procedure should produce some error code indicating the kind of error
 that occurred.
 Be sure to document your error codes.
 For now, we have enough error codes that we can encode which operation and which
@@ -763,7 +763,7 @@ to use it.
          values-bits-lang-v7?]{
 Performs the monadic form transformation, unnesting all non-trivial operators
 and operands to @exprs-bits-lang-v7[binop]s, @exprs-bits-lang-v7[call]s, and
-@exprs-bits-lang-v7[relops]s, making data flow explicit and and simple to
+@exprs-bits-lang-v7[relops]s, making data flow explicit and simple to
 implement imperatively.
 }]
 

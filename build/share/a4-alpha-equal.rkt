@@ -4,7 +4,7 @@
   (require rackunit)
   ; Values-lang p -> Values-lang p -> void
   ; Checks that p1 and p2 are alpha-equivalent Values-lang programs.
-  ; Also worked for Values-unique-lang.
+  ; Also works for Values-unique-lang.
   ; Returns nothing useful, or raises a test failure.
   (define-check (check-Values-lang-alpha-equal? p1 p2)
     ; Env is a dictionary mapping a Values-lang name to a Values-lang name.

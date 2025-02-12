@@ -22,10 +22,10 @@ about programming at different levels of abstraction.  We'll expose labels and
 using them in the source language, compile the latter abstraction to the former
 implementation, and practice reasoning about our new source language.
 
-This assignment is due Friday Febuary 14, 2020 at 11:59pm; you have 2 weeks
+This assignment is due Friday February 14, 2020 at 11:59pm; you have 2 weeks
 this time.
 
-By Friday Febuary 7, 2020 at 11:59pm, you should have tests for all exercises,
+By Friday February 7, 2020 at 11:59pm, you should have tests for all exercises,
 should have finished implementing 1/3--1/2 of the exercises.  We will provide
 interim feedback by running any tests you've pushed to your repository against
 the reference solution at this time.
@@ -455,10 +455,10 @@ instructions that came before the label in the instruction sequence, but
 potentially arbitrary instructions that were executed prior to a jumping to the
 label.
 
-To simplify reasoning about programs, we can organizing code into labeled
+To simplify reasoning about programs, we can organize code into labeled
 blocks, assuming that control flow only enters the beginning of a block and
 exits the end of a block.  This block abstraction simplifies reasoning about
-control flow.  We have more structure on which to hang assumption, and can make
+control flow.  We have more structure on which to hang assumptions, and can make
 more assumptions about code when writing analyses.  We want to introduce this
 abstraction before we have to extend the register allocator, which currently
 does the most analysis in our compiler.
@@ -534,7 +534,7 @@ assumption: we should allow nested @object-code{tail}s.  This means nested
 
 It is not obvious why we would want to make this change, and this is one place
 where our back-to-front design fails us.  In truth, compiler design, like most
-software design, is an interative process.  We must look ahead a few steps in
+software design, is an interactive process.  We must look ahead a few steps in
 the compiler to see the problem.
 
 If we were following our nose and propagating our new features up to the next
@@ -556,7 +556,7 @@ we could have an @object-code{if} statement of the form
 @object-code{(if (cmp loc loc) (begin s ... (jump loc)) (begin s ... (jump
 loc)))}.
 @;
-Compiling this require introducing a new fresh label.  The nesting structure
+Compiling this requires introducing a new fresh label.  The nesting structure
 allows all earlier compiler passes to ignore jumps that are quite easy to
 eliminate.  In general, jumps are difficult to deal with (as we will see), so
 avoiding them for as long as possible is generally a good design choice.
@@ -692,7 +692,7 @@ We extend that idea to blocks: each block is now annotated with its locals and
 its conflicts.
 Conceptually, the allocator should now run the same algorithm as before, but on
 each block independently.
-However, to different blocks may refer to the same abstract location.
+However, two different blocks may refer to the same abstract location.
 Conceptually, an abstract location is just the name of a unique location, so all
 references to it must be to the same physical location.
 This means the allocator should always assign the same abstract location the
@@ -826,7 +826,7 @@ predicate position because we have no explicit representation of the value that
 a comparison operation produces, @emph{i.e.}, we don't have booleans.  All the
 intermediate languages simply use the comparison instruction, which sets
 @a0-tech{x64} flags that we do not yet have access to.  The lower level
-languages we've design essentially treat compare-and-branch as an atomic
+languages we've designed essentially treat compare-and-branch as an atomic
 statement.
 
 We also add an @object-code{apply} expression that can call a declared function
@@ -913,7 +913,7 @@ that labels are not used as argument to @object-code{binop} or
 
 You may find this implementation of alpha equivalence for @tech{Values-lang v2}
 helpful: @share{a4-alpha-equal.rkt}.  The code is annotated to demonstrate
-idiomatic Racket style, and explain feature you may be unfamiliar with.
+idiomatic Racket style, and explain features you may be unfamiliar with.
 
 @exercise{
 Redesign and extend the implementation of @racket[uniquify].  The source
@@ -927,7 +927,7 @@ We now, finally, have a source language in which we can write interesting
 programs.  It is not like most programming languages that you're likely to have
 written programs in.  It has limitations designed into it because of what we
 know how to implement, and implement efficiently.  This will always be the
-case, in everything language you ever write, and so it is useful to learn to
+case, in every language you ever write, and so it is useful to learn to
 think in a new layer of abstraction.
 
 @exercise{
@@ -1018,8 +1018,7 @@ While the Fibonacci function should be implemented in @tech{Values-lang v2},
 since @tech{Values-lang v2} cannot take input from the user, we simulate input
 by generating a new @tech{Values-lang v2} program with the input provided.
 
-Make sure you use the function to test your interpreter against and your
-compiler.
+Make sure you test the function against your interpreter and your compiler.
 }
 
 @exercise{

@@ -33,7 +33,7 @@
  generate-x64)
 
 ; A useful helper.
-; You should not feel compelled to use this unless you felt like you needed such
+; You should not feel compelled to use this unless you feel like you need such
 ; a function.
 ;
 ; A multi-return-value map.

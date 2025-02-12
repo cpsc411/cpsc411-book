@@ -104,5 +104,5 @@ You will earn up to 100% of marks back on tests.
 @;For end-to-end tests, we will replace @emph{each assignment's} end-to-end tests
 @;score with the maximum of the score on a11 and the score on the original
 @;assignment. You cannot lose marks by introducing mistakes in a11.
-@;If you score 100% for end-to-end tests in a11, we replace your end-to-end
-@;scoresfor a6, a7, a8, a9, and a10 with 100%.
+@;If you score 100% for end-to-end tests in a11, we will replace your end-to-end
+@;scores for a6, a7, a8, a9, and a10 with 100%.

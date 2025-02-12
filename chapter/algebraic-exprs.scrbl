@@ -147,8 +147,8 @@ until we have a boolean data type.
 @margin-note{
 @emph{Algebraic} here refers to the fact that these expressions can be modeled
 mathematically as an algebraic structure---they have a set of elements (the
-64-bit intergers), and some operations on those elements (*, +, -, etc) that
-satsify various algebraic laws, including commutativity, associativity, etc.
+64-bit integer), and some operations on those elements (*, +, -, etc) that
+satisfy various algebraic laws, including commutativity, associativity, etc.
 This allows the user of such expressions to reason algebraically, manipulating
 expressions according to those laws, instead of reasoning about execution steps
 of the underlying machine.
@@ -177,7 +177,7 @@ can dynamically distinguish procedures from machine integers.
 (exprs-lang-v6.5)
 ]
 
-we can see a significant change in the syntax.
+We can see a significant change in the syntax.
 In essence, previously, @values-lang-v6[value] had to be explicitly bound by a
 @values-lang-v6[let], and operands to our primitive operations had to be
 trivial.
@@ -220,10 +220,10 @@ like the following:
       (call ,x_1 ,x_2)))
 ]
 If you've written any examples or tests in @ch-v6-tech{Values-lang v6}, you've
-probably done this tranformation by hand many times.
+probably done this transformation by hand many times.
 
 @digression{
-The above examples is intuitively all we need to do, and would produce valid
+The above example is intuitively all we need to do, and would produce valid
 output.
 However, we can do a better job if we design each function around the template
 for the @emph{output language} while processing the @emph{input language}.
@@ -262,7 +262,7 @@ most of our compiler passes necessarily needed to target low-level languages
 with low-level instructions, and not languages with @tech{algebraic
 expressions}.
 
-We'll add a new pass, which we call this pass @racket[remove-complex-opera*],
+We'll add a new pass, which we'll call @racket[remove-complex-opera*],
 because it makes complex operands (and later, operators) trivial.
 This pass will be just after @racket[uniquify], so only new high-level
 abstractions will be able to take advantage of it.
@@ -375,7 +375,7 @@ All the other passes remain completely unchanged from
 @;
 @;A-normal form was introduced in
 @;@hyperlink["https://slang.soe.ucsc.edu/cormac/papers/pldi93.pdf"]{this paper},
-@;which you might be interested in reading, and it is still of active interest in
+@;which you might be interested in reading, and is still of active interest in
 @;the compiler construction and research community.
 
 @section[#:tag "sec:overview"]{Appendix: Overview}

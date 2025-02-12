@@ -252,7 +252,7 @@ second operand is an expression that evaluates to an offset in bytes from that
 base pointer, and the third operand evaluates to the value to be stored in the
 memory location computed by adding the offset to the base.
 As usual, we become responsible for implementing this abstraction at some
-pointer further down the compiler pipeline.
+point further down the compiler pipeline.
 
 Using this abstraction, we can implement our constructors as specified.
 @exprs-lang-v8[cons] is meant to not only allocate, but also initialize the two
@@ -515,7 +515,7 @@ We design the target language, @deftech{Exprs-unsafe-data-lang v8}, below.
 (exprs-unsafe-data-lang-v8)
 ]
 
-Note that in this language, we add expose effect context and
+Note that in this language, we expose effect context and add
 @exprs-unsafe-data-lang-v8[begin].
 In the source, we have an effect procedure, namely @racket[vector-set!].
 The user must manually call impure functions and bind the result.
@@ -524,13 +524,13 @@ The result of an effectful function is either @exprs-unique-lang-v8[void], or an
 The unsafe variant, @exprs-unsafe-data-lang-v8[unsafe-vector-set!], does not need to produce a
 value, so we expose effect context.
 
-Introducing this contextual distinction, we requrie primops to respect contexts.
+Introducing this contextual distinction, we require primops to respect contexts.
 Only @exprs-unsafe-data-lang-v8[primops] that produce values can appear in
 @exprs-unsafe-data-lang-v8[value] context, while only imperative
 @exprs-unsafe-data-lang-v8[primops] (only
 @exprs-unsafe-data-lang-v8[unsafe-vector-set!] so far) can be directly called in
 effect context.
-Otherwise, we'd need to supprot values in effect context sometime later, which
+Otherwise, we'd need to support values in effect context sometime later, which
 we haven't considered how to do yet.
 
 To implement the safe language, we wrap all accessors to perform dynamic tag checking

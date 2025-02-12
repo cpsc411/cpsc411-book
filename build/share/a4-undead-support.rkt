@@ -62,7 +62,7 @@
 ;;          Undead-block-lang/tail, so this ambiguity is not a problem.
 ;; interp. a tree of Undead-sets.  The structure of the tree mirrors the
 ;;   structure of a Block-locals-lang tail. There are three kinds of sub-trees:
-;; 1) an instruction node is simply an undead sets;
+;; 1) an instruction node is simply an undead set;
 ;; 2) an if node has an undead-set for the condition and two branch sub-trees.
 ;; 3) a begin node is a list of undead sets, culminating in a sub-tree;
 ;;

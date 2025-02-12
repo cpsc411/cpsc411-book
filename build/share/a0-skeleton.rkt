@@ -11,8 +11,8 @@
 ; String -> Procedure? -> Integer
 ;
 ; Runs the string as a shell command, and either returns the exit code or fails
-; with an error message including command and the non-successful exit code.
-; Options takes a predicate as the second argument, which takes an exit code
+; with an error message including the command and the non-successful exit code.
+; Optionally takes a predicate as the second argument, which takes an exit code
 ; and returns true if the exit code indicates success.
 (define (system/exit-code! str [success? zero?])
   (let ([code (system/exit-code str)])

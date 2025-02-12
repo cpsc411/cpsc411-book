@@ -76,12 +76,12 @@ L4 -> L62 [label=" assign-homes-opt"];
 With @ch2-tech{Asm-lang v2}, we introduced @ch2-tech{abstract locations} to free
 the programmer from thinking about @ch2-tech{physical locations}.
 Unfortunately, our implementation strategy has a severe limitation.
-While it's simple and works, generates extremely slow code!
+While it's simple and works, it generates extremely slow code!
 Each and every variable assignment or reference accesses memory.
 While memory accesses have improved a lot compared to old computers due to
-caching, accessing memory are still orders of magnitude slower than accessing a
+caching, accessing memory is still orders of magnitude slower than accessing a
 register when our variable is not in the cache (and, in general, it won't be in
-cache).
+the cache).
 Our compiler will have better performance if we help the machine out by using
 registers as much as possible.
 
@@ -92,9 +92,9 @@ infinitely many @ch2-tech{frame variables}, but only 16 registers.
 Actually, fewer than 16, since the compiler and run-time system reserve some of
 those for various purposes.
 To assign an @ch2-tech{abstract location} a new @ch2-tech{frame variable} is
-trivial---just pick a new one, there's always new one, just like
+trivial---just pick a new one, there's always a new one, just like
 @ch2-tech{abstract locations}.
-This one-to-one mapping between abstractions means assigment is a simple,
+This one-to-one mapping between abstractions means assignment is a simple,
 systematic algorithm.
 To assign an @ch2-tech{abstract location} to a register, however, we need to
 pick a register that isn't currently in use, and figuring out which registers
@@ -172,18 +172,18 @@ After this, our existing pass @racket[replace-locations] should handle replacing
 @ch2-tech{abstract locations} by the assigned @ch2-tech{physical locations}.
 
 Any compiler optimization should be seen as a transformation between programs in
-the @emph{same language}, @ie, an @emph{intra-language transformation}.
+the @emph{same language}, @ie an @emph{intra-language transformation}.
 The point is not to introduce a new layer of abstraction, but to improve some
 performance metric of a program in some language.
 In this case, the optimization happens in @ch2-tech{Asm-lang v2/assignments}; all
 the programs we generate are equivalent to a program that only uses
-@ch2-tech{frame variable} in its @asm-lang-v2/assignments[assigments] field.
+@ch2-tech{frame variables} in its @asm-lang-v2/assignments[assigments] field.
 In this case, performing the optimization requires additional steps of
 analysis, so we introduce several administrative languages prior to
 @ch2-tech{Asm-lang v2/assignments}.
 @todo{Make this actually intra-language.}
 
-To emphasize that this is an optimizatiom, we design @racket[assign-homes-opt]
+To emphasize that this is an optimization, we design @racket[assign-homes-opt]
 as a drop-in replacement for @racket[assign-homes].
 
 @nested[#:style 'inset]{
@@ -267,7 +267,7 @@ To start the loop, this algorithm requires a default @tech{undead-out set} for
 the last instruction in the scope of our analysis.
 The default @tech{undead-out set} for @ch2-tech{Asm-lang v2/locals} is the empty
 set---no variables are @tech[#:key "live"]{alive} after the end of the program,
-are we are analyzing the entire program at once.
+as we are analyzing the entire program at once.
 In general, the default set may not be empty, depending on the language and the
 scope of the analysis.
 For example, in @tech[#:tag-prefixes '("book:" "chp-boilerplate:")]{Paren-x64
@@ -399,7 +399,7 @@ appear in a program.
 We could use the undead information to design an optimization to remove dead
 @tech{variables}.
 However, to separate concerns, we should not do this during register allocation.
-Instead, later, we'll design more general optimization pass that happens before
+Instead, later, we'll design a more general optimization pass that happens before
 register allocation.
 
 @;@challenge{
@@ -582,7 +582,7 @@ Decorates a program with its @tech{conflict graph}.
 ]}}
 
 @section{Register Allocation}
-Register allocation, as in the step that actually assigns @ch2-tech{abstract
+Register allocation, as the step that actually assigns @ch2-tech{abstract
 locations} to @ch2-tech{physical locations}, takes the set of @ch2-tech{abstract
 locations} to assign homes, the @tech{conflict graph}, and some set of assignable
 registers, and tries to assign each @ch2-tech{abstract location} to
@@ -637,7 +637,7 @@ call).
 @itemlist[
 @item{If you succeed in selecting a register, then add the assignment for
 the chosen @variable to the result of the recursive call.}
-@item{Otherwise, we cannot assign the choosen @variable to a register.
+@item{Otherwise, we cannot assign the chosen @variable to a register.
 Instead, we @emph{spill it}, @ie we assign it a @ch2-tech{frame variable}.
 We can assign a @ch2-tech{fresh variable}, but we can reduce memory usage by
 trying to assign a non-conflicting @ch2-tech{frame variable}.

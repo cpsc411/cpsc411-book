@@ -32,7 +32,7 @@
 The goal of this assignment is to introduce data type representation.
 We will finally add booleans, as well as the empty list, the void object,
 characters, and an error value.
-We will introduce a tagged object representation to distinguished different data
+We will introduce a tagged object representation to distinguish different data
 types dynamically.
 This will let us implement dynamic tag checking, reducing the amount of
 undefined behaviour in our surface language.

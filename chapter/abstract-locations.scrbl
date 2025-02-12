@@ -100,7 +100,7 @@ This will prevent the human from causing run-time errors when they inevitably
 make a mistake and overwrite a register that was still in use.
 
 To address this, we will introduce @tech{abstract locations}, of which there are
-an arbitrary number and that the programmer does not need to know what
+an arbitrary number such that the programmer does not need to know what
 @tech{physical location} they end up using.
 
 In general, these cannot all be mapped to registers, since there are a fixed
@@ -182,8 +182,8 @@ indicates that this operand is accessing 64 bits at a time.
 @margin-note{
 "Word" normally means the unit of addressing memory---64 bits in our case.
 Unfortunately, in the past, the word size was different.
-In order to avoid backwards incompatibilty changes, tools that use @tt{WORD} as
-a keyword, like @tt{nasm}, didn't want to change it's meaning.
+In order to keep backwards compatibility, tools that use @tt{WORD} as
+a keyword, like @tt{nasm}, didn't want to change its meaning.
 Instead, the keyword @tt{WORD} means 16 bits, not the word size, and prefixes
 give us multiple of that notion of @tt{WORD}.
 So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on x64.
@@ -197,7 +197,7 @@ instruction @tt{mov rax, QWORD [rbp - 0]}.
 
 Note that a @tt{mov} instruction to an address can only move 32-bit integer
 literals.
-@tt{mov [rbp + 0], 9223372036854775807} is invalid; instead, the interger would
+@tt{mov [rbp + 0], 9223372036854775807} is invalid; instead, the integer would
 need to be moved into a register, first, as in:
 @;
 @verbatim{
@@ -273,7 +273,7 @@ register, by changing the value of @racket[current-frame-base-pointer-register],
 among other parameters.
 If our language definitions were sufficiently parameterized, few if any compiler
 passes would need to differ between target machines.
-This language is not suffiently abstract yet, but using parameterized languages
+This language is not sufficiently abstract yet, but using parameterized languages
 in this way is a common tool we will use.
 }
 
@@ -755,7 +755,7 @@ the @tech{physical location} assigned by @racket[assign-fvars].
 @defproc[(replace-locations (p asm-lang-v2/assignments?))
           nested-asm-lang-v2?]{
 Compiles @tech{Asm-lang v2/assignments} to @tech{Nested-asm-lang v2},
-replaced each @tech{abstract location} with its assigned @tech{physical
+replacing each @tech{abstract location} with its assigned @tech{physical
 location} from the @asm-lang-v2/assignments[assignment] @tech{info field}.
 }
 

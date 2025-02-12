@@ -8,11 +8,11 @@ build a control-flow graph.
 A control-flow graph is a directed graph in which each instruction represents a
 node (vertex), and an edge from vertex @tt{v1} to @tt{v2} means that @tt{v1} is
 executed before @tt{v2}.
-In general, a vertex may have multiple predecessors due to jumps, and a multiple
+In general, a vertex may have multiple predecessors due to jumps, and multiple
 successors due to branching.
 
 We generate the control-flow graph essentially by labeling each instruction
-with a uniquie identifier (such as a number, a symbol, or a pointer to the
+with a unique identifier (such as a number, a symbol, or a pointer to the
 instruction's representation), traversing the program, and adding an edge from
 instruction's ID to the ID of its successor.
 
@@ -91,8 +91,8 @@ We can represent its control-flow graph as:
 ]
 
 Each instruction is replaced by a list whose first element is its ID, second
-element contain the set of successors, third element contains the set of defs,
-fourth elements containing the set of uses, and the fifth element containing the
+element contains the set of successors, third element contains the set of defs,
+fourth element contains the set of uses, and fifth element contains the
 original instruction.
 This representation is quite inefficient, but useful for pedagogical purposes.
 
@@ -143,7 +143,7 @@ to @a3-tech{undead-out sets}.
 We can easily construct an @tech{Undead-set-tree} for each block by traversing
 the control-flow graph, replacing each node by its @a3-tech{undead-out set}.
 
-We provide the function @racket[undead-analysis], and decorates each block with
+We provide the function @racket[undead-analysis], and decorate each block with
 the @a3-tech{undead-in sets} and @a3-tech{undead-out sets}.
 
 Now, @a3-tech{undead-out sets} will contain variables that may not exist in the

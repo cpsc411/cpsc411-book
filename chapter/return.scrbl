@@ -270,7 +270,7 @@ create a new one for the callee and saving the caller's values on the stack, and
 each @ch5-tech{procedure} accesses its own @tech{frame} starting from
 @ch2-tech{frame variable} @asm-pred-lang-v6[#:datum-literals (fv0) fv0], the
 same as before.
-This means our compiler users the stack not to push and pop values, but to push
+This means our compiler uses the stack not to push and pop values, but to push
 and pop @tech{frames}: it is a stack of @tech{frames}.
 
 It's only when we push a @tech{frame} that stack space is allocated.
@@ -891,7 +891,7 @@ analysis.
 The locals set is the set of unassigned variables, so we add variables to it
 that are unassigned, and remove variables from the set as they are assigned.
 So @tech{new frame variables} are listed in the locals set for the enclosing
-block, until they are assigend @ch2-tech{frame variables}.
+block, until they are assigned @ch2-tech{frame variables}.
 
 @nested[#:style 'inset
 @defproc[(uncover-locals (p asm-pred-lang-v6?))
@@ -929,7 +929,7 @@ The @asm-pred-lang-v6/undead[call-undead] field stores @emph{every}
 undead-out set of a @asm-pred-lang-v6[return-point].
 The @ch2-tech{abstract locations} must be allocated to the @tech{frame}, as
 discussed above, and both these @ch2-tech{abstract locations} and the
-@ch2-tech{frame variables} are requried to compute the size of the @tech{frame}.
+@ch2-tech{frame variables} are required to compute the size of the @tech{frame}.
 
 First, we update the definition of @racket[undead-set-tree?]
 to handle the @asm-pred-lang-v6[return-point] instruction, which includes a
@@ -947,7 +947,7 @@ Our new @deftech{undead-set tree} is one of:
 ... undead-set-tree?_2)], corresponding to a @asm-pred-lang-v6[begin] statement
 @asm-pred-lang-v6[(begin effect_1 ... effect_2)] or @asm-pred-lang-v6[(begin
 effect_1 ... tail)].
-The first element of the list represents @tech{undead-set tree} for the first
+The first element of the list represents the @tech{undead-set tree} for the first
 @asm-pred-lang-v6[effect], the second element represents the @tech{undead-set tree}
 for the second @asm-pred-lang-v6[effect], and so on.
 }
@@ -1315,7 +1315,7 @@ from the @asm-pred-lang-v6/pre-framed[new-frame] lists.
 In order, each @tech{new-frame variable} is assigned to a @ch2-tech{frame
 variable} starting with @racket[(make-fvar n)].
 These assignments are added to the @asm-pred-lang-v6/pre-framed[assignment]
-field the enclosing block.
+field of the enclosing block.
 
 The output is @deftech{Asm-pred-lang-v6/framed}, which only changes in its
 info fields compared to @tech{Asm-pred-lang-v6/pre-framed}.
@@ -1444,7 +1444,7 @@ decorating programs with their register assignments.
 
 @;Before running the register allocator, you should remove from the conflict graph
 @;any location known to be assigned to frame variables.
-@;This includes the @object-code{call-undead} set
+@;This includes the @object-code{call-undead} set.
 
 @;@margin-note{
 @;It's possible to reuse the more general cross-block allocation strategy to
@@ -1712,7 +1712,7 @@ all nested expressions by generate fresh basic blocks and jumps.
 
 @racket[resolve-predicates] and @racket[flatten-program] should not need any
 real changes, since they don't inspect binary operations and didn't inspect at
-@ch2-tech{frame variables}
+@ch2-tech{frame variables}.
 
 We define @deftech{Block-asm-lang v6} below.
 @bettergrammar*-ndiff[

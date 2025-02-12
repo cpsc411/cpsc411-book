@@ -191,7 +191,7 @@ can compile to later.
 @section{Exposing Control-Flow Primitives}
 When we want to add a new feature to the source language, we must always ask if
 there's some existing abstraction in the target language that we can use.
-So far, @ch2-tech{Paren-x64 v2} exposes only intructions to move data between
+So far, @ch2-tech{Paren-x64 v2} exposes only instructions to move data between
 locations and perform simple arithmetic computation on locations.
 This is insufficiently expressive, so we must reach even lower and expose new
 primitives from the machine.
@@ -303,7 +303,7 @@ We make an additional simplifying restriction in @tech{Paren-x64 v4} compared to
 We assume that a @paren-x64-v4[compare] instruction is always followed
 immediately by a @paren-x64-v4[jump-if], and similarly, that any
 @paren-x64-v4[jump-if] is immediately preceeded by a @paren-x64-v4[compare].
-This is necessay since other instructions in @ch1-tech{x64}, such as binary
+This is necessary since other instructions in @ch1-tech{x64}, such as binary
 operations, can affect comparison flags.
 However, we do not want to try to reason about how the flags are affected by
 arbitrary comparison, and our compiler will always generate a
@@ -336,7 +336,7 @@ This process of resolving labels is called @deftech{linking}.
 @margin-note*{
 We only cover @tech{linking} local labels in this chapter.
 More generally, @tech{linking} requires resolving references to
-external labels, @ie, linking imported libraries, and in the context of many
+external labels, @ie linking imported libraries, and in the context of many
 operating systems, preparing some additional metadata so the operating system
 knows where to begin executing.
 The more general instance is conceptually similar to what we present here---the
@@ -776,7 +776,7 @@ branches of an @values-lang-v4[if] statement.
 
 It is not obvious why we would want to make this change, and this is one place
 where our back-to-front design fails us.
-In truth, compiler design, like most software design, is an interative process.
+In truth, compiler design, like most software design, is an interactive process.
 We must look ahead a few steps in the compiler to see the problem.
 
 If we were following our nose and propagating our new features up to the next
@@ -938,7 +938,7 @@ For example, we can express the following rewrites:
         @racketblock0[(begin (set! reg int64_1) (false))])))
 ]
 
-The language doesn't allow us to express relational opreations directly on
+The language doesn't allow us to express relational operations directly on
 @nested-asm-lang-v4[opand]s, so we have to be a little more clever to record the
 possible values of @ch2-tech{abstract locations}, and detect @nested-asm-lang-v4[(> loc
 0)], when @nested-asm-lang-v4[loc] is surely greater than 0.
@@ -1064,7 +1064,7 @@ or @asm-pred-lang-v4[(set! aloc triv)].}
 ... undead-set-tree?_2)], corresponding to a @asm-pred-lang-v4[begin] statement
 @asm-pred-lang-v4[(begin effect_1 ... effect_2)] or @asm-pred-lang-v4[(begin
 effect_1 ... tail)].
-The first element of the list represents @tech{undead-set tree} for the first
+The first element of the list represents the @tech{undead-set tree} for the first
 @asm-pred-lang-v4[effect], the second element represents the @tech{undead-set tree}
 for the second @asm-pred-lang-v4[effect], and so on.
 }

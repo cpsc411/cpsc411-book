@@ -171,7 +171,7 @@
 
   ; (Values-unique-lang v) -> (List-of (Loc-lang s)) and (Loc-lang aloc)
   ; Assigns the value v to a fresh temporary, returning two values: the list of
-  ; statements the implement the assignment in Loc-lang, and the aloc that the
+  ; statements that implement the assignment in Loc-lang, and the aloc that the
   ; value is stored in.
   (define (assign-tmp v)
     (TODO "Consider implementing assign-tmp for Exercise 10."))

@@ -104,7 +104,7 @@ remain the same with some additional suffix added to the tag, akin to semantic
 versioning.
 }
 @section{Designing an Abstraction}
-Our current abstraction boundary, @ie, our current language, is @ch1-tech{x64}.
+Our current abstraction boundary, @ie our current language, is @ch1-tech{x64}.
 So we start by asking: what's wrong with @ch1-tech{x64}?
 
 There is a lot wrong with @ch1-tech{x64}, but we'll start with one problem that
@@ -133,7 +133,7 @@ mov rax, r9
 }
 
 And, in our desired language, combining these would be well defined, such as in
-the following example, without ever referring to the boilerplate requried by
+the following example, without ever referring to the boilerplate required by
 @tt{nasm}.
 @verbatim{
 ;; Program 3, by combining Program 1 and Program 2
@@ -153,7 +153,7 @@ then there exists @racket[(p-append _p_1 _p_2)] (for some definition of
 @racket[p-append]) which first executes the instructions in @metavar{p_1} and then
 executes the instructions in @metavar{p_2}.
 
-Below, we select the subset of @ch1-tech{x64} instructions we plan to suppport
+Below, we select the subset of @ch1-tech{x64} instructions we plan to support
 in our @tech{compiler}, but note that the abstraction of @tech{instruction
 sequences} applies to all @ch1-tech{x64} instructions.
 
@@ -162,7 +162,7 @@ sequences} applies to all @ch1-tech{x64} instructions.
 @item{@tt{mov @metavar{triv}, @metavar{triv}}
 
 This string represents the move instruction, which moves a value from one
-location to another, or moves a value into a locaction.
+location to another, or moves a value into a location.
 
 @ch1-tech{x64} imposes further restrictions on @tt{mov}
 (remember---@ch1-tech{x64} @emph{is}, we must not ask why).
@@ -253,7 +253,7 @@ sequence} means, independent of how it is implemented.
 Otherwise, we would not know whether we are compiling them correctly.
 
 We address both of these problems next by designing a @tech{source language}
-that captures the meaning of @tech{instruction sequences}, for our choosen
+that captures the meaning of @tech{instruction sequences}, for our chosen
 subset of @ch1-tech{x64}, and choosing a new representation of programs that we
 will use for the rest of this book.
 @;The final result of the @tech{instruction sequence} is the value of some
@@ -321,7 +321,7 @@ Our abstract syntax makes more clear that the arithmetic operations are actually
 a combination of an arithmetic operation and an operation that changes state.
 The instruction @tt{add @metavar{reg}, @metavar{integer}} is represented
 @paren-x64-v1[(set! reg (+ reg integer))].
-Note that this duplicates the register in the syntax, and the two occurences
+Note that this duplicates the register in the syntax, and the two occurrences
 must be the same in order to correspond to a valid @ch1-tech{x64} instruction.
 
 Some restrictions from @ch1-tech{x64} are not apparent in the definition of the
@@ -534,7 +534,7 @@ valid---it only transforms the @emph{type}, or interpretation, of the data.
 @;rather than complex string automata.
 
 You could view @racket[check-paren-x64] as a type checker.
-In this view, it checks for a single type: @emph{The-Paren-x64-Type}, which
+In this view, it checks for a single type: The @emph{Paren-x64-Type}, which
 every valid instruction has, and which has quite simple typing rules.
 @racket[check-paren-x64] checks that the input program is following the typing
 disciplines of the language (which aren't very restrictive).
@@ -566,7 +566,7 @@ program.}
 We split this into two separate functions to enable separation of concerns.
 We always want our syntax to be valid, but because @tech{Paren-x64 v1} will
 serve as a target language, we may not always want to enforce that registers are
-provabably initialized.
+provably initialized.
 For example, the language may evolve to the point where checking this will be
 undecidable, and source languages will be responsible for enforcing the guarantee
 instead.
@@ -736,9 +736,9 @@ The @deftech{run-time system} provides all run-time support required by the
 language but that that is not provided by the underlying machine.
 Exactly what this run-time support is depends on the language.
 Typically, the language run-time provides memory allocation and deallocation,
-initialization of the process environment such as the stack, handles returning
-values to the user, and provides any built-in procedures that all programs in
-the language can expect to use.
+provides initialization of the process environment such as the stack, handles
+returning values to the user, and provides any built-in procedures that all
+programs in the language can expect to use.
 For @tech{Paren-x64 v1}, the only run-time support we require is returning the
 final value to the operating system and exiting.
 
