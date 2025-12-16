@@ -8,8 +8,8 @@
 
 (define course-number "CPSC 411")
 (define lecture-room (list "CEME 1202 -- " (url "https://learningspaces.ubc.ca/classrooms/ceme-1202")))
-(define semester "2024w2")
-(define gh-org "cpsc411-2024w-t2")
+(define semester "2025w2")
+(define gh-org "cpsc411-2025w-t2")
 (define course-title "Introduction to Compiler Construction")
 
 (define url-root (string-append "https://www.students.cs.ubc.ca/~cs-411/" semester))

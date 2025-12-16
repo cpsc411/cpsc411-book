@@ -191,7 +191,7 @@ In no particular order, these are:
 
 @itemlist[
 @item{Office hours}
-@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22024/cpsc411" "Piazza"]
+@item{@hyperlink["https://piazza.com/ubc.ca/winterterm22025/cpsc411" "Piazza"]
 
     The Piazza course discussion board. The instructor, TAs, and all students are expected to read the discussion board on a very regular basis. Late breaking information about milestones, corrections to mistakes made in class, and generally useful information will often be communicated through Piazza. You are responsible for keeping up with posts on Piazza---pleas of ignorance will not be received.
 
