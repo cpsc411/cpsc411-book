@@ -23,4 +23,4 @@ This calendar is subject to change.
                      #:key car)])
       ; render dates
       (list (~t (car als) "E, MMM d") (cdr als))))]
-@margin-note{a11 does not not actually exist. I've left it in the calendar for technical reasons.}
+@;margin-note{a11 does not not actually exist. I've left it in the calendar for technical reasons.}
