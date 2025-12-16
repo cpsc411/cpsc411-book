@@ -211,7 +211,7 @@ which commit we grade.
 
 @exercise{
 Future assignments rely on the @racketmodname[cpsc411/compiler-lib] package.
-To make sure this is installed, run @tt{raco pkg install --user --auto https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2024w2}.
+To make sure this is installed, run @tt{raco pkg install --user --auto https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2025w2}.
 To check this is installed correctly, run @tt{raco test -p cpsc411-lib}.
 You should see a lot of files run, followed by @tt{25 tests passed}.
 }
