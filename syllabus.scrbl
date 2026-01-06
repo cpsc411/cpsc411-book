@@ -169,6 +169,7 @@ available electronic textbook may be suggested.
 (list
   (list @bold{Instructor} @bold{Contact Details} @bold{Office} @bold{Office Hours})
   (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "Tue 15:30-16:30")
+)
 ]
 
 @tabular[
@@ -176,7 +177,7 @@ available electronic textbook may be suggested.
 #:column-properties '(center)
 #:row-properties '(bottom-border)
 (list
-(list @bold{TA} Details} @bold{Office} @bold{Office Hours})
+(list @bold{TA} @bold{Office} @bold{Office Hours})
 (list "Chester Gould" "TBD" "TBD")
 (list "Yanze Li" "TBD" "TBD")
 )
