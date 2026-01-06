@@ -7,7 +7,7 @@
 (provide (all-defined-out))
 
 (define course-number "CPSC 411")
-(define lecture-room (list "ESB 2012 -- " (url "https://learningspaces.ubc.ca/classrooms/esb-2012")))
+(define lecture-room (list "FSC 1611 -- " (url "https://learningspaces.ubc.ca/classrooms/fsc-1611")))
 (define semester "2025w2")
 (define gh-org "cpsc411-2025w-t2")
 (define course-title "Introduction to Compiler Construction")
