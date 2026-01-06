@@ -45,16 +45,15 @@ In the event of various eventualities, such as extreme weather, illness of both 
 We will not subject students to Zoom.
 
 @section{Prerequisites}
-A passing grade in CPSC 311.
+A passing grade in CPSC 311, CPSC 213, CPSC 221.
 
-@;{
 @subsection{What if I want to take it but can't fulfill the prerequisites?}
-Subject to available space in the course for all interested students meeting the prerequisites, I’m
-willing to consider flexibility for students for whom taking CPSC 311 is not practical or possible.
-You should reach out to me well in advance, ideally a semester beforehand, if you think you will not
-be able to take CPSC 311 before CPSC 411. If I support your case, we will work with the CPSC advising
-team to ensure they have no objections.
-}
+Please review the material below if you believe you can take the course without the prerequisites.
+
+Undergraduates can appeal the prerequisite through undergraduate advising: @url{https://www.cs.ubc.ca/prerequisite-rules}.
+I do not have the power to waive the prerequisite unilaterally for undergraduates.
+
+For graduate students, I am willing to consider waiving the prerequisites.
 
 @subsection{Judging your own background}
 This course demands programming in a functional programming languages, learning
