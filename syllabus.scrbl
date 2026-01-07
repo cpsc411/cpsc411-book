@@ -178,8 +178,8 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
 (list @bold{TA} @bold{Office} @bold{Office Hours})
-(list "Chester Gould" "TBD" "TBD")
-(list "Yanze Li" "TBD" "TBD")
+(list "Chester Gould" "TBD" "Tuesday 10:30am -- 11:30am; Wednesday 11am--12pm")
+(list "Yanze Li" "TBD" "Monday 11am--12pm; Wednesday 2pm--3pm")
 )
 ]
 
