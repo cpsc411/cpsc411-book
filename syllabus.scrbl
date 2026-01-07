@@ -168,7 +168,7 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
   (list @bold{Instructor} @bold{Contact Details} @bold{Office} @bold{Office Hours})
-  (list "Prof. William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "Tue 15:30-16:30")
+  (list "William J. Bowman" @mailto["wilbowma@cs.ubc.ca"] "ICCS 389" "Tue & Thur 15:30-16:30")
 )
 ]
 
@@ -178,8 +178,10 @@ available electronic textbook may be suggested.
 #:row-properties '(bottom-border)
 (list
 (list @bold{TA} @bold{Office} @bold{Office Hours})
-(list "Chester Gould" "TBD" "Tuesday 10:30am -- 11:30am; Wednesday 11am--12pm")
-(list "Yanze Li" "TBD" "Monday 11am--12pm; Wednesday 2pm--3pm")
+(list "Chester Gould" "ICICS X337" "Tuesday 10:30am--11:30am")
+(list "Chester Gould" "ICICS X337" "Wednesday 11am--12pm")
+(list "Yanze Li" "ICICS 202" "Monday 11am--12pm")
+(list "Yanze Li" "ICICS 204" "Wednesday 2pm--3pm")
 )
 ]
 
