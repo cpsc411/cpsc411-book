@@ -161,7 +161,7 @@ available electronic textbook may be suggested.
 @(define (mailto addr)
    (hyperlink (format "mailto:~a" addr) addr))
 
-@section{Contacts}
+@section{Contact Info and Office Hours}
 @tabular[
 #:style 'boxed
 #:column-properties '(center)
