@@ -1,12 +1,18 @@
 #lang scribble/base
+
 @(require "../assignment/assignment-mlang.rkt")
 
-@title[#:tag "top" #:tag-prefix "chp1:"]{A Compiler Begins with a Language}
+@title[#:tag "top" #:tag-prefix "chp1:"]{The first language}
+
+@(define eval-eg
+   (make-cached-eval
+    "x64-eval"
+    '(require
+      "x64-interp.rkt")))
 
 To me, the study of compilers is the study of languages.
-As a mathematical object, a @deftech{compiler} is a transformation between
-languages, transforming a source language into a target language---but that is
-for another time.
+I view a @deftech{compiler} as a meaning-preserving transformation between
+languages, transforming a source language into a target language.
 As a program, a compiler is a function that takes any program in a @ch-bp-tech{source
 language} and produces some program that "behaves the same" in a @tech{target
 language}.
@@ -15,38 +21,36 @@ This definition tells us we need three things before we can start designing our 
 We need a @ch-bp-tech{source language}, @tech{target language}, and some definition of
 "behaviour" for programs in each.
 Each of these is a design choice.
-Often, we choose a pre-existing @tech{target language}.
-Picking a target language is an interesting point in the design of any compiler.
-By contrast, the source language is often designed to achieve a balance between
-aesthetic and pragmatic goals.
 
-In this course, we will pick a starting @tech{target language} (@tech{x64}), and
+In this course, we pick a starting @tech{target language} (@tech{x64}), and
 systematically design @emph{many} @ch-bp-tech{source languages}.
 Each of our @ch-bp-tech{source languages} will be designed to remove a restriction from a
 @tech{target language}, or add high-level features to improve usability.
 We also take care to ensure the @ch-bp-tech{source languages} can be compiled
 efficiently.
-For each of these languages, their behaviour is defined by an interpreter.
+The behaviour of each language is defined by an interpreter.
 For @tech{x64}, the behaviour is defined by whatever happens when we turn it
 into binary and run it on a CPU (The First Interpreter).
 
-This last step, understanding the behaviour of programs in the language, is a
-key step.
+Understanding the behaviour of programs in each language is a key step.
 We will write programs that validate, analyze, and transform programs.
 We will write templates for programs, and whole classes of programs.
 That is the nature of a compiler.
 So we must understand what a program @emph{means}.
 
-So we begin by picking and studying our chosen @tech{target language}.
+We begin by picking and studying our chosen @tech{target language}.
+
+@todo{should introduce interpreters and validators in this chapter.
+write one for x64, since we have one for Racket.}
 
 @section{Picking the target language}
 The @deftech{target language} of a compiler is the language in which the
 compiler writes programs.
 
-Our first language, and chosen @tech{target language}, is x86-64 plus
+Our first language, and ultimate @tech{target language}, is x86-64 plus
 @tech{system calls}, which we call @deftech{x64} for short.
 In fact, we'll only use a subset @tech{x64} of this language, which will expand
-it slightly throughout the course; @tech{x64} will refer to the current subset.
+it slightly throughout the book; @tech{x64} will refer to the current subset.
 I elaborate on this language and what @tech{system calls} are shortly.
 
 This is an unusual choice for a @tech{target language} in a contemporary compiler.
@@ -62,10 +66,8 @@ This frees the compiler writer to focus on other design goals of the new
 @ch-bp-tech{source language}.
 Perhaps they want to focus on ruling out more errors statically, or providing
 convenient syntax for certain programming patterns they find common.
-These are common goals in @ch-bp-tech{source language} and domain-specific language
-design.
 
-However, choosing such languages as a target has a cost.
+However, choosing higher-level languages as a target has a cost.
 These targets come with their own implementations, their own compilers and
 @ch-bp-tech{run-time systems}.
 If we want to use them, we commit ourselves to using their toolchains as well.
@@ -76,42 +78,44 @@ work at a level of abstraction lower than our @tech{target language}.
 This may complicate or entirely prevent us from implementing certain
 functionality or optimizations.
 
-For this course, we choose @tech{x64} for two main reasons.
-First, for educational goals, we want to write transformations and optimizations
-at some of the lowest abstraction layers we can.
-Second, for pragmatic goals, it is significantly easier on the students (many)
-to setup the toolchain for @tech{x64} than a C, LLVM, or JavaScript toolchain,
-at a minor cost to the course staff (few) who must maintain some @tech{x64}
-support code.
-The second reason is a common rationale in compiler design---simplifying
-something for the many users at the expense of the few compiler writers is
-usually a good trade-off.
+We choose @tech{x64} for two main reasons: one pedgogical, one pramatic.
+First, we want to learn to write transformations and optimizations at some of
+the lowest abstraction layers.
+Choosing a hardware instruction set means we can learn about low-level transformations.
+Second, it is easier to setup the toolchain for @tech{x64} than a C, LLVM, or
+JavaScript toolchain, at a minor cost to the course staff who must maintain
+some @tech{x64} support code.
+Choosing @tech{x64} pulls in far fewer dependencies.
 
-@section{Programming in x64}
+@section{The meaning of x64 programs}
 Having chosen our @tech{target language}, we must now understand the
 language---its behaviour, the abstractions it provides, the restrictions it
 requires us to work with, and even its syntax.
-As far as we are concerned, the @tech{target language} was not designed---it was
-discovered@margin-note{Take a computer architecture course if you want to learn
-how it was designed.}
+As far as we are concerned, the @tech{x64} was not designed---it was
+discovered.
 It is the language of a wild CPU found by geologists in cave somewhere, probably
 in the Amazon.
 It is primordial.
 It is not sensible to ask questions like "why"---@tech{x64} @emph{is}.
 And, because we want to talk to the CPU, we must deal with it.
+@margin-note{The reasons x64 ended up this way is interesting, but not in scope for this book.
+A computer architecture course would provide some insight, but it is also the
+artifact of decades of iteration and design decisions.}
 
 While we have chosen @tech{x64} as our @tech{target language}, @tech{x64}
 itself does not run on most hardware.
-Instead, it is the @ch-bp-tech{source language} yet another compiler, which transforms
-@tech{x64} to a binary machine code that I call @tech{bin64} for now.
-In this course, we use the @tt{nasm} assembler to compile @tech{x64} into
-@tech{bin64}.
+Instead, it is the @ch-bp-tech{source language} of yet another compiler that
+transforms @tech{x64} to a binary machine code that I will name @tech{bin64} for
+now.
+We will use the @tt{nasm} assembler to compile @tech{x64} into @tech{bin64}.
 The compiled programs can run natively on most hardware, but you may need an
 interpreter depending on your machine.
 @margin-note{Usually, interpreters for machine code are called "virtual machines".}
 
-To get started with @tech{x64}, let's consider the factorial function @racket[fact].
-In Racket, following the design recipe, we would simply write:
+To get started understanding the meaning of @tech{x64} programs, let's start with a simpler language.
+Consider the factorial function @racket[fact].
+In Racket, following the design recipe ala @hyperlink["https://htdp.org/"]{@emph{How to Design Programs}}, we would simply write:
+%TODO: cite
 @examples[
 (code:comment "Natural -> Natural")
 (code:comment "Takes a natural number n and returns the factorial of n.")
@@ -132,7 +136,15 @@ In Racket, following the design recipe, we would simply write:
 (void))
 (fact 5)
 ]
-We run this and the computer prints @code{120}.
+
+The meaning of this program is easily understood in the usual way for functional languages.
+The meaning of each expressions can be assigned a value.
+The meaning of 0 is the natural number 0; the meaning of @racket[(zero? n)] is the boolean value true if the meaning of @racket[n] is 0, and the boolean value false otherwise.
+We could represent this meaning as an interpreter.
+The meaning of any program is simply the value or sequences values of each expression in the program.
+
+This meaning gives us a fairly accurate understanding of what happens when we run the program.
+We run this and the computer prints @code{120}, the value of program.
 
 We can implement the equivalent computation in @tech{x64} as follows.
 @margin-note{@tech{x64} actually supports at least two syntaxes.
@@ -143,7 +155,7 @@ language syntax.}
 #:result (fake "internal OS-defined error")
 #:type 'unix
 #:file-name "plain-fact-x64.s"
-]{global start   ; Declare starting block for linker.
+]{global start                  ; Declare starting block for linker.
 
 section .text                   ; Start of the "code"
 
@@ -161,7 +173,7 @@ fact:
 ;; Computes the factorial of r8 with accumulator r9
 ;; r9 is PositiveInt64; contains the result so far of computing the factorial of the input.
 ;;
-;; Follows the template for self-referential natural numbers.
+;; Follows the template for unary natural numbers.
 fact_acc:
   cmp r8, 0                     ; compare r8 and 0, i.e., (zero? r8)
   je fact_done                  ; jump if last comparison was equal
@@ -172,84 +184,162 @@ fact_acc:
 fact_done:
 ;; Done. The result is in r9.
 
-section .data ; The data section. This is where we declare initialized memory locations.
+section .data                   ; Start of statically allocated "data". Required to be non-empty on MacOS
 
 dummy: db 0
 }
 
-In this example, we compute the result, which is stored in @exec{r9}.
-Intuitively, the meaning of this program is a transformation over a register machine.
+We compute the result of factorial of 5, the result of which gets stored in @exec{r9}.
+We do this by imperatively transforming the state of registers, until the computation is complete.
+
+This is similar to the Racket program we wrote, but we cannot understand the
+meaning of the program by simply assigning each piece of the program a value.
+Instead, intuitively, the meaning of this program is a transformation over a register machine.
 It expects a machine with at least two registers, @exec{r8} and @exec{r9}, whose
 initial values are arbitrary.
 It begins executing the first instruction, then executes the next, and so on.
-After running the machine is left with in a state where @exec{r9} contains the
+Each instruction transforms the state of the registers.
+After running, the machine is left with in a state where @exec{r9} contains the
 result.
-Unfortunately, that's not what happens if we try to run it.
 
-Instead, after reaching @exec{fact_done}, the machine happily tries to
-execute the next instruction in memory.
-There is no next instruction, so it executes whatever happens to be in that
-memory location.
+To formalize this meaning, we could write an interpreter.
+Doing so over strings would be slightly tedious, but a basic environment passing interpreter might include a function like
+@racketblock[
+(define (interp-x64-instr labels regs strs)
+  (if (empty? strs)
+      regs
+      (match (car strs)
+        [(regexp #px"\\s*mov (\\w+), (\\w+)" (list _ rand1 rand2))
+         (interp-x64-instr 
+          labels 
+          (dict-set regs (string->symbol rand1) (interp-x64-rand reg labels rand2))
+          (cdr strs))]
+        ....)))
+]
+@nested[#:style 'inset]{
+@defproc[(interp-x64 [p string?]) dict?]{
+Takes a string representing an @tech{x64} program and returns a dictionary mapping registers to values.
+
+@examples[#:eval eval-eg
+(interp-x64
+"global start
+section .text
+start:
+  mov r9, 120
+section .data
+dummy: db 0")
+]
+}
+}
+
+@todo{Exercise here: write a little interpreter. Over strings? Then we don't
+have to introduce abstract syntax yet. could move on to abstract syntax in the
+next chapter.}
+
+Unfortunately, this intuitive meaning isn't complete.
+If this were the correct interpretation, and the program stopped with @exec{r9}
+containing the result, and we had some way to read the result of @exec{r9} back
+to the user, this would be a fairly good compilation of our original Racket program.
+Instead, the program crashes rather than producing the result @racket[120].
+
+There are two problems with this intuitive understanding of the meaning of @tech{x64}.
+First, there's no signal to stop running the program, so it doesn't stop with
+the result in @exec{r9}, and crashes.
+Second, even if it did, there is no instruction to communicate that the result
+is in @exec{r9}.
+Both problems require us to expand our understanding of what @tech{x64} is.
+
+What actually happens when we run this program is that after reaching
+@exec{fact_done}, the machine happily tries to execute the next instruction in
+memory.
+There is no next instruction, so the machine executes whatever happens to be in
+the memory location after the final instruction.
 The program hopefully crashes with a @tt{SEGFAULT} or @tt{SIGBUS} error, but
-this depends on the operating system (@deftech{OS}).
+this depends on the @tech{operating system} (@tech{OS}).
 
-This fact that the behaviour depends on the OS is our first clue that this
-example is not implemented in @emph{just} x86-64, the language of the CPU.
+This fact that the behaviour of the program depends on the @tech{OS} is our
+first clue that this example is not implemented in @emph{just} x86-64, the
+language of the CPU.
 The meaning of the program, and thus the actual language in which we were
 programming, depends critically on the @tech{OS}.
 
-Each OS makes different assumptions about and enforce different restrictions
+The @deftech{operating system} (@deftech{OS}) is the piece of software that the
+hardware first loads on boot, and thereafter becomes responsible for managing
+the hardware, including running launching new (sub)programs to run on that hardware.
+Each @tech{OS} makes different assumptions about and enforce different restrictions
 on @tech{x64} programs.
-Most operating systems require that you explicitly "exit" the process, by calling
-a special, @tech{OS}-specific "exit" procedure at the end of the process.
-Each @tech{OS} defines a different set of these procedures, which we can think
-of as the "standard library" for @tech{x64}.
-@tech{OS}, and exactly where the @tech{OS} expects the final answer to be differs.
+Most @tech{operating systems} require that a program explicitly "exit", by calling
+a special, @tech{OS}-specific "exit" procedure when the program is complete.
+Each @tech{OS} defines a different set of these procedures, typically called
+@tech{system calls}, which we can think of as the standard library for
+@tech{x64}.
+Each @deftech{system call} is a procedure predefined by the @tech{operating system}
+that defines how an @tech{x64} program interacts with the system.
+@;tech{OS}, and exactly where the @tech{OS} expects the final answer to be differs.
 @;For example, the linker for each @tech{OS} assumes a different entry label for
 @;where to start executing (although you can usually override this default).
 @;The entry label is assumed to be "start" on macOS (at least, on some versions),
 @;"_start" on Linux, and "Start" on Windows (depending on which Windows linker you
 @;use).
-macOS imposes a restrictions: the @exec{.data} section, which is used to declare
-initialized memory locations, cannot be empty, and the linker rejects the
-program if it is.
+Some @tech{operating systems} impose additional restrictions, both syntactic
+and semantic, on @tech{x64}.
+For example, the entry label is assumed to be "start" on macOS (at least, on some versions),
+"_start" on Linux, and "Start" on Windows (depending on which Windows linker you
+use), although this can often be redefined by the linker.
+macOS requires that the @exec{.data} section, which is used to declare
+initialized memory locations, cannot be empty, and the linker statically
+rejects the program if it is.
 In the above example, we don't actually use the heap, so we declare a dummy
 value to ensure compatibility with macOS.
 This example is compatible with macOS, Linux, and Windows, as long as you
 specify "start" as the entry label, and don't mind exiting with a bang.
 
-Because of this critical dependence on the @tech{OS}, the @tech{target language}
-in this course cannot @emph{really} be "plain" @tech{x64}---@tech{x64} is a
-family of programming languages, indexed by an operating system.
-In this class, we never program the raw CPU---we program the operating system.
+Because of this critical dependence on the @tech{OS}, our @tech{target language}
+cannot @emph{really} be "plain" @tech{x64} that will be interpreted by the
+hardware---we can think of @tech{x64} as a family of programming languages,
+indexed by an operating system.
+We never program the raw CPU---we program the operating system.
 The CPU together with the operating system implements a different programming
 language than the CPU by itself.
-From a programming languages perspective, the operating system (@eg Linux) is
-the @tech{run-time system} for the OS-flavoured @tech{x64} programming language
-(@eg @tech{x64-linux}).
+From a programming languages perspective, we can view the operating system (@eg
+Linux) as the @tech{run-time system} for the OS-flavoured @tech{x64}
+programming language (@eg @tech{x64-linux}).
 
-In @tech{x64}, the result of the computation is not implicitly returned to the
-user via the REPL like it is in Racket.
-Instead, we have to explicitly say what the result is, and how to communicate it
-to the user.
-To do this, we need to use a @deftech{system call}, a procedure predefined by
-the operating system that defines how an @tech{x64} program interacts with the
-system.
+Even if we had signaled to the @tech{operating system} to stop the program, we
+need to explicitly produce a result value in some way.
+In a functional language, expressions implicitly have values, so the language
+can automatically provide a result: the values of each expression the user
+provided.
+But no one statement in @tech{x64} necessarily indicates a result.
+Any given register might contain a result, or might contain an intermediate value.
+We must explicitly produce a result.
 
-@todo{Never introduce the linker}
+Further, how we produce the result matters.
+In Racket, like many high-level languages, any result is returned to the
+caller.
+The top-level call, such as the REPL, prints whatever value is returned to it.
+In @tech{x64}, the result of the computation must be explicitly passed to the
+@tech{operating system}, and we must explicitly choose how the result is
+returned: is it printed, is it an error code, is it written to a file?
+To do this, we need to use a @tech{system call}.
 
 After compiling our @tech{x64} program with @tt{nasm}, we are left with a program
 in the first target language---a machine code binary, which is just about the
 raw language of the CPU.
 In fact, it is machine code in a binary format described by the @tech{OS}, which
 contains @tech{x64} instructions arranged according to the @tech{OS}
-specification, with additional boilerplate (often installed by the linker) to
-ensure correct interoperation with the OS.
+specification. 
 I call this target language @deftech{bin64}, and like @tech{x64}, it is a
 family of languages.
 As we rely on @tt{nasm} to generate @tech{bin64}, we do not study this target
 language in any detail, and normally forget about its existence except when
 directing @tt{nasm} to generate the right language.
+
+This is not the end of the process either: the program is not complete yet.
+We need to to install additional code for the operating system to load the
+binary properly.
+This is done by the linker, @exec{ld}, which links together different pieces of
+machine code into a single binary executable by the \tech{OS}.
 
 @margin-note{Take an operating systems course if you want to know more about how
 to program the "raw" CPU to implement the "lowest" level of programming
