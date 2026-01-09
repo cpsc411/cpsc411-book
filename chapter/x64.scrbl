@@ -10,6 +10,26 @@
     '(require
       "x64-interp.rkt")))
 
+\todo{Crafting a compiler describes the ISA+OS as a virtual machine in the
+intro. This is quite in line with my approach, perhaps better.
+Doing it that way could let me start with my first abstraction being to
+virtualize or abstract the machine.
+If I took that to an extreme, we could virtualize the ISA and target ARM64 (ARM is a RISC) or x64.
+That would solve some of the reviewer concerns, might be nice for students as well.
+Would I also provide custom assembler? Linker? ... probably not.
+
+Looks like the main difference is load/store are reduced on ARM.
+Given that memory instructions are separated in most of the compiler as mset! and mref, and fvars, this shouldn't be a big deal.
+
+This biggest problem with this chapter is I really want to start with language
+semantics, but that normal way I do that is with interpreters, but I haven't
+introduced abstract syntax yet.
+I suppose I could have a short chapter on abstract syntax first, or a prelude.
+Even this chapter starts with a lil prelude: "... the study of languages".
+Could jump off from there to a refresher about abstract vs concrete syntax, syntax vs semantics.
+}
+
+
 To me, the study of compilers is the study of languages.
 I view a @deftech{compiler} as a meaning-preserving transformation between
 languages, transforming a source language into a target language.
