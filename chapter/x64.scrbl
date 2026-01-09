@@ -339,7 +339,7 @@ This is not the end of the process either: the program is not complete yet.
 We need to to install additional code for the operating system to load the
 binary properly.
 This is done by the linker, @exec{ld}, which links together different pieces of
-machine code into a single binary executable by the \tech{OS}.
+machine code into a single binary executable by the @tech{OS}.
 
 @margin-note{Take an operating systems course if you want to know more about how
 to program the "raw" CPU to implement the "lowest" level of programming
