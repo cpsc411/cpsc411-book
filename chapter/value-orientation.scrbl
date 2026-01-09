@@ -142,7 +142,7 @@ Intermediate operations can be named using @values-lang-v3[let], which
 binds an arbitrary number of independent computations to @tech{names}.
 
 This language introduces two new abstractions: @tech{names} and
-@deftech{expressions}.
+@tech{expressions}.
 
 A @deftech{name}, or @deftech{lexical identifier}, is a placeholder that is
 indistinguishable from the value of the expression it names.

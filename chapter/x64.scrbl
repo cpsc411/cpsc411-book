@@ -302,7 +302,7 @@ We never program the raw CPU---we program the operating system.
 The CPU together with the operating system implements a different programming
 language than the CPU by itself.
 From a programming languages perspective, we can view the operating system (@eg
-Linux) as the @tech{run-time system} for the OS-flavoured @tech{x64}
+Linux) as the @ch-bp-tech{run-time system} for the OS-flavoured @tech{x64}
 programming language (@eg @tech{x64-linux}).
 
 Even if we had signaled to the @tech{operating system} to stop the program, we

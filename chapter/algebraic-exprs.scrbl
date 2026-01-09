@@ -207,7 +207,7 @@ helps us see the true difference and see that the essence of the transformation
 is @exprs-unique-lang-v6.5[let]-binding intermediate results to make all
 operands trivial.
 
-To transform this into @tech{Values-unique-lang v6}, we need to perform the
+To transform this into @ch-v6-tech{Values-unique-lang v6}, we need to perform the
 monadic-form translation.
 In essence, we recursively translate any nested expression that is not a
 @values-unique-lang-v6[value] into one by let-binding all intermediate

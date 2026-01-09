@@ -707,7 +707,8 @@ the set of variables in an @tech{info field}.
 
 Next, we assign homes for all the @tech{abstract locations}.
 For now, our strategy is trivial: we assign each @tech{abstract location} a
-fresh @tech{frame variable}.
+@tech{fresh} @tech{frame variable}.
+A @deftech{fresh} variable is one that is globally unique, unused anywhere else in the program.
 
 We capture this information in a new @tech{info field}, described in
 @deftech{Asm-lang-v2/assignments}.

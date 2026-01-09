@@ -639,8 +639,8 @@ call).
 the chosen @variable to the result of the recursive call.}
 @item{Otherwise, we cannot assign the chosen @variable to a register.
 Instead, we @emph{spill it}, @ie we assign it a @ch2-tech{frame variable}.
-We can assign a @ch2-tech{fresh variable}, but we can reduce memory usage by
-trying to assign a non-conflicting @ch2-tech{frame variable}.
+We can assign a @ch2-tech{fresh} variable, but we can reduce memory usage by
+trying to assign an existing but non-conflicting @ch2-tech{frame variable}.
 }
 ]}
 ]

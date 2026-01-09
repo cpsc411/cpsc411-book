@@ -140,7 +140,7 @@ frame variables, we'll need to introduce new low-level abstraction.
 Our run-time system will also need to provide access to the heap memory in some
 way.
 
-@section{Implementing Structured Data}
+@section{Structured Data}
 @;Now we have all the abstractions necessary to implement structured data.
 @;
 @;We design a new @deftech{Exprs-unsafe-data-lang v8} below.
@@ -203,7 +203,7 @@ These are two very commonly used data types, so we assign them @ch7-tech{primary
 tags}.
 Here is our updated list of @ch7-tech{primary tags}:
 @itemlist[
-@item{@code{#b000}, @tech{fixnums}, fixed-sized integers}
+@item{@code{#b000}, @ch7-tech{fixnums}, fixed-sized integers}
 @item{@code{#b001}, @tech{pairs}}
 @item{@code{#b010}, @emph{unused}}
 @item{@code{#b011}, @tech{vectors}}

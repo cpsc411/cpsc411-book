@@ -535,7 +535,7 @@ on @tech{ptrs} are easily expressed as algebraic expressions.
 For example, the expression @exprs-lang-v7[(call fixnum? 7)] is compiled to as
 @exprs-bits-lang-v7[(= (bitwise-and 7 #b111) #b000)].
 
-Thankfully, we just added @tech{algebraic expressions}.
+Thankfully, we just added @ch-ae-tech{algebraic expressions}.
 If we position our new passes @emph{above} @racket[remove-complex-opera*], we
 don't need to manually introduce auxiliary variables, or generate code with
 additional let-bindings.

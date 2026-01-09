@@ -154,7 +154,7 @@ then there exists @racket[(p-append _p_1 _p_2)] (for some definition of
 executes the instructions in @metavar{p_2}.
 
 Below, we select the subset of @ch1-tech{x64} instructions we plan to support
-in our @tech{compiler}, but note that the abstraction of @tech{instruction
+in our @ch1-tech{compiler}, but note that the abstraction of @tech{instruction
 sequences} applies to all @ch1-tech{x64} instructions.
 
 @itemlist[

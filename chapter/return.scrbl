@@ -1591,7 +1591,8 @@ Other assignments to @nested-asm-lang-v6[fbp] are invalid programs.
 This means we don't have to consider complicated data flows into
 @nested-asm-lang-v6[fbp].
 
-The source language for @racket[implement-fvars], @deftech{Nested-asm-lang-fvars v6},
+@todo{Nested-asm-lang-fvars v6 already introduced}
+The source language for @racket[implement-fvars], @tech{Nested-asm-lang-fvars v6},
 is defined below typeset with respect to @deftech{Nested-asm-lang v5}.
 
 @bettergrammar*-ndiff[
@@ -1746,15 +1747,6 @@ blocks into labeled instructions.
 The only two passes that should require changes are @racket[patch-instructions]
 and @racket[generate-x64].
 The languages change only in minor ways.
-
-@deftech{Para-asm-lang v6} is defined below.
-
-@bettergrammar*-ndiff[
-#:labels ("Diff vs v5" "Diff vs Source" "Para-asm-lang v6")
-(#:exclude (triv opand trg reg relop int64) para-asm-lang-v5 para-asm-lang-v6)
-(#:exclude (triv opand trg loc relop int64 binop) block-asm-lang-v6 para-asm-lang-v6)
-(para-asm-lang-v6)
-]
 
 @racket[patch-instructions] should be updated to work over
 @para-asm-lang-v6[addr]s instead of @nested-asm-lang-fvars-v6[fvars]s.

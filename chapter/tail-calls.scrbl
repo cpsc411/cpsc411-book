@@ -462,7 +462,8 @@ We start by extending the first few passes down to @racket[normalize-bind].
 
 @section{Extending front-end with support for call}
 
-We start by formally defining @deftech{Values-lang v5}, the new source language.
+@todo{This was already introduced}
+We start by formally defining @tech{Values-lang v5}, the new source language.
 We typeset the difference compared to @ch4-tech{Values-lang v4}.
 
 @bettergrammar*-ndiff[

@@ -113,7 +113,7 @@ that the compiler needs to make use of to implement procedure calls.
 
 Every instance of @exprs-lang-v9[lambda] compiles to a procedure.
 The procedure now has three pieces of information: its arity for dynamic
-checking; the label to its @deftech{code}, the computation it executes when
+checking; the label to its @tech{code}, the computation it executes when
 invoked; and its @deftech{environment}, the values of the free variables used in
 the definition of the procedure.
 We compile each application of a procedure to dereference and call the label of
@@ -596,7 +596,7 @@ blocks of code.
 Unfortunately, now our first-class procedures can contain references to
 @tech{free} variables in their lexical scope.
 This means we cannot simply lift first-class @tech{procedure} definitions to the
-top-level, stick on a label, and generate a labeled @ch6-tech{procedure}.
+top-level, stick on a label, and generate a labeled @ch5-tech{procedure}.
 
 First, we uncover the @tech{free} variables in each @lam-free-lang-v9[lambda].
 We add these as an annotation on the @lam-free-lang-v9[lambda], which the next
@@ -649,7 +649,7 @@ contribute to the free variable set for the context surrounding the
 After we know the @tech{free} variables, we make @tech{closures} explicit.
 
 Strictly speaking, all the previous languages had
-@deftech{closures}---procedures that (implicitly) close over their lexical
+@tech{closures}---the procedures (implicitly) closed over their lexical
 environment.
 However, our earlier languages forbid us from ever creating procedures that had
 a non-empty environment, so all our @tech{closures} were trivial to compile
@@ -844,7 +844,7 @@ Implement @tech{closures} in terms of the procedure data structure.
 Finally, we need to implement the procedure data type.
 It is intentionally designed to be similar to the vector data type.
 
-The target language is @tech{Exprs-bits-lang v8}, which is unchanged
+The target language is @ch8-tech{Exprs-bits-lang v8}, which is unchanged
 from the previous chapter.
 
 @bettergrammar*-ndiff[
