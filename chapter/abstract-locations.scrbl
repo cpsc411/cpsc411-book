@@ -279,17 +279,25 @@ in this way is a common tool we will use.
 
 To use the stack, the run-time system must initialize
 @racket[current-frame-base-pointer-register].
-On systems following the SYS V ABI, @paren-x64-v2[rsp] is initialized the @emph{end} of
-the virtual memory space, so we can create a simple run-time system by
-copying @paren-x64-v2[rsp] into
-@paren-x64-v2[#,(current-frame-base-pointer-register)], and growing down from
-there will access unused memory.
+On systems following the SYS V ABI (including Linux and macOS on x64),
+@paren-x64-v2[rsp] is the initial stack pointer, and points to final element of
+the virtual address space.
+By subtracting from it, we can find new unallocated stack space.
+Initially, the stack contains some data passed by the operation system.
+@paren-x64-v2[(rsp + 0)] contains the argument count (@tt{argc}) of arguments
+passed to the process, with each stack slot above it containing a pointer to an
+argument.
+That is, @paren-x64-v2[(rsp + 8)] contains a pointer to the first argument to the
+process, @paren-x64-v2[(rsp + 16)] the second, @emph{etc}.
+This mean we can create a simple run-time system by copying @paren-x64-v2[(rsp -
+8)] into @paren-x64-v2[#,(current-frame-base-pointer-register)], and growing
+down from there will access unused memory.
 
 @margin-note*{
 We provide such a run-time system in @racketmodname[cpsc411/2c-run-time].
-The run-time system provides a default stack of size 8 megabytes.
-This should be enough for now, but if it's not, you can use the
-@racket[parameter?] @racket[current-stack-size] to increase it.
+@;The run-time system provides a default stack of size 8 megabytes.
+@;This should be enough for now, but if it's not, you can use the
+@;@racket[parameter?] @racket[current-stack-size] to increase it.
 
 Our run-time system also prints the value of @paren-x64-v2[rax] to the
 screen, instead of returning it via an exit code, and does the work of
