@@ -190,10 +190,10 @@ So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on x64.
 }
 
 For example, if @tt{rbp} holds a memory address, we can move the value
-@tt{42} to that memory address using the instruction
-@tt{mov QWORD [rbp - 0], 42}.
+@tt{42} to just below that memory address using the instruction
+@tt{mov QWORD [rbp - 8], 42}.
 We can move the value from memory into the register @tt{rax} using the
-instruction @tt{mov rax, QWORD [rbp - 0]}.
+instruction @tt{mov rax, QWORD [rbp - 8]}.
 
 Note that a @tt{mov} instruction to an address can only move 32-bit integer
 literals.
@@ -211,16 +211,24 @@ values, we increment pointers in multiples of 8.
 For example, the following snippet of code moves two values into memory, then
 pulls them out and adds them.
 @verbatim{
-mov QWORD [rbp - 0], 21
 mov QWORD [rbp - 8], 21
-mov rax, QWORD [rbp - 8]
-mov rbx, QWORD [rbp - 0]
+mov QWORD [rbp - 16], 21
+mov rax, QWORD [rbp - 16]
+mov rbx, QWORD [rbp - 8]
 add rax, rbx
 }
 
 These accesses grow @emph{downwards}, subtracting from the base pointer rather
 than adding, following common conventions about how stack memory is used.
 This is an arbitrary choice, but we choose to follow the convention.
+They also exclusive use @emph{negative} offsets, avoiding the 0 offset.
+@margin-note{
+This follows the convention for the SYS V ABI, where local variables must be
+stored in negative offsets from the stack.
+Non-negative offsets (including the current stack base pointer) can include
+data already, and by default will include process arguments from the operating
+system.
+}
 
 The new version of @deftech{Paren-x64 v2} (@racket[paren-x64-v2]) is below.
 
@@ -241,12 +249,14 @@ the start of the current stack frame, which is stored in the parameter
 @paren-x64-v2[#,(current-frame-base-pointer-register)] by default.
 An @paren-x64-v2[addr] may only be used with the
 @racket[current-frame-base-pointer-register] as its first operand.
-The offset of each @paren-x64-v2[addr] is restricted to be an integer that is
-divisible by 8, the number of bytes in a machine word in @ch1-tech{x64}.
+The offset of each @paren-x64-v2[addr] is restricted to be an integer greater
+than 0 that is divisible by 8, the number of bytes in a machine word in
+@ch1-tech{x64}.
 This ensures all memory accesses are machine-word aligned, meaning we leave
 space for all bytes in the word between each access.
-Note that the offset is @emph{negative}; we access the stack backwards,
-following the @ch1-tech{x64} "stack grows down" convention.
+Note that the offset must be interpreted as @emph{negative} offset from the base
+pointer; we access the stack backwards, following the @ch1-tech{x64} "stack
+grows down" convention.
 @todo{introduce this convention}
 
 All languages in our compiler assume that the uses of
@@ -257,8 +267,10 @@ Pointer arithmetic, such as @paren-x64-v2[(set! rbp (+ rbp opand))], is allowed
 only when the @paren-x64-v2[opand] is a @racket[dispoffset?].
 Incrementing the pointer beyond its initial value given by the run-time system
 is forbidden.
-We do not try to enforce these statically, since it may be impossible to do so
-in general.
+Using a @paren-x64-v2[dispoffset] of 0 or a negative number (resulting in a
+positive access) is forbidden.
+We do not try to enforce all of these statically, since it may be impossible to
+do so in general.
 
 @digression{
 The language is parameterized by the @racket[current-frame-base-pointer-register].
@@ -379,11 +391,12 @@ We replace the @paren-x64-v2[addr], the @tech{displacement mode operand}, with
 the abstraction of an @paren-x64-fvars-v2[fvar],
 which represents a unique location on the frame, relative to the current value
 of @racket[current-frame-base-pointer-register].
-These are written as the symbol @racket[fv] followed by a
-number indicating the slot on the frame.
-For example @paren-x64-fvars-v2[fv1] is the frame variables indicating the
-first slot on the frame.
-Frame variables are distinct from registers and abstract locations.
+These are written as the symbol @racket[fv] followed by a number indicating the
+slot on the frame, where the 0th slot is
+@paren-x64-v2[addr] @paren-x64-v2[fbp - 8].
+For example @paren-x64-fvars-v2[fv1] is the @tech{frame variable} indicating the
+first slot on the frame, which corresponds to @paren-x64-v2[addr] @paren-x64-v2[fbp - 16].
+@tech{Frame variables} are distinct from registers and abstract locations.
 The number represents the index into the frame for the current function.
 
 @todo{
