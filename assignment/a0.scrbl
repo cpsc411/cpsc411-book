@@ -21,7 +21,7 @@ You should have a git repository created for you at @url{https://github.students
 @item{Ensure you have a CSID: @url{https://www.cs.ubc.ca/getacct/}.}
 @item{Either:
   @itemlist[
-  @item{Connect to @tt{ssh://remote.students.cs.ubc.ca}, or}
+  @item{Connect to @exec{ssh://remote.students.cs.ubc.ca}, or}
   @item{Setup a 64-bit Linux (virtual) machine for local development}
   ]
 }
@@ -31,7 +31,7 @@ You should have a git repository created for you at @url{https://github.students
 @item{Compile and execute fact.s from the command line.}
 @item{Compile and execute fact.s from Racket.}
 @item{Test submission process.}
-@item{Install and test @tt{cpsc411-lib}.}
+@item{Install and test @exec{cpsc411-lib}.}
 ]
 
 @section{Language Diagram}
@@ -71,7 +71,7 @@ week, so we have no previous languages, and no previous compiler.
 We therefore start from someone else's languages and compiler.
 For the source language, we pick @ch1-tech{x64}.
 For the target, we choose @ch1-tech{bin64}.
-Thankfully, someone has already written a compiler, called @tt{nasm}, from
+Thankfully, someone has already written a compiler, called @exec{nasm}, from
 @ch1-tech{x64} to @ch1-tech{bin64} for most machines.
 You can read more about these languages in @Secref[#:tag-prefixes
 '("book:" "chp1:")]{top}.
@@ -93,26 +93,26 @@ You can connect via SSH using the username setup at
 @url{https://www.cs.ubc.ca/getacct/}.
 
 The remote machines have Racket 8.15 installed.
-To access the v8.15 Racket, add @tt{/home/c/cs-411/racket-v8-15/bin} to your path.
+To access the v8.15 Racket, add @exec{/home/c/cs-411/racket-v8-15/bin} to your path.
 Remember that you must prepend this to the path, in order for this version to
 take precedence.
-For example, type this in a shell or add it to your profile file such as @tt{.bash_profile}:
-@tt{export PATH="/home/c/cs-411/racket-v8-15/bin:$PATH"}.
+For example, type this in a shell or add it to your profile file such as @exec{.bash_profile}:
+@exec{export PATH="/home/c/cs-411/racket-v8-15/bin:$PATH"}.
 You will need to add this to a profile file, unless you want to run the command
 manually each time you connect to remote.
 
-If you want a local development environment, you can use the @tt{Dockerfile}
+If you want a local development environment, you can use the @exec{Dockerfile}
 found in your git repository to set up a development container that mirrors
 @url{remote.students.cs.ubc.ca}.
 This will install a container with all the appropriate build tools and version.
 We recommend editing the compiler assignment files in the host machine,
 mounting them in the Docker container, and running tests in the container.
-You can create a new image using @tt{docker image build -t cpsc411 .} from your
-git repository with the @tt{Dockerfile}.
+You can create a new image using @exec{docker image build -t cpsc411 .} from your
+git repository with the @exec{Dockerfile}.
 Assuming your compilers assignments are stored in the path
-@tt{~/workspace/}, you can launch a new container with access to your
-assignments via @tt{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
-You can use docker compose via @tt{docker-compose run cpsc411}, which should
+@exec{~/workspace/}, you can launch a new container with access to your
+assignments via @exec{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
+You can use docker compose via @exec{docker-compose run cpsc411}, which should
 automate all of the above.
 
 Whichever you choose, the following exercises will make sure your machine is
@@ -139,7 +139,7 @@ and check that a message like "NASM version 2.14.02" is printed and that the
 version is at least "2.13".
 }
 
-Now you should be able to create and compile the following file @hyperlink["fact.s"]{@tt{fact.s}}.
+Now you should be able to create and compile the following file @hyperlink["fact.s"]{@exec{fact.s}}.
 
 @nasm-example[
 #:file-name "fact.s"
@@ -171,7 +171,7 @@ exit:
   syscall
 }
 
-@exercise{Compile and execute @tt{fact.s} from the command line. You should observe
+@exercise{Compile and execute @exec{fact.s} from the command line. You should observe
 @code{120} as the exit code.}
 
 
@@ -180,14 +180,14 @@ file from Racket using @racket[system] or @racket[system/exit-code] to make
 calls to command line programs from Racket.
 This is how the last pass of the compiler will translate your code into an
 executable, and how you will test your compiler from Racket.
-The file @tt{fact.rkt} demonstrates how to do this with the above assembly
+The file @exec{fact.rkt} demonstrates how to do this with the above assembly
 program.
 
 @exercise{
-Modify and run the @tt{fact.rkt} file to ensure the test passes, using @tt{raco
+Modify and run the @exec{fact.rkt} file to ensure the test passes, using @exec{raco
 test fact.rkt}.
-When you're done, commit the changes to @tt{fact.rkt}, and make sure to push to
-@tt{assignment-0} branch of the git repository we created for you.
+When you're done, commit the changes to @exec{fact.rkt}, and make sure to push to
+@exec{assignment-0} branch of the git repository we created for you.
 
 It is your responsibility to make sure the final commit to that branch is the
 right one; use good software development practices and avoid merging to that
@@ -199,21 +199,21 @@ Other commits will not be graded.
 We will be attempting to grade using GradeScope, and milestones may include an
 autograder.
 You can manually submit by logging in to GradeScope using the email
-@tt{CWL@"@"student.ubc.ca}, and uploading a ZIP archive created from your
-git repo using @tt{git archive -o submission.zip assignment-0}.
+@exec{CWL@"@"student.ubc.ca}, and uploading a ZIP archive created from your
+git repo using @exec{git archive -o submission.zip assignment-0}.
 You will be able to see some information from the autograder after submitting.
 
 Regardless of whether you submit or not, we'll automatically submit your final
-commit prior to the deadline from the @tt{assignment-0} branch.
+commit prior to the deadline from the @exec{assignment-0} branch.
 You are not required to submit manually, and submitting manually does not affect
 which commit we grade.
 }
 
 @exercise{
 Future assignments rely on the @racketmodname[cpsc411/compiler-lib] package.
-To make sure this is installed, run @tt{raco pkg install --user --auto https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2025w2}.
-To check this is installed correctly, run @tt{raco test -p cpsc411-lib}.
-You should see a lot of files run, followed by @tt{25 tests passed}.
+To make sure this is installed, run @exec{raco pkg install --user --auto https://github.com/cpsc411/cpsc411-pub.git?path=cpsc411-lib#2025w2}.
+To check this is installed correctly, run @exec{raco test -p cpsc411-lib}.
+You should see a lot of files run, followed by @exec{25 tests passed}.
 }
 
 @section{x64 References}
