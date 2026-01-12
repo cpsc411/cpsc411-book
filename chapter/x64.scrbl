@@ -166,7 +166,8 @@ The meaning of any program is simply the value or sequences values of each expre
 This meaning gives us a fairly accurate understanding of what happens when we run the program.
 We run this and the computer prints @code{120}, the value of program.
 
-We can implement the equivalent computation in @tech{x64} as follows.
+We can implement the a similar computation in @tech{x64} as follows.
+The computations are similar in the sense they both compute factorial, but how they compute is quite different.
 @margin-note{@tech{x64} actually supports at least two syntaxes.
 We use Intel assembler syntax, as it maps more closely to familiar imperative
 language syntax.}
