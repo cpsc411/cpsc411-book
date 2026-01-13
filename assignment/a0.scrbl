@@ -87,10 +87,13 @@ This account will be your GradeScope account and your account on
 If you're running your own Linux machine, I trust you can figure out how to
 install @exec{racket} and @exec{nasm}.
 
-If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca},
-which has the correct version of @exec{nasm} and @exec{racket}.
+If you don't have a Linux machine, you can use @url{remote.students.cs.ubc.ca}
+or a Docker image described below.
+The @exec{remote.students} machines have the correct version of @exec{nasm} and
+@exec{racket}.
 You can connect via SSH using the username setup at
 @url{https://www.cs.ubc.ca/getacct/}.
+You may need to be connected to the VPN to connect via @exec{ssh}.
 
 The remote machines have Racket 8.15 installed.
 To access the v8.15 Racket, add @exec{/home/c/cs-411/racket-v8-15/bin} to your path.
@@ -107,13 +110,26 @@ found in your git repository to set up a development container that mirrors
 This will install a container with all the appropriate build tools and version.
 We recommend editing the compiler assignment files in the host machine,
 mounting them in the Docker container, and running tests in the container.
-You can create a new image using @exec{docker image build -t cpsc411 .} from your
-git repository with the @exec{Dockerfile}.
+
+On a x86-64 machine, you can create a new image using @exec{docker image build
+-t cpsc411 .} from your git repository with the @exec{Dockerfile}.
 Assuming your compilers assignments are stored in the path
 @exec{~/workspace/}, you can launch a new container with access to your
 assignments via @exec{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
 You can use docker compose via @exec{docker-compose run cpsc411}, which should
 automate all of the above.
+
+On other machines, such as Apple's M series chips or other ARM machines, you
+need to explicitly enable virtualization of the platform.
+Use the command build command @exec{docker image build -t cpsc411 . --platform=linux/amd64}.
+You may also need to enable or change virtual machines options instruction set
+in Docker.
+Particularly on macOS, we've had reports that the default virtualization causes
+an error while installing Racket, which reports @exec{Error: error reading from
+~a ("petite")}.
+To fix this, change the Docker virtual machine options to use Docker VMM or
+QEMU, in @exec{Settings -> General -> Virtual Machine Options} in Docker
+Desktop.
 
 Whichever you choose, the following exercises will make sure your machine is
 set up and working properly.
