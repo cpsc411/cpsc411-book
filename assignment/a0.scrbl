@@ -116,12 +116,13 @@ On a x86-64 machine, you can create a new image using @exec{docker image build
 Assuming your compilers assignments are stored in the path
 @exec{~/workspace/}, you can launch a new container with access to your
 assignments via @exec{docker run -i -t -v ~/workspace:/app/workspace cpsc411}.
-You can use docker compose via @exec{docker-compose run cpsc411}, which should
+You can use docker compose via @exec{docker compose run cpsc411}, which should
 automate all of the above.
 
 On other machines, such as Apple's M series chips or other ARM machines, you
 need to explicitly enable virtualization of the platform.
-Use the command build command @exec{docker image build -t cpsc411 . --platform=linux/amd64}.
+Use the command build command @exec{docker image build -t cpsc411 .
+--platform=linux/amd64}; this should happen automatically using @exec{docker compose}.
 You may also need to enable or change virtual machines options instruction set
 in Docker.
 Particularly on macOS, we've had reports that the default virtualization causes
