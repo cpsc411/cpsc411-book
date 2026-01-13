@@ -604,10 +604,11 @@ dummy: db 0
 
 To compile this file, we run @exec{nasm -f macho64 exit-fact-x64-macos.s exit-fact-x64-macos.o}.
 @tt{macho64} is the binary formatted used by 64-bit macOS.
-To link, we run @exec{ld -macosx_version_min 10.6 -e start -o
+To link, we run @exec{ld -static -e start -o
 exit-fact-x64-macos.exe exit-fact-x64-macos.o}.
-We need to specify a minimum macOS version number of 10.6, otherwise the linker
-will ignore the custom entry label and fail to link.
+We need to specify @exec{-static}, which forces macOS to turn off features such
+as position independent code (which can cause problems when using @exec{mov}
+with labels), disables dynamic linking, and allows using a custom entry label.
 We can execute the file @tt{exit-fact-x64-macos.exe} on the command line
 in the usual way, and can get the result of the exit code using @exec{echo $?}
 or @exec{echo $status}, depending on your shell.

@@ -156,9 +156,10 @@
     ['unix
      @~a{> ld -e start -o @|name.exe| @|name.o|}]
     ['macosx
-     ;; no_pie needed until we switch to position independent code, using lea
+     ;; -static needed until we switch to position independent code, using lea
      ;; instead of mov to function/static data pointers
-     @~a{> ld -no_pie -macosx_version_min 10.6 -e start -o @|name.exe| @|name.o|}]
+     ;; implies no_pie, and static linking compatibility things.
+     @~a{> ld -static -e start -o @|name.exe| @|name.o|}]
     ['windows
      @~a{> golink /entry Start /fo @|name.exe| @|name.o| kernel32.dll}]))
 
