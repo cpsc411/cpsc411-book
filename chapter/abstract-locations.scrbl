@@ -2,6 +2,7 @@
 
 @(require
   "../assignment/assignment-mlang.rkt"
+  "diagrams/sys-v-stack.rkt"
   scriblib/figure
   cpsc411/langs/v1
   cpsc411/langs/v2
@@ -277,11 +278,16 @@ This language is not sufficiently abstract yet, but using parameterized language
 in this way is a common tool we will use.
 }
 
+
 To use the stack, the run-time system must initialize
 @racket[current-frame-base-pointer-register].
 On systems following the SYS V ABI (including Linux and macOS on x64),
 @paren-x64-v2[rsp] is the initial stack pointer, and points to final element of
 the virtual address space.
+We can visualize this as in @Figure-ref{fig:sysv-stack}.
+
+@figure["fig:sysv-stack" @elem{The SYS V Initial Process Stack} sys-v-stack-diagram]
+
 By subtracting from it, we can find new unallocated stack space.
 Initially, the stack contains some data passed by the operation system.
 @paren-x64-v2[(rsp + 0)] contains the argument count (@tt{argc}) of arguments
@@ -389,10 +395,20 @@ which represents a unique location on the frame, relative to the current value
 of @racket[current-frame-base-pointer-register].
 These are written as the symbol @racket[fv] followed by a
 number indicating the slot on the frame.
-For example @paren-x64-fvars-v2[fv1] is the frame variables indicating the
-first slot on the frame.
-Frame variables are distinct from registers and abstract locations.
+Conceptually, frame variables let us treat the stack frame like a normal 0-indexed array.
+For example @paren-x64-fvars-v2[fv0] is the frame variable indicating the
+current frame pointer and 0th slot in the frame, with @paren-x64-fvars-v2[fv1]
+the next word sized slot, and so on.
+We can visualize frame variables relative to the stack as in @Figure-ref{fig:fvar-stack}.
 The number represents the index into the frame for the current function.
+Frame variables are distinct from registers and abstract locations.
+
+@figure[
+"fig:fvar-stack"
+"Frame variables relative to the process stack"
+frame-var-diagram
+]
+
 
 @todo{
 The @share{a6-compiler-lib.rkt} defines a few helpers for working with frame
