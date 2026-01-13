@@ -11,6 +11,7 @@
   (for-label (except-in cpsc411/reference/a2-solution check-paren-x64))
   (for-label (only-in cpsc411/reference/a1-solution check-paren-x64))
   (for-label (except-in cpsc411/compiler-lib compile))
+  (for-label cpsc411/2c-run-time)
   #;(except-in "abstracting-boilerplate.scrbl" doc))
 
 @(provide
@@ -311,7 +312,7 @@ converting numbers to ASCII strings.
 The @racket[execute] function uses @racket[nasm-run/read] to parse printed
 output into a Racket datum.
 If you're interested in how this is done, you can read the definition of
-@racket[wrap-x86-64-run-time].
+@racket[wrap-x64-run-time].
 
 We assume that this run-time system is used until we introduce data types, which
 require additional run-time support.
