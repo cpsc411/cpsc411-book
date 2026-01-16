@@ -12,7 +12,7 @@ Instead, it's meant to be forked and modified to fit your course.
 This collection can be easily built into a website with added notes and pages,
 or built as a PDF (TODO).
 
-The "official" version of this used in the course is built here: https://www.students.cs.ubc.ca/~cs-411/
+The "official" version of this used in the course is built here: https://www.students.cs.ubc.ca/~cs-411/2025w2/
 
 My temporary working version is built here: https://www.williamjbowman.com/tmp/compilers/
 
