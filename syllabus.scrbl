@@ -439,10 +439,10 @@ you have a plan to get your project back on track.
 If you miss a milestone deadline, you receive no feedback, and it does not
 directly impact your grade.
 
-At every milestone deadline, you are required to submit a milestone reflection.
-The reflection will include what you worked on for that milestone (even if the answer is "nothing"), and a declaration of how your group collaborated.
-This milestone must be submitted and missing it without a reason will result in a 10% loss in your final project score.
-It will be unusual to need an excuse to miss this, and submitting the reflection should take less time than requesting to be excused.
+At every group milestone deadline, you are required to submit a milestone reflection.
+As these reflections can be very short, it will be unusual to need an excuse to
+miss this, and submitting the reflection should take less time than requesting
+to be excused.
 
 @subsection{Project Evaluation}
 The project, the compiler you write through this course, will be divided into
@@ -450,6 +450,12 @@ approximately 10 milestone.
 At the end of the semester, your entire compiler will be thoroughly tested and
 hand-graded for design elements.
 This will constitute the entire project grade.
+
+At each group milestone "deadline", you must be submit a short milestone reflection via GradeScope.
+The reflection will include what you worked on for that milestone (even if the
+answer is "nothing"), and a declaration of how your group collaborated.
+Missing this deadline without a reason will result in a 10% loss in your final
+project score, under the assumption you did not contribute to that milestone.
 
 You are required to complete the first 8 milestones to pass the course project,
 but you may choose to stop any time after completing milestone 8.
