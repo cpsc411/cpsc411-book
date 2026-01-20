@@ -14,6 +14,7 @@
 
 (define url-root (string-append "https://www.students.cs.ubc.ca/~cs-411/" semester))
 
+;; Actually, there is a recursive binding construct
 ;;
 ;; NOTE: The key name is meaningful.
 (define deadline-dict
