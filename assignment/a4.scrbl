@@ -23,7 +23,7 @@ provide abstractions for using them in the source language, compile the latter
 abstraction to the former implementation, and practice reasoning about our new
 source language.
 
-This milestone is due @(due 'a4).
+This milestone is due @(due 'milestone-4).
 
 You can use the interrogator to get limited access to the reference solution:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a4}.

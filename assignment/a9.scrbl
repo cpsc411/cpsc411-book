@@ -18,7 +18,7 @@ the procedure's definition.
 We add @exprs-lang-v9[lambda] as a first-class value in the source language, which
 can create a procedure at any point in the program.
 
-This assignment is due @(due 'a9).
+This assignment is due @(due 'milestone-9).
 
 You can use the interrogator to get limited access to the reference solution:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a9}.

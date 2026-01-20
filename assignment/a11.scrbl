@@ -12,7 +12,7 @@ The goal of this assignment is to (1) give you a chance to polish your compiler
 and learn from past mistakes (2) give you time to review the lessons of the past
 milestones prior to the final.
 
-This assignment is due @(due 'a11).
+This assignment is due @(due 'milestone-11).
 There are no extensions on this assignment; the late policy does not apply.
 
 @;At the deadline, we will regrade your final milestone code base.

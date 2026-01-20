@@ -21,7 +21,7 @@ compile a designed feature top-down.
 We'll introduce an abstraction and consider how to design translations to lower
 the new an abstraction to existing features.
 
-This milestone is due @(due 'a5).
+This milestone is due @(due 'milestone-5).
 
 @todo{Design component?}
 

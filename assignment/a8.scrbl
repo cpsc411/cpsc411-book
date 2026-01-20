@@ -34,7 +34,7 @@ We will add cons pairs and vectors.
 We will extend our tagged object representation to distinguish these data
 types dynamically.
 
-This assignment is due @(due 'a8).
+This assignment is due @(due 'milestone-8).
 
 You can use the interrogator to get limited access to the reference solution:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a8}.

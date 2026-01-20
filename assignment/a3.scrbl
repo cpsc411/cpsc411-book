@@ -23,7 +23,7 @@ In this assignment, you will replace the @racket[assign-homes] pass with
 @racket[assign-homes-opt], a version that tries hard to put variables into
 registers instead of in the frame.
 
-This assignment is due @(due 'a3).
+This assignment is due @(due 'milestone-3).
 
 You can use the interrogator to get limited access to the reference solution:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a3}.

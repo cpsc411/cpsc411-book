@@ -18,7 +18,7 @@ The goal of this assignment is to introduce the procedure return abstraction and
 non-tail calls, so that we can call functions that return values to non-tail
 contexts.
 
-This assignment is due @(due 'a6).
+This assignment is due @(due 'milestone-6).
 
 You can use the interrogator to get limited access to the reference solution:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a6}.

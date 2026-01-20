@@ -23,7 +23,7 @@ In this assignment, you will implement a small abstraction layer on top of
 v1}, which allows easily writing a subset of @ch1-tech{x64} programs while
 ignoring some of the boilerplate and operating-system-specific details.
 
-This milestone is due @(due 'a1).
+This milestone is due @(due 'milestone-1).
 
 You should start from the @tt{milestone-1} branch of the @tt{cpsc411-skeleton}
 repository.

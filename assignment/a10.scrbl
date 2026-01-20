@@ -20,7 +20,7 @@ The goal of this milestone is to add syntactic sugar to our language.
 @;This isn't really related to recursive data, but the assignment is small if we
 @;don't merge the two separate goals into a single milestone.
 
-This assignment is due @(due 'a10).
+This assignment is due @(due 'milestone-10).
 
 You can use the reference solution here:
 @url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a10}
