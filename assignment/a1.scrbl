@@ -137,7 +137,7 @@ system.
 @racket[sys-exit], that are helpful for this.
 
 Note that a similarly named function exists in that library, but will not
-correctly implement the run-time system for this milestone.
+correctly implement the @ch-bp-tech{run-time system} for this milestone.
 
 For formatting strings in Racket, you may want to investigate @racket[format],
 @racket[~a], and @racketmodname[at-exp].
@@ -154,7 +154,7 @@ running the same programs through your interpreter and through your compiler and
 comparing the results.
 
 While testing, you may want to avoid hard-coding values modulo 256, as the
-run-time system may change in later iterations to return values directly.
+@ch-bp-tech{run-time system} may change in later iterations to return values directly.
 
 You can test your implementation against the reference interpreter,
 @racket[interp-paren-x64-v1].

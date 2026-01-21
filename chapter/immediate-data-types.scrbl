@@ -158,21 +158,21 @@ empty list, the void object, (printable) ASCII character literals, and an error
 value indicating an exit code.
 @margin-note{We restrict ASCII characters to the printable ones, so we don't
 have to figure out how to print non-printable characters.
-The run-time system will work with some non-printable characters, but the
+The @ch-bp-tech{run-time system} will work with some non-printable characters, but the
 results will not be converted to Racket properly.
 }
 
 We want to allow @tech{Exprs-lang v7} programs to return any of these values,
-which requires additional support from the run-time system.
-The run-time system must be able to distinguish these different values in order
+which requires additional support from the @ch-bp-tech{run-time system}.
+The @ch-bp-tech{run-time system} must be able to distinguish these different values in order
 to pretty print or otherwise return them to the user (such as via an exit code
 in the case of the error value).
 This means our run-time representation of values cannot just be 64-bit machine
-integers; we need some way for the run-time system to differentiate values
+integers; we need some way for the @ch-bp-tech{run-time system} to differentiate values
 dynamically.
 
 @margin-note{
-The support libraries include an implementation of this new run-time system in
+The support libraries include an implementation of this new @ch-bp-tech{run-time system} in
 @racketmodname[cpsc411/ptr-run-time], which supports pretty printing all the new
 values.
 @racketmodname[cpsc411/compiler-lib] also contains parsers for the values.
@@ -210,7 +210,7 @@ These don't necessarily need to be dynamic checks, as long as they are somehow
 expressible by the compiler, whether as expressions that dynamically check or
 meta-data that is statically checked.
 However, even in a statically typed language, we may need some ability for the
-run-time system to distinguish different kinds of data dynamically.
+@ch-bp-tech{run-time system} to distinguish different kinds of data dynamically.
 
 Depending on how these type checks are implement, this alone is enough to let us
 implement different data types safely.

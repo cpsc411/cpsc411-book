@@ -119,7 +119,7 @@ error-prone process if that snippet ever needs to change.
 
 We could solve this problem by allowing the programmer to focus on writing and
 composing sequences of instructions, by giving those sequences meaning
-independent of the boilerplate and the run-time system.
+independent of the boilerplate and the @tech{run-time system}.
 For example, a programmer should be able to write two sequences, separately:
 @verbatim{
 ;; Program 1
@@ -672,17 +672,17 @@ The structure of our compiler is determined partially by these levels of
 abstractions, both the source layer and the target layer.
 There are two pieces that need to be added to a @tech{Paren-x64 v1} program to
 make it a complete @ch1-tech{x64} program: (1) boilerplate, such as the declaration
-of the starting label and (2) the run-time system, which implements our
+of the starting label and (2) the @tech{run-time system}, which implements our
 convention for the meaning of @tech{instruction sequences}.
 
 We design our compiler as a series of compiler passes along these natural lines
 to separate concerns as much as possible.
 First, we translate from @tech{Paren-x64 v1} into the string representation of
 @tech{instruction sequences}.
-Then, we introduce the run-time system.
+Then, we introduce the @tech{run-time system}.
 Finally, we wrap the whole thing in boilerplate.
 This order is not arbitrary; it is dictated by our abstract layers.
-Implementing the run-time system requires instructions outside the subset used
+Implementing the @tech{run-time system} requires instructions outside the subset used
 by @tech{Paren-x64 v1}, so we must reach a lower level of abstraction to
 implement it.
 However, it can be implemented as an @tech{instruction sequence}, and we want to
@@ -732,7 +732,7 @@ result to the operating system.
 This code is a very simple @tech{run-time system}.
 
 The @deftech{run-time system} provides all run-time support required by the
-language but that that is not provided by the underlying machine.
+language but that is not provided by the underlying machine.
 Exactly what this run-time support is depends on the language.
 Typically, the language run-time provides memory allocation and deallocation,
 provides initialization of the process environment such as the stack, handles
@@ -741,7 +741,7 @@ programs in the language can expect to use.
 For @tech{Paren-x64 v1}, the only run-time support we require is returning the
 final value to the operating system and exiting.
 
-Our choice of run-time system depends on the abstractions provided by the
+Our choice of @tech{run-time system} depends on the abstractions provided by the
 language, the machine, the operating system, and the user interface we desire.
 Some languages print the final result.
 Some languages discard the final result, relying on the user program to print
@@ -749,16 +749,16 @@ the result, or modify the filesystem, or modify the state of the machine (or the
 world) in some other non-temporary way.
 
 Our language does not provide the user with any way to observe the state of the
-machine, so our run-time system must do the job of communicating the return
+machine, so our @tech{run-time system} must do the job of communicating the return
 value to the user.
 
 We could print the result, but as we saw in the factorial example above, the
 operating system's definition of "print" does not match our intuition.
 When trying to print "120", we get the character "x".
 This would make for a very confusing user interface, or a very complicated
-run-time system.
+@tech{run-time system}.
 
-Instead, we opt for a very simple run-time system: communicate via the operating
+Instead, we opt for a very simple @tech{run-time system}: communicate via the operating
 system exit code.
 This exit code is a number between 0 and 255 given to the exit system call, and
 is easily accessible in shells via the variable @tt{$?} (or @tt{$status} in
@@ -768,11 +768,11 @@ In Racket, we can access the exit code of a subprocess using
 This limits how much our programs can communicate; we will lift that restriction
 in later versions of our compiler.
 
-Our run-time system is an @ch1-tech{x64} @tech{instruction sequence} which
+Our @tech{run-time system} is an @ch1-tech{x64} @tech{instruction sequence} which
 expects to be composed after another @tech{instruction sequence}.
-The run-time system assumes that the first @tech{instruction sequence} must
+The @tech{run-time system} assumes that the first @tech{instruction sequence} must
 initialize @paren-x64-v1[rax].
-The run-time system then calls the @tt{exit} system call with the value of
+The @tech{run-time system} then calls the @tt{exit} system call with the value of
 @paren-x64-v1[rax] passed as the exit code.
 @racketmodname[cpsc411/compiler-lib] provides some definitions, such as
 @racket[sys-exit], that are helpful for this.
@@ -782,10 +782,10 @@ For formatting strings in Racket, you may want to investigate @racket[format],
 
 @nested[#:style 'inset
 @defproc[(wrap-x64-run-time [x string?]) string?]{
-Installs the @tech{Paren-x64 v1} run-time system.
+Installs the @tech{Paren-x64 v1} @tech{run-time system}.
 The input is the same as the output for @racket[generate-x64]: a
 string representing an @ch1-tech{x64} @tech{instruction sequence}.
-The run-time system is composed with the input as a second @tech{instruction
+The @tech{run-time system} is composed with the input as a second @tech{instruction
 sequence}.
 
 Note that in the string representation, string concatenation implements

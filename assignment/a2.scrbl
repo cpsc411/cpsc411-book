@@ -85,7 +85,7 @@ wrap-x64-run-time
 @;      assigned to @deftech{frame locations}.  These are locations in memory on
 @;      the @emph{stack frame}.  We'll talk about the stack and frames more in
 @;      class, but for now it suffices to think of it as some place in memory of
-@;      arbitrary size provided by the run-time system.  With access to memory,
+@;      arbitrary size provided by the @ch-bp-tech{run-time system}.  With access to memory,
 @;      the number of physical locations becomes large enough to be practically
 @;      infinite.
 @;
@@ -197,7 +197,7 @@ You may find the function @racket[fvar->index] helpful.
 @exercise{Remove your definitions of @racket[wrap-x64-boilerplate] and
 @racket[wrap-x64-run-time].
 These are now provided by @racketmodname[cpsc411/2c-run-time], since your
-run-time system is getting more complicated.
+@ch-bp-tech{run-time system} is getting more complicated.
 }
 
 @exercise{

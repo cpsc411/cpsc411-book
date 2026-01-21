@@ -7,7 +7,7 @@
 @title{Course Project Logistics}
 
 @section{Operating System Support}
-Our run-time system aims to support multiple operating systems, but this has not
+Our @ch-bp-tech{run-time system} aims to support multiple operating systems, but this has not
 been tested thoroughly.
 We therefore assume you are running on a Linux machine.
 Your compiler must produce code for x64 using Linux system calls.

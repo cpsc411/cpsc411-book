@@ -350,7 +350,7 @@ This happens either as the body of a @ch5-tech{procedure}, or as the initial
 
 @digression{
 This generalization lets us treat all @tech{returns}, including returning the
-final value to the run-time system, uniformly, and allows us to eliminate the
+final value to the @ch-bp-tech{run-time system}, uniformly, and allows us to eliminate the
 @asm-pred-lang-v5[halt] instruction.
 This isn't necessary; we could continue to support
 @asm-pred-lang-v5[halt] and treat the module-level @tech{entry point} separate
@@ -385,9 +385,9 @@ We reuse the @racket[current-return-value-register] as this designated register.
 Third, we need to explicitly return a value in @imp-cmf-lang-v6[tail] position.
 Previously, the final value in @imp-cmf-lang-v6[tail] position was also the final
 value of the program.
-This value was implicitly returned to the run-time system.
+This value was implicitly returned to the @ch-bp-tech{run-time system}.
 However, now, a value in @imp-cmf-lang-v6[tail] position may either be returned
-to the run-time system, or may be returned to some other computation from a
+to the @ch-bp-tech{run-time system}, or may be returned to some other computation from a
 non-tail call.
 We transform a value in @imp-cmf-lang-v6[tail] position by moving it into the
 @racket[current-return-value-register], and jumping to the @tech{return
@@ -756,10 +756,10 @@ Our compiler can never generate this code, and there is no reason to support it.
 
 The implicit return value, @imp-cmf-lang-v6[value] in @imp-cmf-lang-v6[tail]
 position, is no longer valid.
-Instead, the run-time system will set the first return address, and the final
-result of any computation is explicitly returned to the run-time system using
+Instead, the @ch-bp-tech{run-time system} will set the first return address, and the final
+result of any computation is explicitly returned to the @ch-bp-tech{run-time system} using
 the @ch5-tech{calling conventions}.
-The run-time system initializes the @racket[current-return-address-register] to
+The @ch-bp-tech{run-time system} initializes the @racket[current-return-address-register] to
 be the address of the exit procedure.
 
 To implement @tech{return}, we modify every @tech{entry point} to store the

@@ -569,7 +569,7 @@ We use the following heuristics to implement @racket[check-values-lang]:
   @item{Every procedure must return an @values-lang-v5[int64].}
 ]
 
-Finally, we have one restriction imposed by the run-time system: the final
+Finally, we have one restriction imposed by the @ch-bp-tech{run-time system}: the final
 result of the program must be an @values-lang-v5[int64].
 
 @nested[#:style 'inset

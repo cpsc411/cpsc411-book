@@ -137,7 +137,7 @@ perform dynamic checking, etc.
 
 Since our low-level languages don't have any operations on memory address except
 frame variables, we'll need to introduce new low-level abstraction.
-Our run-time system will also need to provide access to the heap memory in some
+Our @ch-bp-tech{run-time system} will also need to provide access to the heap memory in some
 way.
 
 @section{Structured Data}
@@ -278,7 +278,7 @@ This is relatively easy to achieve---most operating systems enable requesting
 aligned pointers, ensuring the 3 low-order bits are 0.
 We could also over-allocate, then find an address in the allocated range that is
 aligned properly to consider our base.
-We'll assume the run-time system is capable of giving us aligned pointers, so we
+We'll assume the @ch-bp-tech{run-time system} is capable of giving us aligned pointers, so we
 avoid wasting memory through over allocation.
 However, this method means we get pointers whose high-order bits contain part of
 the address, and low-order bits are already zero---we do not need to shift the
@@ -360,7 +360,7 @@ multiple of 8.
 
 To implement these new memory operations, or @deftech{mops} (pronounced
 @emph{em ops}), we need to expose additional features from @ch1-tech{x64} and
-from the run-time system.
+from the @ch-bp-tech{run-time system}.
 Namely, we need low-level pointer operations that are different from those for
 @ch2-tech{frame variables}, and we need run-time support for getting aligned
 addresses from the operating system to enable tagging pointers efficiently.
@@ -404,11 +404,11 @@ It assumes @tt{r12} contains some valid pointer.
 We formalize these restrictions in our definition of @tech{Paren-x64 v8}.
 
 To implement allocation, we need some strategy for managing memory.
-Our run-time system or compiler needs to know what memory is in use, how to
+Our @ch-bp-tech{run-time system} or compiler needs to know what memory is in use, how to
 allocate (mark free memory as in use), and how to deallocate memory (return
 in-use memory to the pool of free memory and ultimately to the system).
 There are many strategies for this, such as "let the user deal with it",
-"add a process to the run-time system that dynamically manages memory", or "make
+"add a process to the @ch-bp-tech{run-time system} that dynamically manages memory", or "make
 the type system so complex that the compiler can statically manage memory".
 Each of these has merits.
 
@@ -432,11 +432,11 @@ For a quick introduction to garbage collection, see this short video
 @url{https://mastodon.social/@"@"TartanLlama/109643267561353728}.
 }
 
-To implement our allocation-only strategy, we need the run-time system to
+To implement our allocation-only strategy, we need the @ch-bp-tech{run-time system} to
 provide an initial base pointer from which we can start allocating.
 We reserve another register, the @racket[current-heap-base-pointer-register]
 (abbreviated @paren-x64-v8[hbp]).
-The run-time system initializes this register to point to the base of the heap,
+The @ch-bp-tech{run-time system} initializes this register to point to the base of the heap,
 with all positive-integer indexes after this base as free memory.
 Allocation is implemented by copying the current value of this pointer, and
 incrementing it by the number of bytes we wish to allocate.

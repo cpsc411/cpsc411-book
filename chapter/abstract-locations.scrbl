@@ -257,7 +257,7 @@ below; all other uses are @ch-bp-tech{undefined behaviour}.
 Setting its value directly is forbidden.
 Pointer arithmetic, such as @paren-x64-v2[(set! rbp (+ rbp opand))], is allowed
 only when the @paren-x64-v2[opand] is a @racket[dispoffset?].
-Incrementing the pointer beyond its initial value given by the run-time system
+Incrementing the pointer beyond its initial value given by the @ch-bp-tech{run-time system}
 is forbidden.
 We do not try to enforce these statically, since it may be impossible to do so
 in general.
@@ -280,7 +280,7 @@ in this way is a common tool we will use.
 }
 
 
-To use the stack, the run-time system must initialize
+To use the stack, the @ch-bp-tech{run-time system} must initialize
 @racket[current-frame-base-pointer-register].
 On systems following the SYS V ABI (including Linux and macOS on x64),
 @paren-x64-v2[rsp] is the initial stack pointer, and points to final element of
@@ -296,17 +296,17 @@ passed to the process, with each stack slot above it containing a pointer to an
 argument.
 That is, @paren-x64-v2[(rsp + 8)] contains a pointer to the first argument to the
 process, @paren-x64-v2[(rsp + 16)] the second, @emph{etc}.
-This mean we can create a simple run-time system by copying @paren-x64-v2[(rsp -
+This mean we can create a simple @ch-bp-tech{run-time system} by copying @paren-x64-v2[(rsp -
 8)] into @paren-x64-v2[#,(current-frame-base-pointer-register)], and growing
 down from there will access unused memory.
 
 @margin-note*{
-We provide such a run-time system in @racketmodname[cpsc411/2c-run-time].
-@;The run-time system provides a default stack of size 8 megabytes.
+We provide such a @ch-bp-tech{run-time system} in @racketmodname[cpsc411/2c-run-time].
+@;The @ch-bp-tech{run-time system} provides a default stack of size 8 megabytes.
 @;This should be enough for now, but if it's not, you can use the
 @;@racket[parameter?] @racket[current-stack-size] to increase it.
 
-Our run-time system also prints the value of @paren-x64-v2[rax] to the
+Our @ch-bp-tech{run-time system} also prints the value of @paren-x64-v2[rax] to the
 screen, instead of returning it via an exit code, and does the work of
 converting numbers to ASCII strings.
 The @racket[execute] function uses @racket[nasm-run/read] to parse printed
@@ -314,7 +314,7 @@ output into a Racket datum.
 If you're interested in how this is done, you can read the definition of
 @racket[wrap-x64-run-time].
 
-We assume that this run-time system is used until we introduce data types, which
+We assume that this @ch-bp-tech{run-time system} is used until we introduce data types, which
 require additional run-time support.
 }
 

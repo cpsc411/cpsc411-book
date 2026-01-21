@@ -89,7 +89,7 @@ Assigning @ch2-tech{abstract locations} to registers automatically is a
 non-trivial task.
 We started out by compiling to @ch2-tech{frame variables} because there are
 infinitely many @ch2-tech{frame variables}, but only 16 registers.
-Actually, fewer than 16, since the compiler and run-time system reserve some of
+Actually, fewer than 16, since the compiler and @ch-bp-tech{run-time system} reserve some of
 those for various purposes.
 To assign an @ch2-tech{abstract location} a new @ch2-tech{frame variable} is
 trivial---just pick a new one, there's always a new one, just like
