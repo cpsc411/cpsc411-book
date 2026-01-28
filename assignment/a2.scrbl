@@ -37,8 +37,7 @@ abstract names.
 
 This assignment is due @(due 'milestone-2).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a2}.
+@milestone-resources{a2}
 
 @subsection{Learning Objectives}
 @todo{Redo above summary to split out summary from learning objectives.}

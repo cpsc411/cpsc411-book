@@ -290,3 +290,10 @@
 
 (define (due sym)
   (~t (dict-ref deadline-dict sym) "E, MMMM d, y h:mm a"))
+
+(define (milestone-resources tag)
+  (list
+    "You can use the interrogator to get limited access to the reference solution, and the language diff tool to view differences between languages that aren't typeset in the book:"
+  (itemize
+    (item (list "Interrogator: " (url (format "~a/~a/?an=~a" interrogator-host interrogator-path tag))))
+    (item (list "Language Differ: " (url (format "~a/~a/" interrogator-host lang-diff-path)))))))

@@ -25,8 +25,7 @@ This milestone is due @(due 'milestone-5).
 
 @todo{Design component?}
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a5}.
+@milestone-resources{a5}
 
 @subsection{Learning Objectives}
 @todo{Redo above summary to split out summary from learning objectives.}

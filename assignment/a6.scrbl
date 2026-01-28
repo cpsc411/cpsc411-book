@@ -20,8 +20,7 @@ contexts.
 
 This assignment is due @(due 'milestone-6).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a6}.
+@milestone-resources{a6}
 
 @todo{Design component?}
 

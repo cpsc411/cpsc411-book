@@ -39,8 +39,7 @@ undefined behaviour in our surface language.
 
 This assignment is due @(due 'milestone-7).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a7}.
+@milestone-resources{a7}
 
 @todo{Explicit learning objectives}
 

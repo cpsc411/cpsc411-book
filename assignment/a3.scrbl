@@ -25,8 +25,7 @@ registers instead of in the frame.
 
 This assignment is due @(due 'milestone-3).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a3}.
+@milestone-resources{a3}
 
 @subsection{Learning Objectives}
 @todo{Redo above summary to split out summary from learning objectives.}

@@ -36,8 +36,7 @@ types dynamically.
 
 This assignment is due @(due 'milestone-8).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a8}.
+@milestone-resources{a8}
 
 @todo{Explicit learning objectives}
 

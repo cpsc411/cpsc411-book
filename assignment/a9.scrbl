@@ -20,8 +20,7 @@ can create a procedure at any point in the program.
 
 This assignment is due @(due 'milestone-9).
 
-You can use the interrogator to get limited access to the reference solution:
-@url{https://www.students.cs.ubc.ca/~cs-411/@|semester|/interrogator.cgi?an=a9}.
+@milestone-resources{a9}
 
 @subsubsub*section{Checklist}
 
