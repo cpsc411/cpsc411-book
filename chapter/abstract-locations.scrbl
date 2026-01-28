@@ -87,7 +87,7 @@ L9 -> L11 [label = "interp-paren-x64"];
 In the last chapter, we designed our first language, @ch-bp-tech{Paren-x64 v1}, and
 wrote our first compiler to implement it.
 This language introduces the barest, although still useful,
-abstraction---freedom from boilerplate.
+abstraction---freedom from boilerplate. @todo{Make it freedom from syntax, then introduce abstract syntax vs concrete}
 @ch-bp-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
 details of exactly how to pass a value to the operating system.
 
@@ -95,13 +95,13 @@ While @ch-bp-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
 significant limitation for writing programs that we address in this chapter.
 The language requires the programmer to manually manage a small number of
 variables, namely the registers, while programming.
-Human memory is much less reliable than computer memory, so we should
+Human memory is much less reliable than computer memory, so we should@todo{OUGHT}
 design languages that make the computer remember more and free the human to
 remember less.
-This will prevent the human from causing run-time errors when they inevitably
+This would prevent the human from causing run-time errors when they inevitably
 make a mistake and overwrite a register that was still in use.
 
-To address this, we will introduce @tech{abstract locations}, of which there are
+To address this, we introduce @tech{abstract locations}, of which there are
 an arbitrary number and that the programmer does not need to know what
 @tech{physical location} they end up using.
 
@@ -120,7 +120,44 @@ restricts what kinds of @tech{physical locations} instructions can use.
 @section{Designing a Source language}
 When designing a new abstraction, I often start by reading and writing some
 programs using an existing abstraction until I spot a pattern I dislike.
-@todo{Do some example Paren-x64 v1 programming}
+
+Here's an example program @ch-bp-tech{Paren-x64 v1} that computes and returns @paren-x64-v1[120].
+@paren-x64-v1-block[
+(begin
+  (set! rsp 1)
+  (set! rsp (+ rsp 119))
+  (set! rax rsp))
+]
+
+And here is an equivalent program:
+
+@paren-x64-v1-block[
+(begin
+  (set! r15 1)
+  (set! r15 (+ r15 119))
+  (set! rax r15))
+]
+
+The only difference between these two programs is the choice of register used
+to perform the computation: either @paren-x64-v1[rsp] or @paren-x64-v1[r15].
+The choice is irrelevant, but I do need to make the choice to write the program.
+I also need to be sure that register isn't in use.
+
+Here's a different program.
+
+@paren-x64-v1-block[
+(begin
+  (set! r15 1)
+  (set! r14 #,(max-int 60))
+  (set! r15 (+ r15 r14))
+  (set! rax r15))
+]
+
+This program adds two numbers, @paren-x64-v1[1] and @paren-x64-v1[#,(max-int 60)].
+Because the second number is large, I cannot use it directly as an operand to
+the @paren-x64-v1[+] instruction.
+I, the programmer, must remember this, and remember to pick a new arbitrary
+register to store it in.
 
 We've seen a few @ch-bp-tech{Paren-x64 v1} programs by now, and they all have a
 pattern: all computations act on a small set of 16 registers.
@@ -149,6 +186,8 @@ We design a new language, @tech{Asm-lang v2}, to abstract away from these two
 machine-specific concerns.
 
 @bettergrammar*[asm-lang-v2]
+@todo{Use a locals form instead of info field? More semantically justified?
+OTOH, could view the info field as some block declarations, like require/provide statements}
 
 The language no longer knows about registers, but instead presents an
 @tech{abstract location} to the programmer.
@@ -166,7 +205,34 @@ to compile to an instruction that sets @paren-x64-v1[rax].
 We add the @asm-lang-v2[halt] instruction, which indicates the end of the
 computation with a particular value as the result.
 
+@todo{Remove halt, use implicit return. Introduce select-instructions, probably as the first pass. That fits with the all-home loop.}
+
 @section{Exposing Memory in Paren-x64}
+Abstracting away from registers introduces a problem.
+We cannot necessarily compile a program with @tech{abstract locations} into one with registers.
+Consider the following @ch-bp-tech{Asm-lang v2} program, which has 17 @tech{abstract locations}:
+
+@paren-x64-v1-block[
+(module ()
+  (begin
+    (set! x.1 1)
+    (set! x.2 (+ x.2 x.1))
+    (set! x.3 (+ x.3 x.2))
+    (set! x.4 (+ x.4 x.3))
+    (set! x.5 (+ x.5 x.4))
+    (set! x.6 (+ x.6 x.5))
+    (set! x.7 (+ x.7 x.6))
+    (set! x.8 (+ x.8 x.7))
+    (set! x.9 (+ x.9 x.8))
+    (set! x.10 (+ x.10 x.8))
+    (set! x.11 (+ x.11 x.7))
+    (set! x.12 (+ x.12 x.6))
+    (set! x.13 (+ x.13 x.5))
+    (set! x.14 (+ x.14 x.4))
+    (set! x.15 (+ x.15 x.3))
+    (set! x.16 (+ x.16 x.2))
+    (set! x.17 (+ x.17 x.1))
+]
 @todo{Transition}
 
 We first need to expose @ch1-tech{x64} features to access memory locations.

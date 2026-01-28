@@ -109,7 +109,7 @@
 #;(define tech list)
 #;(define deftech list)
 
-(define (todo . rest) (void)#;(apply margin-note "TODO: " rest))
+(define (todo . rest) (apply margin-note "TODO: " rest))
 
 (define (question . rest)
   (para @bold{Question: } rest))
