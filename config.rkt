@@ -13,12 +13,12 @@
 (define course-title "Introduction to Compiler Construction")
 
 ;(format "https://www.students.cs.ubc.ca/~cs-411/~a/" semester)
-(define interrogator-host "https://williamjbowman.com:8083/")
+(define interrogator-host "https://williamjbowman.com:8083")
 
 ; interrogator.cgi
-(define interrogator-path "interrogator/")
+(define interrogator-path "interrogator")
 ; lang-diff.cgi
-(define lang-diff-path "lang-differ/")
+(define lang-diff-path "lang-differ")
 
 (define url-root (string-append "https://www.students.cs.ubc.ca/~cs-411/" semester))
 
