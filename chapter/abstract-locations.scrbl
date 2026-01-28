@@ -87,30 +87,30 @@ L9 -> L11 [label = "interp-paren-x64"];
 In the last chapter, we designed our first language, @ch-bp-tech{Paren-x64 v1}, and
 wrote our first compiler to implement it.
 This language introduces the barest, although still useful,
-abstraction---freedom from boilerplate. @todo{Make it freedom from syntax, then introduce abstract syntax vs concrete}
+abstraction---freedom from boilerplate. @todo{Make it freedom from the trivial concerns of syntax, then introduce abstract syntax vs concrete}
 @ch-bp-tech{Paren-x64 v1} abstracts away from the boilerplate of @ch1-tech{x64}, and
 details of exactly how to pass a value to the operating system.
 
 While @ch-bp-tech{Paren-x64 v1} is an improvement of @ch1-tech{x64}, it has a
 significant limitation for writing programs that we address in this chapter.
 The language requires the programmer to manually manage a small number of
-variables, namely the registers, while programming.
+variables, the registers, while programming.
 Human memory is much less reliable than computer memory, so we should@todo{OUGHT}
-design languages that make the computer remember more and free the human to
+design languages that make the computer remember more and free the programmer to
 remember less.
-This would prevent the human from causing run-time errors when they inevitably
+This would prevent the programmer from causing run-time errors when they inevitably
 make a mistake and overwrite a register that was still in use.
 
 To address this, we introduce @tech{abstract locations}, of which there are
 an arbitrary number and that the programmer does not need to know what
 @tech{physical location} they end up using.
 
-In general, these cannot all be mapped to registers, since there are a fixed
-number of registers.
-So to implement @tech{abstract locations}, we'll need to expose a little more
-from our @ch1-tech{target language}.
-We expose some limited access to memory in @ch1-tech{x64}, and introduce the
-abstraction of a @tech{frame variable} to help use compile @tech{abstract
+In general, we cannot map the arbitrary number of @tech{abstract locations} to
+the fixed number of registers.
+So to implement @tech{abstract locations}, we'll need to expose a new feature
+from our @ch1-tech{target language}, @ch1-tech{x64}.
+We expose some limited access to memory in @ch1-tech{x64}, and introduce a new
+abstraction, the @tech{frame variable}, to help us compile @tech{abstract
 locations} to @tech{physical locations}.
 
 We also need to design a new language, and some translations, that enable
@@ -177,42 +177,125 @@ These limitations make programming cumbersome and error-prone.
 
 Instead, we should free the programmers (ourselves), eliminating cumbersomeness
 and removing error-prone programming patterns.
-
 We should free the programmer to invent new locations at will if it helps their
 programming, and not worry about irrelevant machine-specific restrictions on
 these locations.
 
-We design a new language, @tech{Asm-lang v2}, to abstract away from these two
+To address this, we can design a new language to abstract away from these two
 machine-specific concerns.
+Our goals in this language are: (1) we should be able to invent new, free,
+unused locations at will; (2) we should be able to use instructions uniformaly
+on these locations and integer literals, regardless of the size of the literal
+or choice or location.
+
+Below, we design one such language, @tech{Asm-lang v2}.
+
 
 @bettergrammar*[asm-lang-v2]
 @todo{Use a locals form instead of info field? More semantically justified?
 OTOH, could view the info field as some block declarations, like require/provide statements}
 
-The language no longer knows about registers, but instead presents an
-@tech{abstract location} to the programmer.
-There are two assembly instructions---move a value to an @tech{abstract
+To address the first goal, we introduce the abstraction @tech{abstract locations}.
+An @deftech{abstract location} is name for some @tech{physical location}
+to be chosen by the compiler.
+The name is unique for some unit of compilation, which means globally unique
+for whole-program compilation.
+
+Without a direct representation of @tech{physical locations}, the language
+cannot represent all the constraints on operands, dictacted in part by the
+hardware, so we're also essentially forced to solve the second goal.
+This will become more apparent when we see the constraints on operands
+involving memory operands.
+So, there are now only two instructions---move a value to an @tech{abstract
 location}, or perform a binary operation on an @tech{abstract location}.
-These now act uniformly on their arguments.
+These act uniformly on their arguments, regardless of size.
 The left-hand-side is always the destination location, and the right-hand-side
 is an arbitrary trivial value.
 
-Our convention requires that we pass the result to the @ch1-tech{OS} in
-@paren-x64-v1[rax], but we've removed registers from the language.
+The run-time system still requires that we pass the result to the @ch1-tech{OS}
+in @paren-x64-v1[rax], but we've removed registers from the language.
 This requires us to design some new feature that we can use to indicate the
-result without exposing registers, and that the compiler can identify in order
-to compile to an instruction that sets @paren-x64-v1[rax].
+result without exposing registers.
 We add the @asm-lang-v2[halt] instruction, which indicates the end of the
 computation with a particular value as the result.
+@todo{Introduce physical location in chapter 1 or 2, initially only registers.}
 
 @todo{Remove halt, use implicit return. Introduce select-instructions, probably as the first pass. That fits with the all-home loop.}
+
+The language has one more unusual bit of syntax: the @asm-lang-v2[info] field.
+In order to compile @tech{abstract locations}, we will need some information
+about them, and eventually to map them to @tech{physical locations}.
+In general, we may need metadata lots of metadata about a program in order to
+efficiently compile it.
+To store this metadata, we include an annotation on the program represented by
+@asm-lang-v2[info].
+
+The @deftech{info field} is an annotation in the program that serves only to
+store metadata about the program for compilation.
+This additional information will often be result of some program analysis or
+preprocessing step that informs the next compiler pass.
+In @tech{Asm-lang v2}, the @tech{info field} is unrestricted---it could contain
+anything at all, as long as it's a valid @racket[info?].
+Eventually, we will require it to contain specific metadata.
+
+@margin-note*{
+The module @racketmodname[cpsc411/info-lib] provides utilities for working with
+the @tech{info field} representation.
+It also provides the contract @racket[info/c], which formalizes the
+specification language for @tech{info fields}.
+}
+
+We represent the @tech{info field} as an association list of keys to a proper
+list whose first element is the value of the key, such as @racket[((key
+value))].
+In general, we only give a partial specification---it may contain arbitrary
+other key-value pairs.
+This lax specification is useful for debugging: you may leave residual
+@asm-lang-v2[info] from earlier languages, or include your own debugging
+@asm-lang-v2[info].
+The @asm-lang-v2[info] field is also unordered.
+
+@digression{
+In a production compiler, we would probably not represent this information
+directly as part of the program, but instead store the contents of the
+@tech{info field} "on the side", as a separate data structure that is passed
+through the compiler.
+This would prevent us from deconstructing and reconstructing the syntax tree
+when modifying or accessing the @tech{info field}.
+
+However, directly representing the @tech{info field} as part of the language has
+some advantages.
+It becomes simple to compose passes under a single interface.
+The program representation captures @emph{all} of its invariants, and we do not
+need to consider an external data structure, making debugging, printing, and
+reading programs simpler.
+
+Furthermore, our representation of the @tech{info field} is not
+particularly efficient.
+The proper list representation uses strictly more memory than necessary, and
+does not support random access.
+We could improve it by using improper lists, such as @racket[((key . value))], or
+perhaps a hash table.
+However, the proper list representation is simpler to read and write in program
+text, and hash tables have constant factors that can dominate the cost of
+traversing small lists, so the choice of representation is not entirely
+obvious.
+}
+
+@todo{This is a lot that is... irrelevant to the core concepts.
+Particularly to the source language.
+Could avoid some by introducing a locals form.
+}
 
 @section{Exposing Memory in Paren-x64}
 Abstracting away from registers introduces a problem.
 We cannot necessarily compile a program with @tech{abstract locations} into one with registers.
-Consider the following @ch-bp-tech{Asm-lang v2} program, which has 17 @tech{abstract locations}:
+Consider the following @tech{Asm-lang v2} program, which has 17 @tech{abstract locations}:
 
-@paren-x64-v1-block[
+@asm-lang-v2-block[
+#:datum-literals
+(x.1 x.2 x.3 x.4 x.5 x.6 x.7 x.8 x.9 x.10 x.11
+ x.12 x.13 x.14 x.15 x.16 x.17)
 (module ()
   (begin
     (set! x.1 1)
@@ -232,20 +315,32 @@ Consider the following @ch-bp-tech{Asm-lang v2} program, which has 17 @tech{abst
     (set! x.15 (+ x.15 x.3))
     (set! x.16 (+ x.16 x.2))
     (set! x.17 (+ x.17 x.1))
+    (halt x.17)))
 ]
-@todo{Transition}
 
-We first need to expose @ch1-tech{x64} features to access memory locations.
+To translate this into @ch1-tech{x64} requires assigning each of the 17
+@tech{abstract locations} to @tech{physical locations}.
+However, we cannot simply map each @tech{abstract location} to a register.
+Instead, we need a new source of arbitrarily many @tech{physical locations}, or
+we need to be very clever about reusing registers.
+Being clever is a last resort, so we'd like to avoid it.
+Even if we were clever, we could easily extend the program so that all 17 are
+needed at the same time, making it impossible to reuse only 16 registers.
+@todo{Transition}
+Therefore, we need a source of arbitrary many @tech{physical locations}.
+
+Thankfully, @ch1-tech{x64} does provide this feature: instruction operands that
+enable operating on memory locations instead of registers.
 In particular, we expose @tech{displacement mode operands} for memory locations.
-The @deftech{displacement mode operand} is a new operand that can appear in some location
-positions as the operand of an instruction.
+The @deftech{displacement mode operand} is a new operand that can appear as a
+@tech{physical location} in the the operand of some instructions.
 This allows accessing memory locations using pointer arithmetic.
-It is written as @tt{QWORD [reg - int32]} or
-@tt{QWORD [reg + int32]} in @ch1-tech{x64}, where @tt{reg} is a register
+In @ch1-tech{x64}, a @tech{displacement mode operand} is written as @tt{QWORD
+[reg - int32]} or @tt{QWORD [reg + int32]}, where @tt{reg} is a register
 holding some memory address and the @tt{int32} is an offset number of bytes
-from that address to access, as a 32-bit integer.
+from that base address, as a 32-bit integer.
 The keyword @tt{QWORD}, which is an unintuitive spelling of "8 bytes",
-indicates that this operand is accessing 64 bits at a time.
+indicates that this operand is accessing 8 bytes (64 bits) at a time.
 
 @margin-note{
 "Word" normally means the unit of addressing memory---64 bits in our case.
@@ -254,7 +349,7 @@ To avoid backwards incompatible changes, tools that use @tt{WORD} as
 a keyword, like @tt{nasm}, didn't want to change it's meaning.
 Instead, the keyword @tt{WORD} means 16 bits, not the word size, and prefixes
 give us multiple of that notion of @tt{WORD}.
-So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on x64.
+So @tt{QWORD} is 4 @tt{WORD}s, or 64 bits, which is the word size on @ch1-tech{x64}.
 }
 
 For example, if @tt{rbp} holds a memory address, we can move the value
@@ -657,10 +752,7 @@ We are still required to think about @tech{physical locations}.
 We don't usually care which location a value is stored in, so long as it is
 stored @emph{somewhere}.
 
-We can introduce an abstraction to capture this idea.
-We define an @deftech{abstract location} to be a unique name for some
-@tech{physical location}, that is unique for some unit of allocation (for
-the moment, this means they're globally unique).
+
 Each @tech{abstract location} must be allocated a @tech{physical location}
 somewhere on the machine, and we want to ensure the allocater can replace any
 two instances of an @tech{abstract location} with the same @tech{physical
@@ -697,54 +789,6 @@ For each step, we create an @deftech{administrative language}---an intermediate
 language whose semantics does not differ at all from its parent language, but
 whose syntax is potentially decorated with additional data that simplifies the next
 step of the compiler.
-We represent this additional data in an @deftech{info field}, an annotation in
-the program that serves only to store additional information for compilation.
-This additional information is often the result of some program analysis or
-preprocessing step that informs the next compiler pass.
-In the parent language, @tech{Asm-lang v2} in this case, the @tech{info field}
-is unrestricted---it could contain anything at all.
-In fact, we can view the parent language as a family of languages, each
-differing in its @tech{info field}.
-
-@margin-note*{
-The module @racketmodname[cpsc411/info-lib] provides utilities for working with
-the @tech{info field} representation.
-It also provides the contract @racket[info/c], which formalizes the
-specification language for @tech{info fields}.
-}
-
-We represent the @tech{info field} as an association list of keys to a proper
-list whose first element is the value of the key, such as @racket[((key
-value))].
-In general, we only give a partial specification---it may contain arbitrary
-other key-value pairs.
-This lax specification is useful for debugging: you may leave residual
-@asm-lang-v2[info] from earlier languages, or include your own debugging
-@asm-lang-v2[info].
-The @asm-lang-v2[info] field is also unordered.
-
-@digression{
-In a production compiler, we would probably not represent these
-@tech{administrative languages} at all, but instead store the contents of the
-@tech{info field} "on the side", as a separate data structure.
-This would prevent us from deconstructing and reconstructing the syntax tree
-when modifying or accessing the @tech{info field}.
-
-However, directly representing the @tech{info field} as part of the language has
-some advantages.
-It becomes simple to compose passes under a single interface.
-The program representation captures @emph{all} of its invariants, and we do not
-need to consider an external data structure, making debugging, printing, and
-reading programs simpler.
-
-Furthermore, our representation of the @tech{info field} is not
-particularly efficient.
-The proper list representation uses strictly more memory than necessary, and
-does not support random access.
-We could improve it by using improper lists, such as @racket[((key . value))], or
-perhaps a hash table.
-However, this representation is simpler to read and write in program text.
-}
 
 First, we analyze the @tech{Asm-lang v2} to discover which
 @tech{abstract locations} are in use.
