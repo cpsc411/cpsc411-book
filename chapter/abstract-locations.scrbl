@@ -358,6 +358,10 @@ For example, if @tt{rbp} holds a memory address, we can move the value
 We can move the value from memory into the register @tt{rax} using the
 instruction @tt{mov rax, QWORD [rbp - 0]}.
 
+@todo{Add memory diagram. Requires abstracting the stack diagram code.}
+@;We can represent memory graphically as in @Figure-ref{fig:memory1}
+@;@figure["fig:sysv-stack" @elem{The SYS V Initial Process Stack} sys-v-stack-diagram]
+
 Note that a @tt{mov} instruction to an address can only move 32-bit integer
 literals.
 @tt{mov [rbp + 0], 9223372036854775807} is invalid; instead, the integer would

@@ -11,13 +11,16 @@
   sys-v-stack-diagram
   frame-var-diagram)
 
+;; TODO: Make a make-memory-diagram function.
+
 (define sys-v-stack-diagram
   (parameterize ([dc-for-text-size (make-object bitmap-dc%
                                                 (make-bitmap 1 1))])
-    (let* ([HEIGHT 100]
-           [WIDTH (/ 300 12)]
+    (let* ([HEIGHT 80]
+           [TOTAL-WIDTH 250]
+           [FRAME-WIDTH (/ TOTAL-WIDTH 10)]
            [make-stack-frame 
-             (lambda (contents [width WIDTH] [rot (/ pi 2)])
+             (lambda (contents [width FRAME-WIDTH] [rot (/ pi 2)])
                (cc-superimpose
                  (rectangle width HEIGHT)
                  (text contents '() 12 rot)))]
@@ -52,13 +55,13 @@
       (stack-diagram
         (blank (pict-width (text "M")) 0)
         `(("Low address" . ,(cc-superimpose
-                               (rectangle 300 HEIGHT)
+                               (rectangle TOTAL-WIDTH HEIGHT)
                                (text "Free Space" '() 24)))
           ("rsp - 16" . ,(make-stack-frame "(also free)"))
           ("rsp - 8" . ,(make-stack-frame "(also free)"))
           ("rsp" . ,(make-stack-frame "argc"))
           ("rsp + 8" . ,(make-stack-frame "argv[0]"))
-          ("" . ,(make-stack-frame "..." (* WIDTH 2) 0))
+          ("" . ,(make-stack-frame "..." (* FRAME-WIDTH 2) 0))
           ("High address" . ,(blank)))))))
 
 (define frame-var-diagram
