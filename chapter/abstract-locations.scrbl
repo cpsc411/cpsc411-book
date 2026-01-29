@@ -287,7 +287,7 @@ Particularly to the source language.
 Could avoid some by introducing a locals form.
 }
 
-@section{Exposing Memory in Paren-x64}
+@section{Accessing Memory: Displcement Mode Operands x64}
 Abstracting away from registers introduces a problem.
 We cannot necessarily compile a program with @tech{abstract locations} into one with registers.
 Consider the following @tech{Asm-lang v2} program, which has 17 @tech{abstract locations}:
@@ -362,19 +362,22 @@ instruction @tt{mov rax, QWORD [rbp - 0]}.
 @;We can represent memory graphically as in @Figure-ref{fig:memory1}
 @;@figure["fig:sysv-stack" @elem{The SYS V Initial Process Stack} sys-v-stack-diagram]
 
-Note that a @tt{mov} instruction to an address can only move 32-bit integer
-literals.
+@todo{Be careful here about memory location vs memory address.}
+
+As with other instructions, the hardware imposes arbitrary restrictions on the
+combinations of operands.
+A @tt{mov} instruction only supports both a memory location and a 32-bit
+integer literal, not a 64-bit literal.
 @tt{mov [rbp + 0], 9223372036854775807} is invalid; instead, the integer would
 need to be moved into a register, first, as in:
-@;
 @verbatim{
 mov r9, 9223372036854775807
 mov [rbp + 0], r9
 }
 
-Our offsets are multiples of 8.
-The offset is a number of bytes, and since we are dealing primarily with 64-bit
-values, we increment pointers in multiples of 8.
+The literal offset is the number of bytes to offset from the base pointer.
+While @ch1-tech{x64} supports sub-word addressing, we will only address by word.
+Since we are dealing primarily with 64-bit words, our offsets are always multiples of 8.
 For example, the following snippet of code moves two values into memory, then
 pulls them out and adds them.
 @verbatim{
@@ -384,6 +387,19 @@ mov rax, QWORD [rbp - 8]
 mov rbx, QWORD [rbp - 0]
 add rax, rbx
 }
+
+@section{The Stack}
+Now that we know how to address memory, the next problem is where does the
+memory come from: where do we get that initial base pointer, and how do we know
+how far we're allowed to address?
+
+This requires a little support from the @tech{run-time system}.
+@ch1-tech{x64}, by itself, doesn't have raw access to computer memory---at
+least, not under most @tech{operating systems}.
+Instead, the @tech{run-time system} for our language will have work with the
+@tech{OS} to get a new pointer to the start of some free memory.
+
+@todo{Need to move stack explanation up up}
 
 These accesses grow @emph{downwards}, subtracting from the base pointer rather
 than adding, following common conventions about how stack memory is used.
