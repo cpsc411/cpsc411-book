@@ -488,10 +488,10 @@ in this way is a common tool we will use.
 
 Next, we need a @ch-bp-tech{run-time system}.
 Our approach is to decrement the initial @tt{rsp} by 8, and move its value to
-@racket[current-frame-base-pointer].
+@racket[current-frame-base-pointer-register].
 That way, @paren-x64-v2[(fbp - 0)] is the first free memory location, and we can
 essentially treat @paren-x64-v2[fbp] as a 0-indexed array (using negative
-base-8 indexes).
+multiple-of-8 indexes).
 
 @margin-note*{
 We provide such a @ch-bp-tech{run-time system} in @racketmodname[cpsc411/2c-run-time].
