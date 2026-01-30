@@ -399,17 +399,43 @@ least, not under most @tech{operating systems}.
 Instead, the @tech{run-time system} for our language will have work with the
 @tech{OS} to get a new pointer to the start of some free memory.
 
-@todo{Need to move stack explanation up up}
+Thankfully, on systems following the SYS V ABI (including Linux and macOS on
+x64), when any process launches, @paren-x64-v2[rsp] is initialized to the stack
+pointer.
+We can visualize the initial process stack as in @Figure-ref{fig:sysv-stack}.
 
-These accesses grow @emph{downwards}, subtracting from the base pointer rather
-than adding, following common conventions about how stack memory is used.
-This is an arbitrary choice, but we choose to follow the convention.
+@figure["fig:sysv-stack" @elem{The SYS V Initial Process Stack} sys-v-stack-diagram]
 
-The new version of @deftech{Paren-x64 v2} (@racket[paren-x64-v2]) is below.
+The stack starts at the end of the virtual address space, and everything
+@emph{below} @tt{rsp} is free space.
+The above the stack pointer, @ie, "on the stack", are few values passed by the
+operating system: the command line arguments.
+@tt{[rsp + 0]} contains the argument count (@tt{argc}) of arguments passed to the
+process, with each stack slot above it containing a pointer to an argument.
+That is, @tt{[rsp + 8]} contains a pointer to the first argument to the
+process, @tt{[rsp + 16]} the second, @emph{etc}.
+Since everything above @tt{rsp} is in use, and we're at the end of the virtual
+address space, we can do pointer arthimatic backwards to find indefinite
+amounts of free space (assuming infinite memory).
+
+@section{Redesigning the Target Language(s)}
+To provide access to the stack in our intermediate languages, we need two
+things.
+First, we need to redesign all intermediate langauges with direct access to
+@tech{physical locations}, such as @ch-bp-tech{Paren-x64 v1}, to support access
+to the stack.
+We may want to add additional constraints on how the stack pointer is used, to
+simplify compilation or interpretation of our intermediate languages.
+Second, we need a @ch-bp-tech{run-time system} to provide access to the
+initial stack pointer.
+We could use @tt{rsp} directly, but we might choose to use it differently.
+
+We start with the desgin for a new target language, @deftech{Paren-x64 v2}
+(@racket[paren-x64-v2]), whose grammar is typeset below.
 
 @bettergrammar*-ndiff[
-#:labels ("Diff" "Paren-x64 v2" "Paren-x64 v1")
-(paren-x64-v1 paren-x64-v2)
+#:labels ("Diff vs Paren-x64 v1" "Paren-x64 v2" "Paren-x64 v1")
+(#:exclude (reg) paren-x64-v1 paren-x64-v2)
 (paren-x64-v2)
 (paren-x64-v1)
 ]
@@ -428,20 +454,20 @@ The offset of each @paren-x64-v2[addr] is restricted to be an integer that is
 divisible by 8, the number of bytes in a machine word in @ch1-tech{x64}.
 This ensures all memory accesses are machine-word aligned, meaning we leave
 space for all bytes in the word between each access.
-Note that the offset is @emph{negative}; we access the stack backwards,
-following the @ch1-tech{x64} "stack grows down" convention.
-@todo{introduce this convention}
+Note that the offset is @emph{negative}; we access the stack backwards, since
+that's where all the free space is when the process starts.
 
-All languages in our compiler assume that the uses of
-@racket[current-frame-base-pointer-register] obey the @deftech{stack discipline}, defined
-below; all other uses are @ch-bp-tech{undefined behaviour}.
+All languages in our compiler will assume that the uses of
+@racket[current-frame-base-pointer-register] obey the @deftech{stack
+discipline}, defined below.
 Setting its value directly is forbidden.
-Pointer arithmetic, such as @paren-x64-v2[(set! rbp (+ rbp opand))], is allowed
+Pointer arithmetic, such as @paren-x64-v2[(set! fbp (+ fbp opand))], is allowed
 only when the @paren-x64-v2[opand] is a @racket[dispoffset?].
-Incrementing the pointer beyond its initial value given by the @ch-bp-tech{run-time system}
-is forbidden.
+Incrementing the pointer beyond its initial value given by the
+@ch-bp-tech{run-time system} is forbidden.
 We do not try to enforce these statically, since it may be impossible to do so
 in general.
+In this sense, all these forbidden uses are @ch-bp-tech{undefined behaviour}.
 
 @digression{
 The language is parameterized by the @racket[current-frame-base-pointer-register].
@@ -460,44 +486,30 @@ This language is not sufficiently abstract yet, but using parameterized language
 in this way is a common tool we will use.
 }
 
-
-To use the stack, the @ch-bp-tech{run-time system} must initialize
-@racket[current-frame-base-pointer-register].
-On systems following the SYS V ABI (including Linux and macOS on x64),
-@paren-x64-v2[rsp] is the initial stack pointer, and points to final element of
-the virtual address space.
-We can visualize this as in @Figure-ref{fig:sysv-stack}.
-
-@figure["fig:sysv-stack" @elem{The SYS V Initial Process Stack} sys-v-stack-diagram]
-
-By subtracting from it, we can find new unallocated stack space.
-Initially, the stack contains some data passed by the operation system.
-@paren-x64-v2[(rsp + 0)] contains the argument count (@tt{argc}) of arguments
-passed to the process, with each stack slot above it containing a pointer to an
-argument.
-That is, @paren-x64-v2[(rsp + 8)] contains a pointer to the first argument to the
-process, @paren-x64-v2[(rsp + 16)] the second, @emph{etc}.
-This mean we can create a simple @ch-bp-tech{run-time system} by copying @paren-x64-v2[(rsp -
-8)] into @paren-x64-v2[#,(current-frame-base-pointer-register)], and growing
-down from there will access unused memory.
+Next, we need a @ch-bp-tech{run-time system}.
+Our approach is to decrement the initial @tt{rsp} by 8, and move its value to
+@racket[current-frame-base-pointer].
+That way, @paren-x64-v2[(fbp - 0)] is the first free memory location, and we can
+essentially treat @paren-x64-v2[fbp] as a 0-indexed array (using negative
+base-8 indexes).
 
 @margin-note*{
 We provide such a @ch-bp-tech{run-time system} in @racketmodname[cpsc411/2c-run-time].
-@;The @ch-bp-tech{run-time system} provides a default stack of size 8 megabytes.
-@;This should be enough for now, but if it's not, you can use the
-@;@racket[parameter?] @racket[current-stack-size] to increase it.
 
-Our @ch-bp-tech{run-time system} also prints the value of @paren-x64-v2[rax] to the
-screen, instead of returning it via an exit code, and does the work of
-converting numbers to ASCII strings.
+This new @ch-bp-tech{run-time system} also prints the value of
+@paren-x64-v2[rax] to the standard output port , instead of returning it via an
+exit code, and does the work of converting numbers to ASCII strings.
 The @racket[execute] function uses @racket[nasm-run/read] to parse printed
 output into a Racket datum.
 If you're interested in how this is done, you can read the definition of
 @racket[wrap-x64-run-time].
 
-We assume that this @ch-bp-tech{run-time system} is used until we introduce data types, which
-require additional run-time support.
+For the rest of the book, we assume that this @ch-bp-tech{run-time system} is
+used until we introduce data types, which require additional support from the
+@ch-bp-tech{run-time system}.
 }
+
+@section{Redesigning the Compiler}
 
 @nested[#:style 'inset
 @defproc[(generate-x64 (p paren-x64-v2?))
