@@ -81,7 +81,7 @@ L9 -> L11 [label = "interp-paren-x64"];
 }
 ]
 
-@title[#:tag "top" #:tag-prefix "chp2:"]{Abstract Locations}
+@title[#:tag "top" #:tag-prefix "chp2:"]{Abstract Locations (v2)}
 
 @section{Preface: What's wrong with our language?}
 In the last chapter, we designed our first language, @ch-bp-tech{Paren-x64 v1}, and
@@ -117,7 +117,7 @@ We also need to design a new language, and some translations, that enable
 instructions to work over @tech{abstract locations}, even though @ch1-tech{x64}
 restricts what kinds of @tech{physical locations} instructions can use.
 
-@section{Designing a Source language}
+@section{Abstracting Physical Locations in the Source Language}
 When designing a new abstraction, I often start by reading and writing some
 programs using an existing abstraction until I spot a pattern I dislike.
 
@@ -287,7 +287,7 @@ Particularly to the source language.
 Could avoid some by introducing a locals form.
 }
 
-@section{Accessing Memory: Displcement Mode Operands x64}
+@section{Accessing Memory in x64: Displcement Mode Operands}
 Abstracting away from registers introduces a problem.
 We cannot necessarily compile a program with @tech{abstract locations} into one with registers.
 Consider the following @tech{Asm-lang v2} program, which has 17 @tech{abstract locations}:
@@ -388,7 +388,7 @@ mov rbx, QWORD [rbp - 0]
 add rax, rbx
 }
 
-@section{The Stack}
+@section{Run-time Support for Accessing Memory: The Stack}
 Now that we know how to address memory, the next problem is where does the
 memory come from: where do we get that initial base pointer, and how do we know
 how far we're allowed to address?
@@ -418,7 +418,7 @@ Since everything above @tt{rsp} is in use, and we're at the end of the virtual
 address space, we can do pointer arthimatic backwards to find indefinite
 amounts of free space (assuming infinite memory).
 
-@section{Redesigning the Target Language(s)}
+@section{Exposing Memory Access in Intermediate Languages}
 To provide access to the stack in our intermediate languages, we need two
 things.
 First, we need to redesign all intermediate langauges with direct access to
@@ -509,7 +509,7 @@ used until we introduce data types, which require additional support from the
 @ch-bp-tech{run-time system}.
 }
 
-@section{Redesigning the Compiler}
+@section{Translating Abstract Locations into Physical Locations}
 
 @nested[#:style 'inset
 @defproc[(generate-x64 (p paren-x64-v2?))
