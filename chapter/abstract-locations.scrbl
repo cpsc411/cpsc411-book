@@ -408,7 +408,7 @@ We can visualize the initial process stack as in @Figure-ref{fig:sysv-stack}.
 
 The stack starts at the end of the virtual address space, and everything
 @emph{below} @tt{rsp} is free space.
-The above the stack pointer, @ie, "on the stack", are few values passed by the
+Above the stack pointer, @ie "on the stack", are values passed by the
 operating system: the command line arguments.
 @tt{[rsp + 0]} contains the argument count (@tt{argc}) of arguments passed to the
 process, with each stack slot above it containing a pointer to an argument.
@@ -426,12 +426,13 @@ First, we need to redesign all intermediate langauges with direct access to
 to the stack.
 We may want to add additional constraints on how the stack pointer is used, to
 simplify compilation or interpretation of our intermediate languages.
-Second, we need a @ch-bp-tech{run-time system} to provide access to the
+Second, we need the @ch-bp-tech{run-time system} to provide access to the
 initial stack pointer.
 We could use @tt{rsp} directly, but we might choose to use it differently.
 
 We start with the desgin for a new target language, @deftech{Paren-x64 v2}
-(@racket[paren-x64-v2]), whose grammar is typeset below.
+(@racket[paren-x64-v2]), whose grammar is typeset below, displaying differnces
+compared to @ch-bp-tech{Paren-x64 v1}.
 
 @bettergrammar*-ndiff[
 #:labels ("Diff vs Paren-x64 v1" "Paren-x64 v2" "Paren-x64 v1")
