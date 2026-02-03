@@ -80,8 +80,9 @@ You should use @racket[parameterize] and @racket[current-assignable-registers]
 to test spilling.
 
 When debugging your register allocator, you might try comparing your allocator
-to the graph colouring algorithm provided by @other-doc['(lib
-"graph/scribblings/graph.scrbl")].
+to the graph colouring algorithm provided by
+@hyperlink["https://docs.racket-lang.org/graph/index.html"]{Racket Generic Graph Library}.
+@;other-doc['(lib "graph/scribblings/graph.scrbl")].
 This provides an implementation of graph colouring, although it does not perform
 spilling so it will not work in general.
 You cannot use this library in the implementation of your compiler; it may only
