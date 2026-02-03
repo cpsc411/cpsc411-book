@@ -15,7 +15,7 @@
                "draw-lib"
                "pict-lib"))
 (define build-deps
-  '("graph-doc"
+  '(;"graph-doc"
     "rackunit-doc"
     "rackunit-lib"
     "scribble-doc"
