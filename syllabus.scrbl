@@ -593,10 +593,10 @@ No other code should be shared between individuals or teams.
 
 @section{Copying and Plagiarism Policy}
 Please read the departmental policy on Plagiarism and Collaboration
-@hyperlink["http://www.cs.ubc.ca/about/policies/collaboration.shtml" "here"].
+@hyperlink["https://www.cs.ubc.ca/about/policies/collaboration.shtml" "here"].
 
 You might find it interesting to read Dr. Tamara Munzner's
-@hyperlink["http://www.cs.ubc.ca/~tmm/courses/cheat.html" "Cheating: The List Of
+@hyperlink["https://www.cs.ubc.ca/~tmm/courses/cheat.html" "Cheating: The List Of
 Things I Never Want To Hear Again."]
 
 Plagiarism means passing of someone else's work as your own.
