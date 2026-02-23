@@ -897,7 +897,7 @@ For example, we can express the following rewrites:
                [reg (make-variable-id 'reg)]
                [opand_1 (make-variable-id 'opand_1)])
     @racketblock0[(begin (set! reg opand_1)
-                         (< reg ,(max-int 64)))])
+                         (<= reg ,(max-int 64)))])
   "⇒"
   (let-syntax ([set! datum-literal-transformer]
                [begin datum-literal-transformer]
