@@ -51,29 +51,67 @@
     (a6 . ,(+weeks (moment 2019 1 12 23 59 59) 6))))
 
 (define important-dates
-  ;; List of date x note
-  `((,(-days (hash-ref deadline-dict 'milestone-1) 4) . "Weekly Readings: Chp 1 and 2 (4.1 and 4.2)")
-    (,(-days (hash-ref deadline-dict 'milestone-2) 4) . "Weekly Readings: Chp 3 and 4 (4.3 and 4.4)")
-    (,(-days (hash-ref deadline-dict 'milestone-3) 4) . "Weekly Readings: Chp 5 (4.5)")
-    (,(-days (hash-ref deadline-dict 'milestone-4) 4)  . "Weekly Readings: Chp 6 (4.6)")
-    (,(-days (hash-ref deadline-dict 'milestone-5) 4)  . "Weekly Readings: Chp 7 (4.7)")
-    (,(-days (hash-ref deadline-dict 'milestone-6) 4)  . "Weekly Readings: Chp 8 (4.8)")
-    (,(-days (hash-ref deadline-dict 'milestone-7) 4)  . "Weekly Readings: Chp 9 (4.9)")
-    (,(-days (hash-ref deadline-dict 'milestone-8) 4)  . "Weekly Readings: Chp 10 (4.10)")
-    (,(-days (hash-ref deadline-dict 'milestone-9) 4)  . "Weekly Readings: Chp 11 (4.11)")
-    (,(-days (hash-ref deadline-dict 'milestone-10) 4)  . "Weekly Readings: Chp 12 and 14 (4.12, 4.14)")
+  ;; Event x List of date x note
+  `(("" ,(-days (hash-ref deadline-dict 'milestone-1) 4) . "Weekly Readings: Chp 1 and 2 (4.1 and 4.2)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-2) 4) . "Weekly Readings: Chp 3 and 4 (4.3 and 4.4)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-3) 4) . "Weekly Readings: Chp 5 (4.5)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-4) 4)  . "Weekly Readings: Chp 6 (4.6)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-5) 4)  . "Weekly Readings: Chp 7 (4.7)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-6) 4)  . "Weekly Readings: Chp 8 (4.8)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-7) 4)  . "Weekly Readings: Chp 9 (4.9)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-8) 4)  . "Weekly Readings: Chp 10 (4.10)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-9) 4)  . "Weekly Readings: Chp 11 (4.11)")
+    ("" ,(-days (hash-ref deadline-dict 'milestone-10) 4)  . "Weekly Readings: Chp 12 and 14 (4.12, 4.14)")
     #;(,(-days (hash-ref deadline-dict 'a11) 4)  . "Weekly Readings: Chp 13 (4.13)")
     #;(,(moment 2021 2 22) . "Weekly Readings: Chp 7 (4.7)")
     #;(,(moment 2022 2 28) . ,(emph "Midterm! (maybe)"))
 
-    (,(moment 2026 1 5) . "First Day of Lecture")
+    ("" ,(moment 2026 1 5) . "First Day of Lecture")
     #;(,(moment 2023 1 17) . "No lecture; out at POPL")
     #;(,(moment 2023 1 19) . "No lecture; out at POPL")
-    (,(moment 2026 1 16) . "Last day to withdraw, without W")
-    (,(moment 2026 3 6) . "Last day to withdraw, with W")
-    (,(moment 2026 2 16) . "Start of Midterm Break")
-    (,(moment 2026 2 20) . "End of Midterm Break")
-    (,(moment 2026 4 10) . "Last Day of Lecture")
-    (,(moment 2026 4 14) . "Start of exam week")
-    (,(moment 2026 4 25) . "End of exam week")
+    ("" ,(moment 2026 1 16) . "Last day to withdraw, without W")
+    ("",(moment 2026 3 6) . "Last day to withdraw, with W")
+    ("" ,(moment 2026 2 16) . "Start of Midterm Break")
+    ("" ,(moment 2026 2 20) . "End of Midterm Break")
+    ("" ,(moment 2026 4 10) . "Last Day of Lecture")
+    ("" ,(moment 2026 4 14) . "Start of exam week")
+    ("" ,(moment 2026 4 25) . "End of exam week")
+    ))
+
+(define (lecture+1 d)
+  (cond
+    [(thursday? d)
+     (+days d 5)]
+    [(tuesday? d)
+     (+days d 2)]
+    [else (error "expected a Tuesday/Thursday lecture schedule" d)]))
+
+(define (lecture+ d n)
+  (for/fold ([d d])
+            ([_ (in-range 0 n)])
+    (lecture+1 d)))
+
+;(define lecture-1-date (moment 2026 1 6))
+;(define lectures
+;  ;; date x topic
+;  `((,lecture-1-date . "Intro to CPSC 411 and Compilers")))
+
+(define lecture-13-date (moment 2026 2 24))
+(define lecture-start 13)
+(define lectures
+  ;; date x topic
+  `((,lecture-13-date . "Tail Calls")
+    (,(lecture+1 lecture-13-date) . "Tail Calls (Cont.)")
+    (,(lecture+ lecture-13-date 2) . "Return and Non-Tail Calls")
+    (,(lecture+ lecture-13-date 3) . "Return and Non-Tail Calls (Cont.)")
+    (,(lecture+ lecture-13-date 4) . "Inlining")
+    (,(lecture+ lecture-13-date 5) . "Inlining (Cont.)")
+    (,(lecture+ lecture-13-date 6) . "Tagged Immediate Data")
+    (,(lecture+ lecture-13-date 7) . "Tagged Immediate Data (Cont.)")
+    (,(lecture+ lecture-13-date 8) . "Structured Data and Heap Allocation")
+    (,(lecture+ lecture-13-date 9) . "Structured Data and Heap Allocation (Cont.)")
+    (,(lecture+ lecture-13-date 10) . "Parsing")
+    (,(lecture+ lecture-13-date 11) . "Closures")
+    (,(lecture+ lecture-13-date 12) . "Macro systems")
+    (,(lecture+ lecture-13-date 13) . "Performance Comparison and Wrap up")
     ))

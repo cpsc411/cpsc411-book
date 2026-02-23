@@ -53,3 +53,13 @@ blockquote.boxed {
   margin-bottom: 1em;
   margin-top: 0;
 }
+
+.boxed tr:nth-child(odd) {
+  background-color: white;
+}
+
+/*
+.boxed tr:nth-child(odd) > td {
+  align: left;
+}
+*/

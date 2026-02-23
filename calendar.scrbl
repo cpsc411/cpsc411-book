@@ -10,17 +10,21 @@ This calendar is subject to change.
 
 @tabular[
   #:style 'boxed
-  #:column-properties '(left right)
+  #:column-properties '(left left left)
   #:row-properties '(bottom-border ())
-  `(,(list @bold{Date} @bold{Note})
+  `(,(list @bold{Lecture} @bold{Date} @bold{Note})
     ,@(for/list ([als (sort
                        (append
+                        ; convert lectures-dict into important dates
+                        (for/list ([l lectures]
+                                   [i (in-naturals lecture-start)])
+                          (cons (format "~a" i) l))
                         important-dates
                         ; convert deadline-dict into important dates
                         (for/list ([(k v) deadline-dict])
-                          (cons v (format "~a due" k))))
+                          (cons "" (cons v (format "~a due" k)))))
                      moment<?
-                     #:key car)])
+                     #:key cadr)])
       ; render dates
-      (list (~t (car als) "E, MMM d") (cdr als))))]
+      (list (car als) (~t (cadr als) "E, MMM d") (cddr als))))]
 @;margin-note{a11 does not not actually exist. I've left it in the calendar for technical reasons.}
