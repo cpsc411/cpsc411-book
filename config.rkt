@@ -101,7 +101,7 @@
 (define lectures
   ;; date x topic
   `((,lecture-13-date . "Tail Calls")
-    (,(lecture+1 lecture-13-date) . "Tail Calls (Cont.)")
+    (,(lecture+1 lecture-13-date) . "Tail Calls (Cont.); Lexical vs Global Scope")
     (,(lecture+ lecture-13-date 2) . "Return and Non-Tail Calls")
     (,(lecture+ lecture-13-date 3) . "Return and Non-Tail Calls (Cont.)")
     (,(lecture+ lecture-13-date 4) . "Inlining")
