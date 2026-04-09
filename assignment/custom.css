@@ -54,7 +54,10 @@ blockquote.boxed {
   margin-top: 0;
 }
 
-.boxed tr:nth-child(odd) {
+/* tables but not documentation tables
+ * should really just mark the course calendar separately
+ */
+.boxed:not(.RBoxed) tr:nth-child(odd) {
   background-color: white;
 }
 
