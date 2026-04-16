@@ -447,6 +447,7 @@ to be excused.
 @subsection{Project Evaluation}
 The project, the compiler you write through this course, will be divided into
 approximately 10 milestone.
+Each milestone implements a new feature set to the compiler.
 At the end of the semester, your entire compiler will be thoroughly tested and
 hand-graded for design elements.
 This will constitute the entire project grade.
@@ -457,23 +458,24 @@ answer is "nothing"), and a declaration of how your group collaborated.
 Missing this deadline without a reason will result in a 10% loss in your final
 project score, under the assumption you did not contribute to that milestone.
 
-You are required to complete the first 8 milestones to pass the course project,
-but you may choose to stop any time after completing milestone 8.
-Your maximum grade on the project will be 10% for each milestone you choose to
-complete; however, you will receive a bonus 5% on your project grade if your
-milestone is perfect according to our rubric---it passes all of our tests
-(including private tests), and the code is well designed.
+The final project submission must implement the features sets included in the
+first 8 milestones to pass the course project, but you may choose to stop any
+time after implementing feature sets in milestone 8.
+Your maximum grade on the project will be 10% for each milestone's feature set
+you choose to complete; however, you will receive a bonus 5% on your project
+grade if your milestone is perfect according to our rubric---it passes all of
+our tests (including private tests), and the code is well designed.
 The final 5% is all or nothing.
-This means if you complete milestone 8 perfectly, you will receive an 85% on the
-project; if you complete milestone 8 almost perfectly, you get approximately
-80%.
+This means if your submission includes up to milestone 8 perfectly, you will
+receive an 85% on the project; if your submission includes up to milestone 8
+and is almost perfect, you get approximately 80%.
 If you complete milestone 9 perfectly, you will receive 95% on the project, but
 90% or less for an imperfect milestone 9.
 If you complete milestone 10 perfectly, you will receive 105% on the project, but
 100% or less for an imperfect milestone 10.
 
-By the end of the course, you must declare which milestone you intend to be your
-final milestone.
+By the end of the course, you must declare which milestone's feature set you
+intend to be your final milestone.
 You do not have to declare this to the instructors before the end of the
 semester, but you and your group will need to agree beforehand.
 This should be clearly communicated in the README in the main branch of your
