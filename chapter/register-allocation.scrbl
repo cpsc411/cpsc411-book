@@ -625,7 +625,7 @@ fastest way to pick a @tech{low-degree} node.
 Note that @ch2-tech{abstract locations} are removed from the conflict graph, so
 we must re-sort or otherwise calculate @tech{low-degree} on each iteration.
 }
-@item{Recur with the chosen @ch2-tech{abstract location} removed from the input set and
+@item{Recur with the chosen @ch2-tech{abstract location} removed from both the input set and
 the conflict graph.
 The recursive call should return an assignment for all the remaining @|variables|.}
 @item{Attempt to select a register for the chosen @|variable|.
