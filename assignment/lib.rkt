@@ -13,6 +13,7 @@
  scribble/example
  scribble/core
  scribble/html-properties
+ scribble/latex-properties
  scribble/decode
  scribble/bettergrammar
  (rename-in scribble/bettergrammar [bettergrammar* racketgrammar*])
@@ -34,6 +35,11 @@
   "../config.rkt"))
 
 (define-runtime-path custom-css "custom.css")
+(define-runtime-path lib-preamble-path "lib-preamble.tex")
+
+(define refcolumn-inline-style
+  (make-style "refcolumn-inline" (list (make-attributes '((class . "refcolumn")))
+                                       (tex-addition lib-preamble-path))))
 
 (define (load-custom-css)
   (elem #:style (make-style "" (list (make-css-addition custom-css)))))
@@ -43,7 +49,7 @@
    (make-style "refpara" '(command never-indents))
    (list
     (make-nested-flow
-     (make-style "refcolumn refcolumn-inline" (list #;(make-css-addition "custom.css")))
+     refcolumn-inline-style
      (list
       (make-nested-flow
        (make-style "refcontent" null)
@@ -90,10 +96,10 @@
 
 (define (Chref n x) (Secref #:tag-prefixes `("book:" ,(format "chp~a:" n)) x))
 
-(define-syntax-rule (typeset-passlist id ...)
-  (itemlist
-   (item (racket id))
-   ...))
+(define-syntax typeset-passlist
+  (syntax-rules ()
+    [(_ ) (list)]
+    [(_ id ...) (itemlist (item (racket id)) ...)]))
 
 (define-syntax (deflangs stx)
   (syntax-case stx ()
@@ -127,7 +133,7 @@
                        x))]
            #:optional [opt? #f]
            . rest)
-    (nested #:style "boxed"
+    (nested #:style 'boxed
             @bold{Exercise @~a[number]@(if opt? " (optional)" ""): }
             rest)))
 
@@ -137,7 +143,7 @@
   (lambda rest
     (define count (unbox ccounter))
     (set-box! ccounter (add1 count))
-    (nested #:style "boxed"
+    (nested #:style 'boxed
             @bold{Challenge @~a[count]: }
             rest)))
 
@@ -215,20 +221,16 @@
   (define name.exe (string-replace name ".s" ".exe"))
 
   (list
-   ; TODO: Needs an abstraction. Maybe use pygments package?
    (nested #:style 'code-inset
-           (paragraph (style #f (list (alt-tag "pre"))) str))
+           (verbatim str))
 
    (nested #:style 'code-inset
-           (paragraph (style #f (list (alt-tag "pre")))
-                      (list
-                       (nasm-call type name name.o)
-                       "\n"
-                       (ld-call type name.o name.exe)
-                       "\n"
-                       @~a{> ./@|name.exe|}
-                       "\n"
-                       (displayer result-actual))))))
+           (verbatim
+            (string-append
+             (nasm-call type name name.o) "\n"
+             (ld-call type name.o name.exe) "\n"
+             @~a{> ./@|name.exe|} "\n"
+             (displayer result-actual))))))
 
 ;;@todo{Better abstraction for type setting nasm examples}
 

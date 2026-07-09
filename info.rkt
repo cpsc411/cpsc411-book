@@ -6,7 +6,7 @@
                "gregor-lib"
                "memoize-lib"
                "racket-graphviz"
-               ("scribble-bettergrammar-lib" #:version "1.6.4")
+               ("scribble-bettergrammar-lib" #:version "1.7")
                "scribble-lib"
                "web-server-lib"
                "with-cache"
@@ -29,7 +29,7 @@
     ; must be installed manually
     ;"https://github.com/cpsc411/cpsc411-priv.git?path=cpsc411-reference-lib#2025w2"
     "racket-graphviz"
-    ("scribble-bettergrammar-lib" #:version "1.6.4")))
+    ("scribble-bettergrammar-lib" #:version "1.7")))
 (define scribblings '(("index.scrbl" (multi-page no-search))))
 (define test-omit-paths (list "serve.rkt"))
 (define pkg-desc "The CPSC411 Book, which includes lecture notes and assignments.")

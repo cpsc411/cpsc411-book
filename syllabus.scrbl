@@ -1,8 +1,13 @@
 #lang scribble/manual
 @(require
   scribble/core
+  scribble/latex-properties
   "config.rkt"
   "assignment/lib.rkt")
+@(elem #:style (make-style #f (list (tex-addition #"\
+\\usepackage{tipa}\n\
+\\DeclareUnicodeCharacter{0259}{\\textschwa}\n\
+\\DeclareUnicodeCharacter{0313}{\\textsuperscript{'}}\n"))))
 
 @; TODO tag this properly
 @title{Syllabus}
@@ -512,7 +517,7 @@ you should be able to explain alternatives and their relative benefits, as well
 as justify the often subjective value judgements that are inherent in choosing
 one solution over another.
 
-@subsection[#:tag "grading-design"]{@elem[#:style (style "red" (list (color-property "red")))]{Important}: We will grade you on design}
+@subsection[#:tag "grading-design"]{@elem[#:style (style #f (list (color-property "red")))]{Important}: We will grade you on design}
 In each milestone description, we use the word @emph{design} to remind you that you should
 not merely write code, but @emph{design} it.
 You should @emph{design} your code, a la the design recipe, for every

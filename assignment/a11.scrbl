@@ -69,7 +69,7 @@ You will earn up to 100% of marks back on tests.
 @;For example, below is an example of a report for a11 in which I correct several
 @;mistakes in a6 and a7:
 @;
-@;@(nested #:style "boxed"
+@;@(nested #:style 'boxed
 @;@verbatim{
 @;# Assignment 6
 @;## Exercise 1
