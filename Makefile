@@ -13,7 +13,13 @@ all: help
 	raco pkg install --skip-installed --batch --auto
 	touch $@
 
-build: build/index.html
+build: build/index.html build/book.pdf
+
+compiled/readings_scrbl.zo: .racodeps assignment/* appendix/*.scrbl chapter/*.scrbl *.scrbl Makefile config.rkt
+	raco make readings.scrbl
+
+build/book.pdf: compiled/readings_scrbl.zo
+	scribble --dest build --dest-name book --pdf --redirect-main https://docs.racket-lang.org/ +m readings.scrbl
 
 #build/cpsc411.sxref:
 #	mkdir -p build
